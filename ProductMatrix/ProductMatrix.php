@@ -35,7 +35,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 			array( 'CreateTableSQL', array( plugin_table( 'version' ), "
 				id			I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
 				parent_id	I		NOTNULL UNSIGNED DEFAULT '0',
-				name		C(128)	NOTNULL DEFAULT \" '' \",
+				name		C(128)	NOTNULL DEFAULT \" '' \"
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'status' ), "
 				bug_id		I		NOTNULL UNSIGNED PRIMARY,
