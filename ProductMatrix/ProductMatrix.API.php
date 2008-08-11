@@ -40,6 +40,14 @@ class PVMProduct {
 				'WHERE id=' . db_param();
 			db_query_bound( $t_query, array( $this->name, $this->id ) );
 		}
+
+		foreach( $this->versions as $t_version ) {
+			if ( 0 == $t_version->product_id ) {
+				$t_version->product_id = $this->id;
+			}
+
+			$t_version->save();
+		}
 	}
 
 	function load_versions() {
@@ -73,7 +81,7 @@ class PVMProduct {
 	}
 
 	static function delete( $p_id ) {
-		# TODO: Delete versions for product
+		PVMVersion::delete_by_product( $p_id );
 
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
 
@@ -154,6 +162,13 @@ class PVMVersion {
 
 		$t_query = "DELETE FROM $t_version_table WHERE id=" . db_param();
 		db_query_bound( $t_query, array( $p_id ) );
+	}
+
+	static function delete_by_product( $p_product_id ) {
+		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
+
+		$t_query = "DELETE FROM $t_version_table WHERE product_id=" . db_param();
+		db_query_bound( $t_query, array( $p_product_id ) );
 	}
 }
 
