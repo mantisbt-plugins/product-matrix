@@ -13,8 +13,8 @@
 
 class ProductMatrixPlugin extends MantisPlugin {
 	function register() {
-		$this->name = 'Product Version Matrix';
-		$this->description = 'Product Version Matrix';
+		$this->name = plugin_lang_get( 'title' );
+		$this->description = plugin_lang_get( 'description' );
 
 		$this->version = '0.1';
 		$this->requires = array(
@@ -26,6 +26,26 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$this->url = 'http://leetcode.net';
 	}
 
+	function hooks() {
+		return array(
+			'EVENT_VIEW_BUG_DETAILS'	=> 'view_bug',
+			'EVENT_UPDATE_BUG_FORM'		=> 'update_bug_form',
+			'EVENT_UPDATE_BUG'			=> 'update_bug',
+		);
+	}
+
+	function view_bug( $p_event, $p_bug_id ) {
+		var_dump( $p_bug_id );
+	}
+
+	function update_bug_form( $p_event, $p_bug_id ) {
+		var_dump( $p_bug_id );
+	}
+
+	function update_bug( $p_event, $p_bug ) {
+		var_dump( $p_bug );
+	}
+
 	function schema() {
 		return array(
 			array( 'CreateTableSQL', array( plugin_table( 'product' ), "
@@ -34,12 +54,11 @@ class ProductMatrixPlugin extends MantisPlugin {
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'version' ), "
 				id			I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-				parent_id	I		NOTNULL UNSIGNED DEFAULT '0',
+				product_id	I		NOTNULL UNSIGNED DEFAULT '0',
 				name		C(128)	NOTNULL DEFAULT \" '' \"
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'status' ), "
 				bug_id		I		NOTNULL UNSIGNED PRIMARY,
-				product_id	I		NOTNULL UNSIGNED PRIMARY,
 				version_id	I		NOTNULL UNSIGNED PRIMARY,
 				status		I		NOTNULL UNSIGNED
 				" ) ),
