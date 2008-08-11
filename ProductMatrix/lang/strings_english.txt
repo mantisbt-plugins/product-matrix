@@ -14,3 +14,32 @@
 $s_plugin_ProductMatrix_ = '';
 $s_plugin_ProductMatrix_title = 'Product Version Matrix';
 $s_plugin_ProductMatrix_description = '';
+
+# Core strings updated to new meanings
+$s_actiongroup_menu_update_target_version = 'Update Target Milestone';
+$s_actiongroup_menu_update_fixed_in_version = 'Update Fixed in Milestone';
+$s_copy_versions_from = 'Copy Milestones From';
+$s_copy_versions_to = 'Copy Milestones To';
+$s_fixed_in_version_bugs_conf_msg = 'Update Fixed in Milestone to';
+$s_target_version_bugs_conf_msg = 'Update Target Milestone to';
+$s_fixed_in_version_group_bugs_button = 'Update Fixed in Milestone';
+$s_target_version_group_bugs_button = 'Update Target Milestone';
+$MANTIS_ERROR[ERROR_VERSION_DUPLICATE] = 'A version with that name already exists.';
+$MANTIS_ERROR[ERROR_VERSION_NOT_FOUND] = 'Milestone \'%s\' not found.';
+$s_email_fixed_in_version = 'Fixed in Milestone';
+$s_email_target_version = 'Target Milestone';
+$s_fixed_in_version = 'Fixed in Milestone';
+$s_target_version = 'Target Milestone';
+$s_categories_and_version_title = 'Categories and Milestones';
+$s_versions = 'Milestones';
+$s_add_version_button = 'Add Milestone';
+$s_add_and_edit_version_button = 'Add and Edit Milestone';
+$s_version = 'Milestone';
+$s_version_added_msg = 'Milestone has been successfully added...';
+$s_version_deleted_msg = 'Milestone has been successfully deleted...';
+$s_version_delete_sure = 'Are you sure you want to delete this version?';
+$s_delete_version_button = 'Delete Milestone';
+$s_edit_project_version_title = 'Edit Project Milestone';
+$s_update_version_button = 'Update Milestone';
+$s_version_updated_msg = 'Milestone has been successfully updated...';
+
