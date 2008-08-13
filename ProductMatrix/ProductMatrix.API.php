@@ -80,6 +80,27 @@ class PVMProduct {
 		return $t_product;
 	}
 
+	static function load_all( $p_load_versions=false ) {
+		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
+
+		$t_query = "SELECT * FROM $t_product_table";
+		$t_result = db_query_bound( $t_query );
+
+		$t_products = array();
+		while( $t_row = db_fetch_array( $t_result ) ) {
+			$t_product = new PVMProduct( $t_row['name'] );
+			$t_product->id = $t_row['id'];
+
+			if ( $p_load_versions ) {
+				$t_product->load_versions();
+			}
+
+			$t_products[ $t_product->id ] = $t_product;
+		}
+
+		return $t_products;
+	}
+
 	static function load_by_version_ids( $p_version_ids, $p_load_all_versions=false ) {
 		if ( !is_array( $p_version_ids ) ) {
 			if ( !is_numeric( $p_version_ids ) && is_blank( $p_version_ids ) ) {
