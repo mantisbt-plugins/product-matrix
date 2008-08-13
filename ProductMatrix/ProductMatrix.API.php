@@ -219,23 +219,22 @@ class PVMVersion {
 class ProductMatrix {
 	var $bug_id;
 	var $matrix = array();
+	var $products = array();
 
 	function __construct( $p_bug_id ) {
-		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
-		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
+		$this->bug_id = $p_bug_id;
+
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
-		$t_query = "SELECT *, v.name AS vname, p.name AS pname
-			FROM $t_status_table AS s
-			JOIN $t_version_table AS v ON v.id=s.version_id
-			JOIN $t_product_table AS p ON p.id=v.product_id
-			WHERE s.bug_id=" . db_param();
-
+		$t_query = "SELECT * FROM $t_status_table WHERE bug_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
 
 		while( $t_row = db_fetch_array( $t_result ) ) {
-			var_dump( $t_row );
+			$this->matrix[ $t_row['version_id'] ] = $t_row['status'];
 		}
+
+		$t_version_ids = array_keys( $this->matrix );
+		$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
 	}
 }
 
