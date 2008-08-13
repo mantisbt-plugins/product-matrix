@@ -143,7 +143,7 @@ class PVMVersion {
 	static function load_by_product( $p_product_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
-		$t_query = "SELECT * FROM $t_version_table WHERE product_id=" . db_param();
+		$t_query = "SELECT * FROM $t_version_table WHERE product_id=" . db_param() . ' ORDER BY name ASC';
 		$t_result = db_query_bound( $t_query, array( $p_product_id ) );
 
 		$t_versions = array();
@@ -151,7 +151,7 @@ class PVMVersion {
 			$t_version = new PVMVersion( $t_row['product_id'], $t_row['name'] );
 			$t_version->id = $t_row['id'];
 
-			$t_versions[] = $t_version;
+			$t_versions[$t_version->id] = $t_version;
 		}
 
 		return $t_versions;
