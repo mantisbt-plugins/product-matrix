@@ -74,7 +74,7 @@ class PVMProduct {
 		$t_product->id = $t_row['id'];
 
 		if ( $p_load_versions ) {
-			$this->load_versions();
+			$t_product->load_versions();
 		}
 
 		return $t_product;
