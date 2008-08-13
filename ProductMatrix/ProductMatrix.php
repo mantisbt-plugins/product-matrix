@@ -28,10 +28,15 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 	function hooks() {
 		return array(
+			'EVENT_PLUGIN_INIT'			=> 'init',
 			'EVENT_VIEW_BUG_DETAILS'	=> 'view_bug',
 			'EVENT_UPDATE_BUG_FORM'		=> 'update_bug_form',
 			'EVENT_UPDATE_BUG'			=> 'update_bug',
 		);
+	}
+
+	function init() {
+		require_once( 'ProductMatrix.API.php' );
 	}
 
 	function view_bug( $p_event, $p_bug_id ) {
