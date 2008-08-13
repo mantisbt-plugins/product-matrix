@@ -80,6 +80,50 @@ class PVMProduct {
 		return $t_product;
 	}
 
+	static function load_by_version_ids( $p_version_ids, $p_load_all_versions=false ) {
+		if ( !is_array( $p_version_ids ) ) {
+			if ( !is_numeric( $p_version_ids ) && is_blank( $p_version_ids ) ) {
+				return null;
+			}
+
+			$p_version_ids = array( $p_version_ids );
+		} else {
+			if ( count( $p_version_ids ) < 1 ) {
+				return null;
+			}
+		}
+
+		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
+
+		$t_version_list = join( ',', $p_version_ids );
+
+		$t_query = "SELECT * FROM $t_product_table WHERE id IN ( " . db_param() . ' ) ORDER BY name ASC';
+		$t_result = db_query_bound( $t_query, $t_version_list );
+
+		$t_products = array();
+		while( $t_row = db_fetch_array( $t_result ) ) {
+			$t_product = new PVMProduct( $t_row['name'] );
+			$t_product->id = $t_row['id'];
+
+			# TODO: Replace this with code to only load the necessary version objects in a single query,
+			# rather than loading them in one query per-product and them deleting unneeded ones later.
+			$t_product->load_versions();
+
+			if ( !$p_load_all_versions ) {
+				$t_product_version_ids = array_keys( $t_product->versions );
+				foreach( $t_product_version_ids as $t_version_id ) {
+					if ( !in_array( $t_version_id, $p_version_ids ) ) {
+						unset( $t_product->versions[ $t_version_id ] );
+					}
+				}
+			}
+
+			$t_products[$t_product->id] = $t_product;
+		}
+
+		return $t_products;
+	}
+
 	static function delete( $p_id ) {
 		PVMVersion::delete_by_product( $p_id );
 
