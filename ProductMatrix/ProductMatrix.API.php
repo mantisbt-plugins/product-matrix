@@ -239,11 +239,14 @@ class PVMVersion {
 
 class ProductMatrix {
 	var $bug_id;
-	var $matrix = array();
-	var $products = array();
+	var $matrix;
+	var $__matrix;
+	var $products;
 
-	function __construct( $p_bug_id ) {
+	function __construct( $p_bug_id, $p_load_products=true ) {
 		$this->bug_id = $p_bug_id;
+		$this->__matrix = array();
+		$this->matrix = array();
 
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
@@ -252,10 +255,42 @@ class ProductMatrix {
 
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$this->matrix[ $t_row['version_id'] ] = $t_row['status'];
+			$this->__matrix[ $t_row['version_id'] ] = $t_row['status'];
 		}
 
-		$t_version_ids = array_keys( $this->matrix );
-		$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
+		if ( $p_load_products ) {
+			$t_version_ids = array_keys( $this->matrix );
+			$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
+		}
+	}
+
+	function save() {
+		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
+
+		foreach( $this->matrix as $t_version_id => $t_status ) {
+			if ( !isset( $this->__matrix[ $t_version_id ] ) ) { # new status
+				$t_query = "INSERT INTO $t_status_table ( bug_id, version_id, status )
+					VALUES ( " . join( ',', array( db_param(), db_param(), db_param() ) ) . ' )';
+				db_query_bound( $t_query, array( $this->bug_id, $t_version_id, $t_status ) );
+
+				$this->__matrix[ $t_version_id ] = $t_status;
+
+			} else if ( is_null( $t_status ) ) { # deleted status
+				$t_query = "DELETE FROM $t_status_table WHERE bug_id=" . db_param() . ' AND version_id=' . db_param();
+				db_query_bound( $t_query, array( $this->bug_id, $t_version_id ) );
+
+				unset( $this->matrix[ $t_version_id ] );
+				unset( $this->__matrix[ $t_version_id ] );
+
+			} else if ( $t_status != $this->__matrix[ $t_version_id ] ) { # updated status
+				$t_query = "UPDATE $t_status_table SET status=" . db_param() .
+					' WHERE bug_id=' . db_param() . ' AND version_id=' . db_param();
+				db_query_bound( $t_query, array( $t_status, $this->bug_id, $t_version_id ) );
+
+				$this->__matrix[ $t_version_id ] = $t_status;
+
+			}
+		}
 	}
 }
 
