@@ -11,7 +11,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-access_ensure_global_level( ADMINISTRATOR );
+access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 $f_product_name = gpc_get_string( 'product_name' );
 

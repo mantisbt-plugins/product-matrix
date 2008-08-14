@@ -36,6 +36,13 @@ class ProductMatrixPlugin extends MantisPlugin {
 		);
 	}
 
+	function config() {
+		return array(
+			'view_threshold' => VIEWER,
+			'manage_threshold' => MANAGER,
+		);
+	}
+
 	function hooks() {
 		return array(
 			'EVENT_MENU_MAIN'			=> 'menu',

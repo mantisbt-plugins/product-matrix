@@ -11,7 +11,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-$t_can_manage = access_has_global_level( ADMINISTRATOR );
+access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
+$t_can_manage = access_has_global_level( plugin_config_get( 'manage_threshold' ) );
 
 $f_product_id = gpc_get_int( 'id' );
 $t_product = PVMProduct::load( $f_product_id );
