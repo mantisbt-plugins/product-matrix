@@ -26,9 +26,18 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$this->url = 'http://leetcode.net';
 	}
 
+	function errors() {
+		return array(
+			'ProductNotFound' => 'The product was not found.',
+			'VersionNotFound' => 'The version was not found.',
+			'ProductNameEmpty' => 'The product\'s name must not be empty.',
+			'VersionNameEmpty' => 'The version\'s name must not be empty.',
+			'ProductIDNotSet' => 'The product has an invalid ID.',
+		);
+	}
+
 	function hooks() {
 		return array(
-			'EVENT_PLUGIN_INIT'			=> 'init',
 			'EVENT_MENU_MAIN'			=> 'menu',
 			'EVENT_VIEW_BUG_DETAILS'	=> 'view_bug',
 			'EVENT_UPDATE_BUG_FORM'		=> 'update_bug_form',

@@ -23,7 +23,7 @@ class PVMProduct {
 
 	function save() {
 		if ( is_blank( $this->name ) ) {
-			trigger_error( ERROR_GENERIC, ERROR );
+			plugin_error( 'ProductNameEmpty', ERROR );
 		}
 
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
@@ -37,7 +37,7 @@ class PVMProduct {
 
 		} else { #update
 			$t_query = "UPDATE $t_product_table SET name=" . db_param() .
-				'WHERE id=' . db_param();
+				' WHERE id=' . db_param();
 			db_query_bound( $t_query, array( $this->name, $this->id ) );
 		}
 
@@ -52,7 +52,7 @@ class PVMProduct {
 
 	function load_versions() {
 		if ( 0 == $this->id ) {
-			trigger_error( ERROR_GENERIC, ERROR );
+			plugin_error( 'ProductIDNotSet', ERROR );
 		}
 
 		$this->versions = PVMVersion::load_by_product( $this->id );
@@ -65,7 +65,7 @@ class PVMProduct {
 		$t_result = db_query_bound( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
-			trigger_error( ERROR_GENERIC, ERROR );
+			plugin_error( 'ProductNotFound', ERROR );
 		}
 
 		$t_row = db_fetch_array( $t_result );
@@ -168,7 +168,7 @@ class PVMVersion {
 
 	function save() {
 		if ( is_blank( $this->name ) ) {
-			trigger_error( ERROR_GENERIC, ERROR );
+			plugin_error( 'VersionNameEmpty', ERROR );
 		}
 
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
@@ -182,7 +182,7 @@ class PVMVersion {
 
 		} else { #update
 			$t_query = "UPDATE $t_version_table SET product_id=" . db_param() .
-				' name=' . db_param() . 'WHERE id=' . db_param();
+				', name=' . db_param() . ' WHERE id=' . db_param();
 			db_query_bound( $t_query, array( $this->product_id, $this->name, $this->id ) );
 		}
 	}
@@ -194,7 +194,7 @@ class PVMVersion {
 		$t_result = db_query_bound( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
-			trigger_error( ERROR_GENERIC, ERROR );
+			plugin_error( 'VersionNotFound', ERROR );
 		}
 
 		$t_row = db_fetch_array( $t_result );
