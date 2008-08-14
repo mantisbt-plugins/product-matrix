@@ -22,4 +22,3 @@ $t_product->save();
 
 print_successful_redirect( plugin_page( 'products', true ) );
 
-

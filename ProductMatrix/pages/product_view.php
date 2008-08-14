@@ -21,37 +21,52 @@ html_page_top2();
 ?>
 
 <br/>
-<table class="width50" align="center" cellspacing="0">
+<table class="width50" align="center" cellspacing="1">
 
 <tr>
-<td>Name</td>
-<td><?php echo $t_product->name ?></td>
+<td class="form-title" colspan="2">View Product: <?php echo $t_product->name ?></td>
+</tr>
+
+<tr class="row-category">
+<td>Version</td>
+<td>Actions</td>
 </tr>
 
 <?php foreach( $t_product->versions as $t_version ) { ?>
-<tr>
+<tr <?php echo helper_alternate_class() ?>>
 <td><?php echo $t_version->name ?></td>
+<td></td>
 </tr>
 <?php } ?>
+
+<tr>
+<td colspan="2">
+	<form method="post" action="<?php echo plugin_page( 'product_delete' ) ?>"/>
+	<input type="hidden" name="id" value="<?php echo $t_product->id ?>"/>
+	<input type="submit" value="Delete Product"/>
+	</form>
+</td>
+</tr>
 
 </table>
 
 <?php if ( $t_can_manage ) { ?>
 <br/>
 <form method="post" action="<?php echo plugin_page( 'version_create' ) ?>">
-<table class="width50" align="center" cellspacing="0">
+<table class="width50" align="center" cellspacing="1">
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
 
 <tr>
-<td>Name</td>
+<td class="form-title" colspan="2">Create Version</td>
 </tr>
 
-<tr>
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category">Name</td>
 <td><input name="version_name"/></td>
 </tr>
 
 <tr>
-<td><input type="submit"/></td>
+<td class="center" colspan="2"><input type="submit"/></td>
 </tr>
 
 </table>

@@ -20,15 +20,19 @@ html_page_top2();
 ?>
 
 <br/>
-<table class="width50" align="center" cellspacing="0">
+<table class="width50" align="center" cellspacing="1">
 
 <tr>
+<td class="form-title">Products</td>
+</tr>
+
+<tr class="row-category">
 <td>Name</td>
 <td>Actions</td>
 </tr>
 
 <?php foreach( $t_products as $t_product ) { ?>
-<tr>
+<tr <?php echo helper_alternate_class() ?>>
 <td><a href="<?php echo plugin_page( 'product_view' ), '&id=', $t_product->id ?>"><?php echo $t_product->name ?></a></td>
 <td></td>
 </tr>
@@ -39,18 +43,19 @@ html_page_top2();
 <?php if ( $t_can_manage ) { ?>
 <br/>
 <form method="post" action="<?php echo plugin_page( 'product_create' ) ?>">
-<table class="width50" align="center" cellspacing="0">
+<table class="width50" align="center" cellspacing="1">
 
 <tr>
-<td>Name</td>
+<td class="form-title" colspan="2">Create Product</td>
 </tr>
 
-<tr>
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category">Name</td>
 <td><input name="product_name"/></td>
 </tr>
 
 <tr>
-<td><input type="submit"/></td>
+<td class="center" colspan="2"><input type="submit"/></td>
 </tr>
 
 </table>
