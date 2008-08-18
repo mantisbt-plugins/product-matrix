@@ -115,10 +115,13 @@ class PVMProduct {
 		}
 
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
+		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
 		$t_version_list = join( ',', $p_version_ids );
 
-		$t_query = "SELECT * FROM $t_product_table WHERE id IN ( " . db_param() . ' ) ORDER BY name ASC';
+		$t_query = "SELECT * FROM $t_version_table WHERE id IN
+			( SELECT DISTINCT( product_id ) FROM $t_version_table WHERE id IN ( " . db_param() . ' ) )
+			ORDER BY name ASC';
 		$t_result = db_query_bound( $t_query, $t_version_list );
 
 		$t_products = array();
