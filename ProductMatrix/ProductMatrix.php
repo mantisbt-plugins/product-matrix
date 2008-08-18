@@ -45,6 +45,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 	function hooks() {
 		return array(
+			'EVENT_LAYOUT_RESOURCES'	=> 'css',
 			'EVENT_MENU_MAIN'			=> 'menu',
 			'EVENT_VIEW_BUG_DETAILS'	=> 'view_bug',
 			'EVENT_UPDATE_BUG_FORM'		=> 'update_bug_form',
@@ -54,6 +55,10 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 	function init() {
 		require_once( 'ProductMatrix.API.php' );
+	}
+
+	function css() {
+		return '<link rel="stylesheet" href="' . plugin_file( 'default.css' ) . '" type="text/css" />';
 	}
 
 	function menu() {
