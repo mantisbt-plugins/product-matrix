@@ -303,5 +303,59 @@ class ProductMatrix {
 			}
 		}
 	}
+
+	function view() {
+		if ( count( $this->status ) < 1 || count( $this->products ) < 1 ) {
+			return null;
+		}
+
+		$t_version_count = 0;
+		foreach( $this->products as $t_product ) {
+			$t_version_count = max( count( $t_product->versions ), $t_version_count );
+			$t_product->__versions = $t_product->versions;
+		}
+
+		echo '<tr ', helper_alternate_class(), '><td class="category">Product Status</td><td colspan="5">';
+
+		collapse_open( 'view', 'ProductMatrix' );
+
+		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
+		collapse_icon( 'view', 'ProductMatrix' );
+		echo '</td>';
+
+		foreach( $this->products as $t_product ) {
+			echo '<td colspan="2">', $t_product->name, '</td>';
+		}
+
+		echo '</tr>';
+
+		for( $i = 0; $i < $t_version_count; $i++ ) {
+			echo '<tr ', helper_alternate_class(), '><td></td>';
+
+			foreach( $this->products as $t_product ) {
+
+				if ( count( $t_product->__versions ) ) {
+					$t_version = array_shift( $t_product->__versions );
+					echo '<td class="category">', $t_version->name, '</td><td>', $this->status[$t_version->id], '</td>';
+
+				} else {
+					echo '<td></td><td></td>';
+				}
+
+			}
+
+			echo '</tr>';
+		}
+
+		echo '</table>';
+
+		collapse_closed( 'view', 'ProductMatrix' );
+
+		collapse_icon( 'view', 'ProductMatrix' );
+
+		collapse_end( 'view', 'ProductMatrix' );
+
+		echo '</td></tr>';
+	}
 }
 
