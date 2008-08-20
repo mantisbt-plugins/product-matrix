@@ -40,6 +40,21 @@ class ProductMatrixPlugin extends MantisPlugin {
 		return array(
 			'view_threshold' => VIEWER,
 			'manage_threshold' => MANAGER,
+
+			'status' => array(
+				10 => 'open',
+				30 => 'planned',
+				50 => 'in work',
+				70 => 'testing',
+				90 => 'resolved',
+				),
+			'status_color' => array(
+				10 => 'red',
+				30 => 'yellow',
+				50 => 'blue',
+				70 => 'orange',
+				90 => 'green',
+				),
 		);
 	}
 

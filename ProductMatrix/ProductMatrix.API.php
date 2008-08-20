@@ -329,19 +329,23 @@ class ProductMatrix {
 
 		echo '</tr>';
 
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
+
 		for( $i = 0; $i < $t_version_count; $i++ ) {
 			echo '<tr ', helper_alternate_class(), '><td></td>';
 
 			foreach( $this->products as $t_product ) {
-
 				if ( count( $t_product->__versions ) ) {
 					$t_version = array_shift( $t_product->__versions );
-					echo '<td class="category">', $t_version->name, '</td><td>', $this->status[$t_version->id], '</td>';
+					$t_status = $this->status[$t_version->id];
+
+					echo '<td class="category">', $t_version->name, '</td><td bgcolor="',
+						$t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
 
 				} else {
 					echo '<td></td><td></td>';
 				}
-
 			}
 
 			echo '</tr>';
