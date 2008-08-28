@@ -355,7 +355,15 @@ class ProductMatrix {
 
 		collapse_closed( 'view', 'ProductMatrix' );
 
+		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
 		collapse_icon( 'view', 'ProductMatrix' );
+		echo '</td>';
+
+		foreach( $this->products as $t_product ) {
+			echo '<td>', $t_product->name, '</td>';
+		}
+
+		echo '</tr></table>';
 
 		collapse_end( 'view', 'ProductMatrix' );
 
