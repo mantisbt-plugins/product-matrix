@@ -83,7 +83,7 @@ class PVMProduct {
 	static function load_all( $p_load_versions=false ) {
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
 
-		$t_query = "SELECT * FROM $t_product_table";
+		$t_query = "SELECT * FROM $t_product_table ORDER BY name ASC";
 		$t_result = db_query_bound( $t_query );
 
 		$t_products = array();
