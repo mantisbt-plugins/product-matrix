@@ -315,7 +315,8 @@ class ProductMatrix {
 			$t_product->__versions = $t_product->versions;
 		}
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">Product Status</td><td colspan="5">';
+		echo '<tr ', helper_alternate_class(), '><td class="category">,',
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
 
 		collapse_open( 'view', 'ProductMatrix' );
 
@@ -360,6 +361,89 @@ class ProductMatrix {
 		echo '</td>';
 
 		foreach( $this->products as $t_product ) {
+			echo '<td>', $t_product->name, '</td>';
+		}
+
+		echo '</tr></table>';
+
+		collapse_end( 'view', 'ProductMatrix' );
+
+		echo '</td></tr>';
+	}
+
+	function view_form() {
+		$t_products = PVMProduct::load_all( true );
+
+		if ( count( $t_products ) < 1 ) {
+			return null;
+		}
+
+		$t_version_count = 0;
+		foreach( $t_products as $t_product ) {
+			$t_version_count = max( count( $t_product->versions ), $t_version_count );
+			$t_product->__versions = $t_product->versions;
+		}
+
+		echo '<tr ', helper_alternate_class(), '><td class="category">,',
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
+
+		collapse_open( 'view', 'ProductMatrix' );
+
+		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
+		collapse_icon( 'view', 'ProductMatrix' );
+		echo '</td>';
+
+		foreach( $t_products as $t_product ) {
+			echo '<td colspan="2">', $t_product->name, '</td>';
+		}
+
+		echo '</tr>';
+
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
+
+		for( $i = 0; $i < $t_version_count; $i++ ) {
+			echo '<tr ', helper_alternate_class(), '><td></td>';
+
+			foreach( $t_products as $t_product ) {
+				if ( count( $t_product->__versions ) ) {
+					$t_version = array_shift( $t_product->__versions );
+
+					echo '<td class="category">', $t_version->name, '</td><td>',
+						'<select name="Product', $t_product->id, 'Version', $t_version->id, '">';
+
+					if ( isset( $this->status[$t_version->id] ) ) {
+						$t_status = $this->status[$t_version->id];
+					} else {
+						$t_status = 0;
+					}
+
+					echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
+					foreach( $t_status_array as $t_status_value => $t_status_name ) {
+						echo '<option value="', $t_status_value, '"',
+							( $t_status == $t_status_value ? ' selected="selected"' : '' ),
+							'>', $t_status_name, '</option>';
+					}
+
+					echo '</select></td>';
+
+				} else {
+					echo '<td></td><td></td>';
+				}
+			}
+
+			echo '</tr>';
+		}
+
+		echo '</table>';
+
+		collapse_closed( 'view', 'ProductMatrix' );
+
+		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
+		collapse_icon( 'view', 'ProductMatrix' );
+		echo '</td>';
+
+		foreach( $t_products as $t_product ) {
 			echo '<td>', $t_product->name, '</td>';
 		}
 

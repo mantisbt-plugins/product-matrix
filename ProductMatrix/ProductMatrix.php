@@ -86,7 +86,8 @@ class ProductMatrixPlugin extends MantisPlugin {
 	}
 
 	function update_bug_form( $p_event, $p_bug_id ) {
-		var_dump( $p_bug_id );
+		$matrix = new ProductMatrix( $p_bug_id );
+		$matrix->view_form();
 	}
 
 	function update_bug( $p_event, $p_bug ) {

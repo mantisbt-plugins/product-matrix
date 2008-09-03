@@ -15,6 +15,9 @@ $s_plugin_ProductMatrix_ = '';
 $s_plugin_ProductMatrix_title = 'Product Version Matrix';
 $s_plugin_ProductMatrix_description = '';
 
+$s_plugin_ProductMatrix_product_status = 'Product Status';
+$s_plugin_ProductMatrix_status_na = 'N/A';
+
 # Core strings updated to new meanings
 $s_actiongroup_menu_update_target_version = 'Update Target Milestone';
 $s_actiongroup_menu_update_fixed_in_version = 'Update Fixed in Milestone';
