@@ -315,7 +315,7 @@ class ProductMatrix {
 			$t_product->__versions = $t_product->versions;
 		}
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">,',
+		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
 
 		collapse_open( 'view', 'ProductMatrix' );
@@ -384,7 +384,7 @@ class ProductMatrix {
 			$t_product->__versions = $t_product->versions;
 		}
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">,',
+		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
 
 		collapse_open( 'view', 'ProductMatrix' );
