@@ -254,7 +254,15 @@ class ProductMatrix {
 	var $__status;
 	var $products;
 
-	function __construct( $p_bug_id, $p_load_products=true ) {
+	function __construct( $p_bug_id=0, $p_load_products=true ) {
+		if ( !$p_bug_id ) {
+			$this->bug_id = $p_bug_id;
+			$this->__status = array();
+			$this->status = array();
+			$this->products = array();
+			return;
+		}
+
 		$this->bug_id = $p_bug_id;
 		$this->__status = array();
 		$this->status = array();
