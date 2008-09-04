@@ -90,8 +90,10 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$matrix->view_form();
 	}
 
-	function update_bug( $p_event, $p_bug ) {
-		var_dump( $p_bug );
+	function update_bug( $p_event, $p_bug_data, $p_bug_id ) {
+		$matrix = new ProductMatrix( $p_bug_id );
+		$matrix->process_form();
+		$matrix->save();
 	}
 
 	function schema() {

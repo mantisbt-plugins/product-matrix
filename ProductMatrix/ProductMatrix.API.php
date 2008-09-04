@@ -453,5 +453,29 @@ class ProductMatrix {
 
 		echo '</td></tr>';
 	}
+
+	function process_form() {
+		$t_products = PVMProduct::load_all( true );
+
+		foreach( $t_products as $t_product ) {
+			$t_form_product = 'Product' . $t_product->id . 'Version';
+
+			foreach( $t_product->versions as $t_version ) {
+				$t_form_item = $t_form_product . $t_version->id;
+				$t_status = gpc_get_int( $t_form_item, 0 );
+
+				$t_status_set = isset( $this->status[$t_version->id] );
+				$t_status_cleared = $t_status < 1;
+
+				if ( $t_status_cleared ) {
+					if ( $t_status_set ) {
+						$this->status[$t_version->id] = null;
+					}
+				} else {
+					$this->status[$t_version->id] = $t_status;
+				}
+			}
+		}
+	}
 }
 
