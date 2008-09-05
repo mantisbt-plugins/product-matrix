@@ -43,17 +43,19 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 			'status' => array(
 				10 => 'open',
-				30 => 'planned',
+				30 => 'confirmed',
 				50 => 'in work',
 				70 => 'testing',
+				80 => 'suspended',
 				90 => 'resolved',
 				),
 			'status_color' => array(
-				10 => 'red',
-				30 => 'yellow',
-				50 => 'blue',
-				70 => 'orange',
-				90 => 'green',
+				10 => '#ffcdcd',
+				30 => '#ffeccd',
+				50 => '#feffcd',
+				70 => '#cde2ff',
+				80 => '#dadada',
+				90 => '#daf5e7',
 				),
 		);
 	}
