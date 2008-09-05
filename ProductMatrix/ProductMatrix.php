@@ -65,6 +65,8 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'EVENT_VIEW_BUG_DETAILS'	=> 'view_bug',
 			'EVENT_UPDATE_BUG_FORM'		=> 'update_bug_form',
 			'EVENT_UPDATE_BUG'			=> 'update_bug',
+			'EVENT_REPORT_BUG_FORM'		=> 'report_bug_form',
+			'EVENT_REPORT_BUG'			=> 'report_bug',
 		);
 	}
 
@@ -91,6 +93,17 @@ class ProductMatrixPlugin extends MantisPlugin {
 	}
 
 	function update_bug( $p_event, $p_bug_data, $p_bug_id ) {
+		$matrix = new ProductMatrix( $p_bug_id );
+		$matrix->process_form();
+		$matrix->save();
+	}
+
+	function report_bug_form( $p_event ) {
+		$matrix = new ProductMatrix();
+		$matrix->view_form();
+	}
+
+	function report_bug( $p_event, $p_bug_data, $p_bug_id ) {
 		$matrix = new ProductMatrix( $p_bug_id );
 		$matrix->process_form();
 		$matrix->save();
