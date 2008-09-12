@@ -294,12 +294,16 @@ class ProductMatrix {
 
 				$this->__status[ $t_version_id ] = $t_status;
 
+				plugin_history_log( $this->bug_id, 'history_version_tracked', "$t_version_id: $t_status" );
+
 			} else if ( is_null( $t_status ) ) { # deleted status
 				$t_query = "DELETE FROM $t_status_table WHERE bug_id=" . db_param() . ' AND version_id=' . db_param();
 				db_query_bound( $t_query, array( $this->bug_id, $t_version_id ) );
 
 				unset( $this->status[ $t_version_id ] );
 				unset( $this->__status[ $t_version_id ] );
+
+				plugin_history_log( $this->bug_id, 'history_version_ignored', $t_version_id );
 
 			} else if ( $t_status != $this->__status[ $t_version_id ] ) { # updated status
 				$t_query = "UPDATE $t_status_table SET status=" . db_param() .
@@ -308,6 +312,8 @@ class ProductMatrix {
 
 				$this->__status[ $t_version_id ] = $t_status;
 
+				plugin_history_log( $this->bug_id, 'history_version_updated',
+					$this->__status[ $t_version_id ], $t_status );
 			}
 		}
 	}

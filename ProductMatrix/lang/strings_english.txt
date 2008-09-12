@@ -18,6 +18,10 @@ $s_plugin_ProductMatrix_description = '';
 $s_plugin_ProductMatrix_product_status = 'Product Status';
 $s_plugin_ProductMatrix_status_na = 'N/A';
 
+$s_plugin_ProductMatrix_history_version_tracked = 'Product Version Tracked';
+$s_plugin_ProductMatrix_history_version_ignored = 'Product Version Ignored';
+$s_plugin_ProductMatrix_history_version_updated = 'Version Status Updated';
+
 # Core strings updated to new meanings
 $s_actiongroup_menu_update_target_version = 'Update Target Milestone';
 $s_actiongroup_menu_update_fixed_in_version = 'Update Fixed in Milestone';
