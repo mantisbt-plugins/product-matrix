@@ -16,6 +16,7 @@ access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 $f_product_id = gpc_get_int( 'product_id' );
 $f_version_name = gpc_get_string( 'version_name' );
 
+form_security_validate( 'ProductMatrix_version_create' );
 $t_product = PVMProduct::load( $f_product_id );
 $t_product->versions[] = new PVMVersion( $t_product->id, $f_version_name );
 $t_product->save();

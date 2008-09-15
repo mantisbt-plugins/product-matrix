@@ -29,13 +29,11 @@ html_page_top2();
 
 <tr class="row-category">
 <td>Name</td>
-<td>Actions</td>
 </tr>
 
 <?php foreach( $t_products as $t_product ) { ?>
 <tr <?php echo helper_alternate_class() ?>>
 <td><a href="<?php echo plugin_page( 'product_view' ), '&id=', $t_product->id ?>"><?php echo $t_product->name ?></a></td>
-<td></td>
 </tr>
 <?php } ?>
 
@@ -44,6 +42,7 @@ html_page_top2();
 <?php if ( $t_can_manage ) { ?>
 <br/>
 <form method="post" action="<?php echo plugin_page( 'product_create' ) ?>">
+<?php echo form_security_field( 'ProductMatrix_product_create' ) ?>
 <table class="width50" align="center" cellspacing="1">
 
 <tr>

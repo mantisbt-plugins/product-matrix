@@ -15,8 +15,9 @@ access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 $f_product_name = gpc_get_string( 'product_name' );
 
+form_security_validate( 'ProductMatrix_product_create' );
 $t_product = new PVMProduct( $f_product_name );
 $t_product->save();
 
-print_successful_redirect( plugin_page( 'products', true ) );
+print_successful_redirect( plugin_page( 'product_view', true ) . '&id=' . $t_product->id );
 
