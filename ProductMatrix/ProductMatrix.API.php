@@ -285,30 +285,32 @@ class ProductMatrix {
 	function save() {
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
+		$this->load_products();
+		$this->products_to_versions();
+
 		foreach( $this->status as $t_version_id => $t_status ) {
 			if ( !isset( $this->__status[ $t_version_id ] ) ) { # new status
 				$t_query = "INSERT INTO $t_status_table ( bug_id, version_id, status )
 					VALUES ( " . join( ',', array( db_param(), db_param(), db_param() ) ) . ' )';
 				db_query_bound( $t_query, array( $this->bug_id, $t_version_id, $t_status ) );
 
+				$this->history_log( $t_version_id, null, $t_status );
 				$this->__status[ $t_version_id ] = $t_status;
-
-				plugin_history_log( $this->bug_id, 'history_version_tracked', "$t_version_id: $t_status" );
 
 			} else if ( is_null( $t_status ) ) { # deleted status
 				$t_query = "DELETE FROM $t_status_table WHERE bug_id=" . db_param() . ' AND version_id=' . db_param();
 				db_query_bound( $t_query, array( $this->bug_id, $t_version_id ) );
 
+				$this->history_log( $t_version_id, $this->__status[ $t_version_id ], null );
 				unset( $this->status[ $t_version_id ] );
 				unset( $this->__status[ $t_version_id ] );
-
-				plugin_history_log( $this->bug_id, 'history_version_ignored', $t_version_id );
 
 			} else if ( $t_status != $this->__status[ $t_version_id ] ) { # updated status
 				$t_query = "UPDATE $t_status_table SET status=" . db_param() .
 					' WHERE bug_id=' . db_param() . ' AND version_id=' . db_param();
 				db_query_bound( $t_query, array( $t_status, $this->bug_id, $t_version_id ) );
 
+				$this->history_log( $t_version_id, $this->__status[ $t_version_id ], $t_status );
 				$this->__status[ $t_version_id ] = $t_status;
 			}
 		}
@@ -330,6 +332,34 @@ class ProductMatrix {
 				$this->versions[ $t_version->id ] = $t_product;
 			}
 		}
+	}
+
+	function history_log( $t_version_id, $t_old, $t_new ) {
+		$t_status = plugin_config_get( 'status' );
+
+		$t_product_name = $this->versions[ $t_version_id ]->name;
+		$t_version_name = $this->versions[ $t_version_id ]->versions[ $t_version_id ]->name;
+
+		$t_history_string = "$t_product_name $t_version_name: ";
+
+		if ( is_null( $t_old ) ) {
+			$t_field = 'history_version_tracked';
+
+			$t_old = $t_history_string . $t_status[ $t_new ];
+			$t_new = null;
+		} else if ( is_null( $t_new ) ) {
+			$t_field = 'history_version_ignored';
+
+			$t_old = $t_history_string . $t_status[ $t_old ];
+			$t_new = null;
+		} else {
+			$t_field = 'history_version_updated';
+
+			$t_old = $t_history_string . $t_status[ $t_old ];
+			$t_new = $t_status[ $t_new ];
+		}
+
+		plugin_history_log( $this->bug_id, $t_field, $t_old, $t_new );
 	}
 
 	function view() {
