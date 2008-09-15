@@ -278,8 +278,7 @@ class ProductMatrix {
 		}
 
 		if ( $p_load_products ) {
-			$t_version_ids = array_keys( $this->status );
-			$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
+			$this->load_products();
 		}
 	}
 
@@ -311,9 +310,24 @@ class ProductMatrix {
 				db_query_bound( $t_query, array( $t_status, $this->bug_id, $t_version_id ) );
 
 				$this->__status[ $t_version_id ] = $t_status;
+			}
+		}
+	}
 
-				plugin_history_log( $this->bug_id, 'history_version_updated',
-					$this->__status[ $t_version_id ], $t_status );
+	function load_products() {
+		$t_version_ids = array_keys( $this->status );
+		$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
+	}
+
+	function products_to_versions() {
+		if ( isset( $this->versions ) ) {
+			return;
+		}
+
+		$this->versions = array();
+		foreach( $this->products as $t_product ) {
+			foreach( $t_product->versions as $t_version ) {
+				$this->versions[ $t_version->id ] = $t_product;
 			}
 		}
 	}
@@ -468,7 +482,7 @@ class ProductMatrix {
 		echo '</td></tr>';
 	}
 
-	function process_form() {
+	function process_form( $p_reload_products=true ) {
 		$t_products = PVMProduct::load_all( true );
 
 		foreach( $t_products as $t_product ) {
@@ -489,6 +503,10 @@ class ProductMatrix {
 					$this->status[$t_version->id] = $t_status;
 				}
 			}
+		}
+
+		if ( $p_reload_products ) {
+			$this->load_products();
 		}
 	}
 }

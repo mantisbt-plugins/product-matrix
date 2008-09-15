@@ -95,7 +95,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 	}
 
 	function update_bug( $p_event, $p_bug_data, $p_bug_id ) {
-		$matrix = new ProductMatrix( $p_bug_id );
+		$matrix = new ProductMatrix( $p_bug_id, false );
 		$matrix->process_form();
 		$matrix->save();
 	}
@@ -106,7 +106,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 	}
 
 	function report_bug( $p_event, $p_bug_data, $p_bug_id ) {
-		$matrix = new ProductMatrix( $p_bug_id );
+		$matrix = new ProductMatrix( $p_bug_id, false );
 		$matrix->process_form();
 		$matrix->save();
 	}
