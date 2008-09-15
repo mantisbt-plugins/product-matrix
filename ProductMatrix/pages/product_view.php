@@ -42,10 +42,13 @@ html_page_top2();
 
 <tr>
 <td colspan="2">
+	<?php if ( $t_can_manage ) { ?>
 	<form method="post" action="<?php echo plugin_page( 'product_delete' ) ?>"/>
+	<?php echo form_security_field( 'ProductMatrix_product_delete' ) ?>
 	<input type="hidden" name="id" value="<?php echo $t_product->id ?>"/>
 	<input type="submit" value="Delete Product"/>
 	</form>
+	<?php } ?>
 </td>
 </tr>
 
