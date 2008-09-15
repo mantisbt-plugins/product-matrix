@@ -56,13 +56,13 @@ html_page_top2();
 
 <?php if ( $t_can_manage ) { ?>
 <br/>
-<form method="post" action="<?php echo plugin_page( 'version_create' ) ?>">
-<?php echo form_security_field( 'ProductMatrix_version_create' ) ?>
+<form method="post" action="<?php echo plugin_page( 'version_add' ) ?>">
+<?php echo form_security_field( 'ProductMatrix_version_add' ) ?>
 <table class="width50" align="center" cellspacing="1">
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
 
 <tr>
-<td class="form-title" colspan="2">Create Version</td>
+<td class="form-title" colspan="2">Add Version</td>
 </tr>
 
 <tr <?php echo helper_alternate_class() ?>>

@@ -41,12 +41,12 @@ html_page_top2();
 
 <?php if ( $t_can_manage ) { ?>
 <br/>
-<form method="post" action="<?php echo plugin_page( 'product_create' ) ?>">
-<?php echo form_security_field( 'ProductMatrix_product_create' ) ?>
+<form method="post" action="<?php echo plugin_page( 'product_add' ) ?>">
+<?php echo form_security_field( 'ProductMatrix_product_add' ) ?>
 <table class="width50" align="center" cellspacing="1">
 
 <tr>
-<td class="form-title" colspan="2">Create Product</td>
+<td class="form-title" colspan="2">Add Product</td>
 </tr>
 
 <tr <?php echo helper_alternate_class() ?>>
