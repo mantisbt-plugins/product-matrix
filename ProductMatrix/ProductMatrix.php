@@ -119,7 +119,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'version' ), "
 				id			I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-				parent		I		NOTNULL UNSIGNED DEFAULT '0',
+				parent_id	I		NOTNULL UNSIGNED DEFAULT '0',
 				product_id	I		NOTNULL UNSIGNED DEFAULT '0',
 				name		C(128)	NOTNULL DEFAULT \" '' \",
 				date		T		NOTNULL DEFAULT '" . db_null_date() . "',

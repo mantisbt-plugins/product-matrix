@@ -168,13 +168,19 @@ class PVMProduct {
 
 class PVMVersion {
 	var $id;
+	var $parent_id = 0;
 	var $product_id;
 	var $name;
+	var $date;
+	var $released = false;
+	var $obsolete = false;
 
-	function __construct( $p_product_id, $p_name ) {
+	function __construct( $p_product_id, $p_name, $p_parent_id=0 ) {
 		$this->id = 0;
+		$this->parent_id = $p_parent_id;
 		$this->product_id = $p_product_id;
 		$this->name = $p_name;
+		$this->date = date( 'Y-m-d' );
 	}
 
 	function save() {
@@ -182,19 +188,54 @@ class PVMVersion {
 			plugin_error( 'VersionNameEmpty', ERROR );
 		}
 
+		var_dump( $this );
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
 		if ( 0 == $this->id ) { #create
-			$t_query = "INSERT INTO $t_version_table ( product_id, name ) VALUES (" .
-				db_param() . ',' . db_param() . ')';
-			db_query_bound( $t_query, array( $this->product_id, $this->name ) );
+			$t_query = "INSERT INTO $t_version_table (
+					parent_id,
+					product_id,
+					name,
+					date,
+					released,
+					obsolete
+				) VALUES (" .
+					db_param() . ',' .
+					db_param() . ',' .
+					db_param() . ',' .
+					db_param() . ',' .
+					db_param() . ',' .
+					db_param() .
+				')';
+			db_query_bound( $t_query, array(
+				$this->parent_id,
+				$this->product_id,
+				$this->name,
+				db_timestamp( $this->date ),
+				db_prepare_bool( $this->released ),
+				db_prepare_bool( $this->obsolete ),
+			) );
 
 			$this->id = db_insert_id( $t_version_table );
 
 		} else { #update
-			$t_query = "UPDATE $t_version_table SET product_id=" . db_param() .
-				', name=' . db_param() . ' WHERE id=' . db_param();
-			db_query_bound( $t_query, array( $this->product_id, $this->name, $this->id ) );
+			$t_query = "UPDATE $t_version_table SET
+					parent_id=" . db_param() . ',
+					product_id=' . db_param() . ',
+					name=' . db_param() . ',
+					date=' . db_param() . ',
+					released=\'' . db_param() . '\',
+					obsolete=\'' . db_param() . '\',
+				WHERE id=' . db_param();
+			db_query_bound( $t_query, array(
+				$this->parent_id,
+				$this->product_id,
+				$this->name,
+				db_timestamp( $this->date ),
+				db_prepare_bool( $this->released ),
+				db_prepare_bool( $this->obsolete ),
+				$this->id
+			) );
 		}
 	}
 
@@ -210,8 +251,11 @@ class PVMVersion {
 
 		$t_row = db_fetch_array( $t_result );
 
-		$t_version = new PVMVersion( $t_row['product_id'], $t_row['name'] );
+		$t_version = new PVMVersion( $t_row['product_id'], $t_row['name'], $t_row['parent_id'] );
 		$t_version->id = $t_row['id'];
+		$t_version->date = $t_row['date'];
+		$t_version->released = $t_row['released'];
+		$t_version->obsolete = $t_row['obsolete'];
 
 		return $t_version;
 	}
@@ -224,8 +268,11 @@ class PVMVersion {
 
 		$t_versions = array();
 		while( $t_row = db_fetch_array( $t_result ) ) {
-			$t_version = new PVMVersion( $t_row['product_id'], $t_row['name'] );
+			$t_version = new PVMVersion( $t_row['product_id'], $t_row['name'], $t_row['parent_id'] );
 			$t_version->id = $t_row['id'];
+			$t_version->date = $t_row['date'];
+			$t_version->released = $t_row['released'];
+			$t_version->obsolete = $t_row['obsolete'];
 
 			$t_versions[$t_version->id] = $t_version;
 		}
