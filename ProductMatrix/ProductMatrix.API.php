@@ -282,12 +282,22 @@ class PVMVersion {
 	static function delete( $p_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
+		$t_query = "DELETE FROM $t_status_table WHERE version_id=" . db_param();
+		db_query_bound( $t_query, array( $p_id ) );
+
 		$t_query = "DELETE FROM $t_version_table WHERE id=" . db_param();
 		db_query_bound( $t_query, array( $p_id ) );
 	}
 
 	static function delete_by_product( $p_product_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
+
+		$t_product = PVMProduct::load( $p_product_id, true );
+		$t_version_ids = array_keys( $t_product->versions );
+
+		$t_query = "DELETE FROM $t_status_table WHERE version_id IN (" .
+			join( ',', $t_version_ids ) . ' )';
+		db_query_bound( $t_query );
 
 		$t_query = "DELETE FROM $t_version_table WHERE product_id=" . db_param();
 		db_query_bound( $t_query, array( $p_product_id ) );
