@@ -36,7 +36,10 @@ html_page_top2();
 <?php foreach( $t_product->versions as $t_version ) { ?>
 <tr <?php echo helper_alternate_class() ?>>
 <td><?php echo $t_version->name ?></td>
-<td></td>
+<td class="center"><?php
+echo print_bracket_link( plugin_page( 'version_delete' ) .
+	'&id=' . $t_version->id . form_security_param( 'ProductMatrix_version_delete' ), plugin_lang_get( 'delete' ) );
+?></td>
 </tr>
 <?php } ?>
 

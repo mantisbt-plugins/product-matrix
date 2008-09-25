@@ -13,13 +13,15 @@
 
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
-$f_product_id = gpc_get_int( 'id' );
-$t_product = PVMProduct::load( $f_product_id, false );
+$f_version_id = gpc_get_int( 'id' );
+$t_product = array_shift( PVMProduct::load_by_version_ids( $f_version_id ) );
+$t_version = PVMVersion::load( $f_version_id );
 
-helper_ensure_confirmed( plugin_lang_get( 'ensure_delete_product' ) . $t_product->name, plugin_lang_get( 'delete' ) );
+helper_ensure_confirmed( plugin_lang_get( 'ensure_delete_version' ) .
+	$t_product->name . ' ' . $t_version->name, plugin_lang_get( 'delete' ) );
 
-form_security_validate( 'ProductMatrix_product_delete' );
-PVMProduct::delete( $f_product_id );
+form_security_validate( 'ProductMatrix_version_delete' );
+PVMVersion::delete( $f_version_id );
 
-print_successful_redirect( plugin_page( 'products', true ) );
+print_successful_redirect( plugin_page( 'product_view', true ) . '&id=' . $t_product->id );
 
