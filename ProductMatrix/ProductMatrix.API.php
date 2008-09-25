@@ -188,7 +188,6 @@ class PVMVersion {
 			plugin_error( 'VersionNameEmpty', ERROR );
 		}
 
-		var_dump( $this );
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
 		if ( 0 == $this->id ) { #create
