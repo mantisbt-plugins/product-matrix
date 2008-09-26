@@ -223,8 +223,8 @@ class PVMVersion {
 					product_id=' . db_param() . ',
 					name=' . db_param() . ',
 					date=' . db_param() . ',
-					released=\'' . db_param() . '\',
-					obsolete=\'' . db_param() . '\',
+					released=' . db_param() . ',
+					obsolete=' . db_param() . '
 				WHERE id=' . db_param();
 			db_query_bound( $t_query, array(
 				$this->parent_id,
