@@ -71,6 +71,27 @@ class PVMProduct {
 		}
 	}
 
+	function version_tree_list() {
+		$t_list = $this->version_tree_section( $this->version_tree[0] );
+		return $t_list;
+	}
+
+	private function version_tree_section( $t_versions, $t_depth=0 ) {
+		if ( !is_array( $t_versions ) || count( $t_versions ) < 1 ) {
+			return array();
+		}
+
+		$t_list = array();
+		foreach( $t_versions as $t_version_id => $t_version ) {
+			$t_list[] = array( $t_version, $t_depth );
+			if ( isset( $this->version_tree[ $t_version_id ] ) ) {
+				$t_list = array_merge( $t_list, $this->version_tree_section( $this->version_tree[ $t_version_id ], $t_depth+1 ) );
+			}
+		}
+
+		return $t_list;
+	}
+
 	static function load( $p_id, $p_load_versions=true ) {
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
 
