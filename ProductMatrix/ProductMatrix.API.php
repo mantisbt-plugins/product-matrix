@@ -15,6 +15,7 @@ class PVMProduct {
 	var $id;
 	var $name;
 	var $versions = array();
+	var $version_tree = array();
 
 	function __construct( $p_name ) {
 		$this->id = 0;
@@ -56,6 +57,18 @@ class PVMProduct {
 		}
 
 		$this->versions = PVMVersion::load_by_product( $this->id );
+		$this->build_version_tree();
+	}
+
+	function build_version_tree() {
+		foreach( $this->versions as $t_version ) {
+			$t_parent_id = $t_version->parent_id;
+			if ( !isset( $this->version_tree[ $t_parent_id ] ) ) {
+				$this->version_tree[ $t_parent_id ] = array();
+			}
+
+			$this->version_tree[ $t_parent_id ][ $t_version->id ] = $t_version;
+		}
 	}
 
 	static function load( $p_id, $p_load_versions=true ) {
