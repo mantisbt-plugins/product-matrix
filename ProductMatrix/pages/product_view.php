@@ -73,6 +73,22 @@ echo print_bracket_link( plugin_page( 'version_delete' ) .
 <td><input name="version_name"/></td>
 </tr>
 
+<?php if ( count( $t_product->versions ) > 0 ) { ?>
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category">Parent Version</td>
+<td>
+	<select name="parent_id">
+	<option value="0">--</option>
+	<?php foreach( $t_product->versions as $t_version ) { ?>
+	<option value="<?php echo $t_version->id ?>"><?php echo $t_version->name ?></option>
+	<?php } ?>
+	</select>
+</td>
+</tr>
+<?php } else { ?>
+<input name="parent_id" value="0"/></td>
+<?php } ?>
+
 <tr>
 <td class="center" colspan="2"><input type="submit"/></td>
 </tr>
