@@ -28,14 +28,15 @@ html_page_top2();
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
 <?php } ?>
 
-<table class="width75" align="center" cellspacing="1">
+<table class="productmatrix" align="center" cellspacing="1">
 
 <tr>
 <?php if ( $t_can_manage ) { ?>
-<td class="form-title" colspan="4">View Product: <input name="product_name" value="<?php echo $t_product->name ?>"/></td>
+<td class="form-title" colspan="3">View Product: <input name="product_name" value="<?php echo $t_product->name ?>"/></td>
 <?php } else { ?>
-<td class="form-title" colspan="4">View Product: <?php echo $t_product->name ?></td>
+<td class="form-title" colspan="3">View Product: <?php echo $t_product->name ?></td>
 <?php } ?>
+<td><?php print_bracket_link( plugin_page( 'products' ), 'Back' ) ?></td>
 </tr>
 
 <tr class="row-category">
@@ -48,7 +49,7 @@ html_page_top2();
 <?php foreach( $t_product->version_tree_list() as $t_node ) { list( $t_version, $t_depth ) = $t_node; ?>
 <tr <?php echo helper_alternate_class() ?>>
 <?php if ( $t_can_manage ) { ?>
-<td><?php echo str_pad( '', $t_depth, '-' ), ' <input name="version_', $t_version->id, '_name" value="', $t_version->name, '"/>' ?></td>
+<td><?php echo str_pad( '', $t_depth, '-' ), ' <input name="version_', $t_version->id, '_name" value="', $t_version->name, '" size="10"/>' ?></td>
 <?php } else { ?>
 <td><?php echo str_pad( '', $t_depth, '-' ), ' ', $t_version->name ?></td>
 <?php } ?>
