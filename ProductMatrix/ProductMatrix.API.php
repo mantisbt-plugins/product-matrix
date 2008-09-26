@@ -528,10 +528,13 @@ class ProductMatrix {
 			return null;
 		}
 
+		$t_version_trees = array();
 		$t_version_count = 0;
 		foreach( $t_products as $t_product ) {
-			$t_version_count = max( count( $t_product->versions ), $t_version_count );
-			$t_product->__versions = $t_product->versions;
+			$t_version_tree = $t_product->version_tree_list();
+
+			$t_version_count = max( count( $t_version_tree ), $t_version_count );
+			$t_version_trees[ $t_product->id ] = $t_version_tree;
 		}
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
@@ -556,10 +559,11 @@ class ProductMatrix {
 			echo '<tr ', helper_alternate_class(), '><td></td>';
 
 			foreach( $t_products as $t_product ) {
-				if ( count( $t_product->__versions ) ) {
-					$t_version = array_shift( $t_product->__versions );
+				$t_shown = false;
+				if( count( $t_version_trees[ $t_product->id ] ) ) {
+					list( $t_version, $t_depth ) = array_shift( $t_version_trees[ $t_product->id ] );
 
-					echo '<td class="category">', $t_version->name, '</td><td>',
+					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>',
 						'<select name="Product', $t_product->id, 'Version', $t_version->id, '">';
 
 					if ( isset( $this->status[$t_version->id] ) ) {
