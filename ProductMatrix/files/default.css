@@ -3,3 +3,11 @@ table.productmatrix {
 	background: #FFF;
 }
 
+.PVMreleased {
+	background: #DFD;
+}
+
+.PVMobsolete {
+	background: #FDD;
+}
+

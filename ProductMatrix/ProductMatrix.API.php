@@ -281,6 +281,7 @@ class PVMVersion {
 
 	static function delete( $p_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
+		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
 		$t_query = "DELETE FROM $t_status_table WHERE version_id=" . db_param();
 		db_query_bound( $t_query, array( $p_id ) );
@@ -291,6 +292,7 @@ class PVMVersion {
 
 	static function delete_by_product( $p_product_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
+		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
 		$t_product = PVMProduct::load( $p_product_id, true );
 		$t_version_ids = array_keys( $t_product->versions );
