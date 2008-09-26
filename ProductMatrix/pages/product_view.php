@@ -28,7 +28,7 @@ html_page_top2();
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
 <?php } ?>
 
-<table class="width50" align="center" cellspacing="1">
+<table class="width75" align="center" cellspacing="1">
 
 <tr>
 <?php if ( $t_can_manage ) { ?>
@@ -45,12 +45,12 @@ html_page_top2();
 <td>Actions</td>
 </tr>
 
-<?php foreach( $t_product->versions as $t_version ) { ?>
+<?php foreach( $t_product->version_tree_list() as $t_node ) { list( $t_version, $t_depth ) = $t_node; ?>
 <tr <?php echo helper_alternate_class() ?>>
 <?php if ( $t_can_manage ) { ?>
-<td><?php echo '<input name="version_', $t_version->id, '_name" value="', $t_version->name, '"/>' ?></td>
+<td><?php echo str_pad( '', $t_depth, '-' ), ' <input name="version_', $t_version->id, '_name" value="', $t_version->name, '"/>' ?></td>
 <?php } else { ?>
-<td><?php echo $t_version->name ?></td>
+<td><?php echo str_pad( '', $t_depth, '-' ), ' ', $t_version->name ?></td>
 <?php } ?>
 
 <td class="center <?php echo $t_version->released ? 'PVMreleased' : '' ?>">
