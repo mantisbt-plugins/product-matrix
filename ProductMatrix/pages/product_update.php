@@ -23,6 +23,7 @@ foreach( $t_product->versions as $t_version ) {
 	$t_version->name = gpc_get_string( $t_prefix . 'name', $t_version->name );
 	$t_version->released = gpc_get_bool( $t_prefix . 'released', false );
 	$t_version->obsolete = gpc_get_bool( $t_prefix . 'obsolete', false );
+	$t_version->parent_id = gpc_get_int( $t_prefix . 'parent', 0 );
 }
 
 form_security_validate( 'ProductMatrix_product_update' );

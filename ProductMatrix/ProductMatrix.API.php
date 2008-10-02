@@ -72,8 +72,10 @@ class PVMProduct {
 	}
 
 	function version_tree_list() {
-		$t_list = $this->version_tree_section( $this->version_tree[0] );
-		return $t_list;
+		if ( !isset( $this->__version_tree_list ) ) {
+			$this->__version_tree_list = $this->version_tree_section( $this->version_tree[0] );
+		}
+		return $this->__version_tree_list;
 	}
 
 	private function version_tree_section( $t_versions, $t_depth=0 ) {
@@ -197,6 +199,17 @@ class PVMProduct {
 
 		$t_query = "DELETE FROM $t_product_table WHERE id=" . db_param();
 		db_query_bound( $t_query, array( $p_id ) );
+	}
+
+	function select_versions( $p_default_id=0 ) {
+		echo '<option value="0">--</option>';
+		foreach( $this->version_tree_list() as $t_node ) {
+			list( $t_version, $t_depth ) = $t_node;
+
+			echo '<option value="', $t_version->id, '" ',
+				( $t_version->id == $p_default_id ? 'selected="selected" ' : '' ),
+				'>', str_pad( ' ', $t_depth+1, '-', STR_PAD_LEFT ), $t_version->name, '</option>';
+		}
 	}
 }
 

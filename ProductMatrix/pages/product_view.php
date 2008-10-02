@@ -22,21 +22,11 @@ html_page_top2();
 ?>
 
 <br/>
-<?php if ( $t_can_manage ) { ?>
-<form action="<?php echo plugin_page( 'product_update' ) ?>" method="post"/>
-<?php echo form_security_field( 'ProductMatrix_product_update' ) ?>
-<input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
-<?php } ?>
-
-<table class="productmatrix" align="center" cellspacing="1">
+<table class="productmatrix width50" align="center" cellspacing="1">
 
 <tr>
-<?php if ( $t_can_manage ) { ?>
-<td class="form-title" colspan="3">View Product: <input name="product_name" value="<?php echo $t_product->name ?>"/></td>
-<?php } else { ?>
 <td class="form-title" colspan="3">View Product: <?php echo $t_product->name ?></td>
-<?php } ?>
-<td><?php print_bracket_link( plugin_page( 'products' ), 'Back' ) ?></td>
+<td class="right"><?php print_bracket_link( plugin_page( 'products' ), 'Back' ) ?></td>
 </tr>
 
 <tr class="row-category">
@@ -48,30 +38,21 @@ html_page_top2();
 
 <?php foreach( $t_product->version_tree_list() as $t_node ) { list( $t_version, $t_depth ) = $t_node; ?>
 <tr <?php echo helper_alternate_class() ?>>
-<?php if ( $t_can_manage ) { ?>
-<td><?php echo str_pad( '', $t_depth, '-' ), ' <input name="version_', $t_version->id, '_name" value="', $t_version->name, '" size="10"/>' ?></td>
-<?php } else { ?>
 <td><?php echo str_pad( '', $t_depth, '-' ), ' ', $t_version->name ?></td>
-<?php } ?>
 
-<td class="center <?php echo $t_version->released ? 'PVMreleased' : '' ?>">
-<?php if ( $t_can_manage ) { echo '<input type="checkbox" name="version_', $t_version->id, '_released" ',
-	( $t_version->released ? ' checked="checked"' : '' ), '/>'; } ?>
-</td>
-<td class="center <?php echo $t_version->obsolete ? 'PVMobsolete' : '' ?>">
-<?php if ( $t_can_manage ) { echo '<input type="checkbox" name="version_', $t_version->id, '_obsolete" ',
-	( $t_version->obsolete ? ' checked="checked"' : '' ), '/>'; } ?>
-</td>
-<td class="center"><?php
+<td class="center <?php echo $t_version->released ? 'PVMreleased' : '' ?>"></td>
+<td class="center <?php echo $t_version->obsolete ? 'PVMobsolete' : '' ?>"></td>
+<td class="center"><?php if ( $t_can_manage ) {
 echo print_bracket_link( plugin_page( 'version_delete' ) .
 	'&id=' . $t_version->id . form_security_param( 'ProductMatrix_version_delete' ), plugin_lang_get( 'delete' ) );
-?></td>
+} ?></td>
 </tr>
 <?php } ?>
 
 <tr>
 <td colspan="2">
 	<?php if ( $t_can_manage ) { ?>
+	<form method="post" action="<?php echo plugin_page( 'product_manage' ), '&id=', $t_product->id ?>">
 	<input type="submit" value="Update Product"/>
 	</form>
 	<?php } ?>
@@ -110,10 +91,7 @@ echo print_bracket_link( plugin_page( 'version_delete' ) .
 <td class="category">Parent Version</td>
 <td>
 	<select name="parent_id">
-	<option value="0">--</option>
-	<?php foreach( $t_product->versions as $t_version ) { ?>
-	<option value="<?php echo $t_version->id ?>"><?php echo $t_version->name ?></option>
-	<?php } ?>
+	<?php $t_product->select_versions() ?>
 	</select>
 </td>
 </tr>
