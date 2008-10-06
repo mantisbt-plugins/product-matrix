@@ -11,14 +11,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+form_security_validate( 'ProductMatrix_version_add' );
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 $f_product_id = gpc_get_int( 'product_id' );
 
 $f_version_name = gpc_get_string( 'version_name' );
 $f_parent_id = gpc_get_int( 'parent_id' );
-
-form_security_validate( 'ProductMatrix_version_add' );
 
 $t_product = PVMProduct::load( $f_product_id );
 
@@ -34,6 +33,7 @@ if ( 0 != $f_parent_id ) {
 }
 
 $t_version->save();
+form_security_purge( 'ProductMatrix_version_add' );
 
 print_successful_redirect( plugin_page( 'product_view', true ) . '&id=' . $t_product->id );
 

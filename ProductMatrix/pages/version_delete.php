@@ -11,6 +11,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+form_security_validate( 'ProductMatrix_version_delete' );
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 $f_version_id = gpc_get_int( 'id' );
@@ -20,8 +21,8 @@ $t_version = PVMVersion::load( $f_version_id );
 helper_ensure_confirmed( plugin_lang_get( 'ensure_delete_version' ) .
 	$t_product->name . ' ' . $t_version->name, plugin_lang_get( 'delete' ) );
 
-form_security_validate( 'ProductMatrix_version_delete' );
 PVMVersion::delete( $f_version_id );
+form_security_surge( 'ProductMatrix_version_delete' );
 
 print_successful_redirect( plugin_page( 'product_view', true ) . '&id=' . $t_product->id );
 

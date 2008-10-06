@@ -11,6 +11,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+form_security_validate( 'ProductMatrix_product_update' );
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 $f_product_id = gpc_get_int( 'product_id' );
@@ -26,8 +27,8 @@ foreach( $t_product->versions as $t_version ) {
 	$t_version->parent_id = gpc_get_int( $t_prefix . 'parent', 0 );
 }
 
-form_security_validate( 'ProductMatrix_product_update' );
 $t_product->save();
+form_security_purge( 'ProductMatrix_product_update' );
 
 print_successful_redirect( plugin_page( 'product_view', true ) . '&id=' . $t_product->id );
 
