@@ -102,7 +102,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 	function report_bug_form( $p_event ) {
 		$matrix = new ProductMatrix();
-		$matrix->view_form();
+		$matrix->view_report_form();
 	}
 
 	function report_bug( $p_event, $p_bug_data, $p_bug_id ) {

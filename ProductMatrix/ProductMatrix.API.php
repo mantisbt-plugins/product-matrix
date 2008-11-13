@@ -621,6 +621,80 @@ class ProductMatrix {
 		echo '</td></tr>';
 	}
 
+	function view_report_form() {
+		$t_products = PVMProduct::load_all( true );
+
+		if ( count( $t_products ) < 1 ) {
+			return null;
+		}
+
+		$t_version_trees = array();
+		$t_version_count = 0;
+		foreach( $t_products as $t_product ) {
+			$t_version_tree = $t_product->version_tree_list();
+
+			$t_version_count = max( count( $t_version_tree ), $t_version_count );
+			$t_version_trees[ $t_product->id ] = $t_version_tree;
+		}
+
+		echo '<tr ', helper_alternate_class(), '><td class="category">',
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
+
+		collapse_open( 'view', 'ProductMatrix' );
+
+		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
+		collapse_icon( 'view', 'ProductMatrix' );
+		echo '</td>';
+
+		foreach( $t_products as $t_product ) {
+			echo '<td colspan="2">', $t_product->name, '</td>';
+		}
+
+		echo '</tr>';
+
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
+		$t_status_default = array_shift( array_keys( $t_status_array ) );
+
+		for( $i = 0; $i < $t_version_count; $i++ ) {
+			echo '<tr ', helper_alternate_class(), '><td></td>';
+
+			foreach( $t_products as $t_product ) {
+				$t_shown = false;
+				if( count( $t_version_trees[ $t_product->id ] ) ) {
+					list( $t_version, $t_depth ) = array_shift( $t_version_trees[ $t_product->id ] );
+
+					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>',
+						'<input type="checkbox" name="Product', $t_product->id, 'Version', $t_version->id, '" value="', $t_status_default, '"/>',
+						'</td>';
+
+				} else {
+					echo '<td></td><td></td>';
+				}
+			}
+
+			echo '</tr>';
+		}
+
+		echo '</table>';
+
+		collapse_closed( 'view', 'ProductMatrix' );
+
+		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
+		collapse_icon( 'view', 'ProductMatrix' );
+		echo '</td>';
+
+		foreach( $t_products as $t_product ) {
+			echo '<td>', $t_product->name, '</td>';
+		}
+
+		echo '</tr></table>';
+
+		collapse_end( 'view', 'ProductMatrix' );
+
+		echo '</td></tr>';
+	}
+
 	function process_form( $p_reload_products=true ) {
 		$t_products = PVMProduct::load_all( true );
 
