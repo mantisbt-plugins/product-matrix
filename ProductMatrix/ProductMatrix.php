@@ -30,8 +30,10 @@ class ProductMatrixPlugin extends MantisPlugin {
 		return array(
 			'ProductNotFound' => 'The product was not found.',
 			'VersionNotFound' => 'The version was not found.',
+			'PlatformNotFound' => 'The platform was not found.',
 			'ProductNameEmpty' => 'The product\'s name must not be empty.',
 			'VersionNameEmpty' => 'The version\'s name must not be empty.',
+			'PlatformNameEmpty' => 'The platform\'s name must not be empty.',
 			'ProductIDNotSet' => 'The product has an invalid ID.',
 		);
 	}
@@ -130,6 +132,16 @@ class ProductMatrixPlugin extends MantisPlugin {
 				bug_id		I		NOTNULL UNSIGNED PRIMARY,
 				version_id	I		NOTNULL UNSIGNED PRIMARY,
 				status		I		NOTNULL UNSIGNED
+				" ) ),
+			array( 'CreateTableSQL', array( plugin_table( 'platform' ), "
+				id			I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+				product_id	I		NOTNULL UNSIGNED,
+				name		C(128)	NOTNULL DEFAULT \" '' \",
+				" ) ),
+			array( 'CreateTableSQL', array( plugin_table( 'affects' ), "
+				bug_id		I		NOTNULL UNSIGNED PRIMARY,
+				platform_id	I		NOTNULL UNSIGNED PRIMARY,
+				affected	L		NOTNULL UNSIGNED DEFAULT '0'
 				" ) ),
 		);
 	}

@@ -14,6 +14,7 @@
 class PVMProduct {
 	var $id;
 	var $name;
+	var $platforms = array();
 	var $versions = array();
 	var $version_tree = array();
 
@@ -48,6 +49,14 @@ class PVMProduct {
 			}
 
 			$t_version->save();
+		}
+
+		foreach( $this->platforms as $t_platform ) {
+			if ( 0 == $t_platform->product_id ) {
+				$t_platform->product_id = $this->id;
+			}
+
+			$t_platform->save();
 		}
 	}
 
@@ -109,6 +118,8 @@ class PVMProduct {
 		$t_product = new PVMProduct( $t_row['name'] );
 		$t_product->id = $t_row['id'];
 
+		$t_product->platforms = PVMPlatform::load_by_product( $t_product->id );
+
 		if ( $p_load_versions ) {
 			$t_product->load_versions();
 		}
@@ -126,6 +137,8 @@ class PVMProduct {
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$t_product = new PVMProduct( $t_row['name'] );
 			$t_product->id = $t_row['id'];
+
+			$t_product->platforms = PVMPlatform::load_by_product( $t_product->id );
 
 			if ( $p_load_versions ) {
 				$t_product->load_versions();
@@ -193,6 +206,7 @@ class PVMProduct {
 	}
 
 	static function delete( $p_id ) {
+		PVMPlatform::delete_by_product( $p_id );
 		PVMVersion::delete_by_product( $p_id );
 
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
@@ -210,6 +224,114 @@ class PVMProduct {
 				( $t_version->id == $p_default_id ? 'selected="selected" ' : '' ),
 				'>', str_pad( ' ', $t_depth+1, '-', STR_PAD_LEFT ), $t_version->name, '</option>';
 		}
+	}
+}
+
+class PVMPlatform {
+	var $id;
+	var $product_id;
+	var $name;
+
+	function __construct( $p_product_id, $p_name ) {
+		$this->id = 0;
+		$this->product_id = $p_product_id;
+		$this->name = $p_name;
+	}
+
+	function save() {
+		if ( is_blank( $this->name ) ) {
+			plugin_error( 'PlatformNameEmpty', ERROR );
+		}
+
+		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
+
+		if ( 0 == $this->id ) { #create
+			$t_query = "INSERT INTO $t_platform_table (
+					product_id,
+					name
+				) VALUES (" .
+					db_param() . ',' .
+					db_param() .
+				')';
+			db_query_bound( $t_query, array(
+				$this->product_id,
+				$this->name
+			) );
+
+			$this->id = db_insert_id( $t_platform_table );
+
+		} else { #update
+			$t_query = "UPDATE $t_platform_table SET
+					product_id=" . db_param() . ',
+					name=' . db_param() . ',
+				WHERE id=' . db_param();
+			db_query_bound( $t_query, array(
+				$this->product_id,
+				$this->name,
+				$this->id
+			) );
+		}
+	}
+
+	static function load( $p_id ) {
+		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
+
+		$t_query = "SELECT * FROM $t_platform_table WHERE id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $p_id ) );
+
+		if ( db_num_rows( $t_result ) < 1 ) {
+			plugin_error( 'PlatformNotFound', ERROR );
+		}
+
+		$t_row = db_fetch_array( $t_result );
+
+		$t_platform = new PVMPlatform( $t_row['product_id'], $t_row['name'] );
+		$t_platform->id = $t_row['id'];
+
+		return $t_platform;
+	}
+
+	static function load_by_product( $p_product_id ) {
+		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
+
+		$t_query = "SELECT * FROM $t_platform_table WHERE product_id=" . db_param() . ' ORDER BY name ASC';
+		$t_result = db_query_bound( $t_query, array( $p_product_id ) );
+
+		$t_platforms = array();
+		while( $t_row = db_fetch_array( $t_result ) ) {
+			$t_platform = new PVMPlatform( $t_row['product_id'], $t_row['name'] );
+			$t_platform->id = $t_row['id'];
+
+			$t_platforms[$t_platform->id] = $t_platform;
+		}
+
+		return $t_platforms;
+	}
+
+	static function delete( $p_id ) {
+		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
+		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
+
+		$t_query = "DELETE FROM $t_affects_table WHERE platform_id=" . db_param();
+		db_query_bound( $t_query, array( $p_id ) );
+
+		$t_query = "DELETE FROM $t_platform_table WHERE id=" . db_param();
+		db_query_bound( $t_query, array( $p_id ) );
+	}
+
+	static function delete_by_product( $p_product_id ) {
+		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
+		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
+
+		$t_product = PVMProduct::load( $p_product_id, true );
+		$t_platform_ids = array_keys( $t_product->platforms );
+
+		$t_query = "DELETE FROM $t_affects_table WHERE platform_id IN (" .
+			join( ',', $t_platform_ids ) . ' )';
+		db_query_bound( $t_query );
+
+		$t_query = "DELETE FROM $t_platform_table WHERE product_id=" . db_param();
+		db_query_bound( $t_query, array( $p_product_id ) );
 	}
 }
 
