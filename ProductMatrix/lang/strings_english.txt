@@ -22,6 +22,7 @@ $s_plugin_ProductMatrix_delete = 'Delete';
 
 $s_plugin_ProductMatrix_ensure_delete_product = 'Are you sure want to delete this product: ';
 $s_plugin_ProductMatrix_ensure_delete_version = 'Are you sure want to delete this version: ';
+$s_plugin_ProductMatrix_ensure_delete_platform = 'Are you sure want to delete this platform: ';
 
 $s_plugin_ProductMatrix_history_version_tracked = 'Product Version Tracked';
 $s_plugin_ProductMatrix_history_version_ignored = 'Product Version Ignored';

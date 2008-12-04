@@ -29,6 +29,29 @@ html_page_top2();
 <td class="right"><?php print_bracket_link( plugin_page( 'products' ), 'Back' ) ?></td>
 </tr>
 
+<?php if ( count( $t_product->platforms ) > 0 ) { ?>
+<tr class="row-category">
+<td colspan="2">Platform</td>
+<td>Obsolete</td>
+<td>Actions</td>
+</tr>
+
+<?php foreach( $t_product->platforms as $t_platform ) { ?>
+<tr <?php echo helper_alternate_class() ?>>
+<td colspan="2"><?php echo $t_platform->name ?></td>
+
+<td class="center <?php echo $t_platform->obsolete ? 'PVMobsolete' : '' ?>"></td>
+<td class="center"><?php if ( $t_can_manage ) {
+echo print_bracket_link( plugin_page( 'platform_delete' ) .
+	'&id=' . $t_platform->id . form_security_param( 'ProductMatrix_platform_delete' ), plugin_lang_get( 'delete' ) );
+} ?></td>
+</tr>
+<?php } ?>
+
+<tr><td class="spacer"></td><tr>
+
+<?php } ?>
+
 <tr class="row-category">
 <td>Version</td>
 <td>Released</td>
@@ -98,6 +121,28 @@ echo print_bracket_link( plugin_page( 'version_delete' ) .
 <?php } else { ?>
 <input type="hidden" name="parent_id" value="0"/></td>
 <?php } ?>
+
+<tr>
+<td class="center" colspan="2"><input type="submit"/></td>
+</tr>
+
+</table>
+</form>
+
+<br/>
+<form method="post" action="<?php echo plugin_page( 'platform_add' ) ?>">
+<?php echo form_security_field( 'ProductMatrix_platform_add' ) ?>
+<table class="width50" align="center" cellspacing="1">
+<input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
+
+<tr>
+<td class="form-title" colspan="2">Add Platform</td>
+</tr>
+
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category">Name</td>
+<td><input name="platform_name"/></td>
+</tr>
 
 <tr>
 <td class="center" colspan="2"><input type="submit"/></td>
