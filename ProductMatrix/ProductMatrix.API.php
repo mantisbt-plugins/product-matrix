@@ -231,11 +231,13 @@ class PVMPlatform {
 	var $id;
 	var $product_id;
 	var $name;
+	var $obsolete;
 
 	function __construct( $p_product_id, $p_name ) {
 		$this->id = 0;
 		$this->product_id = $p_product_id;
 		$this->name = $p_name;
+		$this->obsolete = false;
 	}
 
 	function save() {
@@ -248,14 +250,17 @@ class PVMPlatform {
 		if ( 0 == $this->id ) { #create
 			$t_query = "INSERT INTO $t_platform_table (
 					product_id,
-					name
+					name,
+					obsolete
 				) VALUES (" .
+					db_param() . ',' .
 					db_param() . ',' .
 					db_param() .
 				')';
 			db_query_bound( $t_query, array(
 				$this->product_id,
-				$this->name
+				$this->name,
+				$this->obsolete
 			) );
 
 			$this->id = db_insert_id( $t_platform_table );
@@ -264,10 +269,12 @@ class PVMPlatform {
 			$t_query = "UPDATE $t_platform_table SET
 					product_id=" . db_param() . ',
 					name=' . db_param() . ',
+					obsolete=' . db_param() . '
 				WHERE id=' . db_param();
 			db_query_bound( $t_query, array(
 				$this->product_id,
 				$this->name,
+				$this->obsolete,
 				$this->id
 			) );
 		}
@@ -287,6 +294,7 @@ class PVMPlatform {
 
 		$t_platform = new PVMPlatform( $t_row['product_id'], $t_row['name'] );
 		$t_platform->id = $t_row['id'];
+		$t_platform->obsolete = $t_row['obsolete'];
 
 		return $t_platform;
 	}
@@ -301,6 +309,7 @@ class PVMPlatform {
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$t_platform = new PVMPlatform( $t_row['product_id'], $t_row['name'] );
 			$t_platform->id = $t_row['id'];
+			$t_platform->obsolete = $t_row['obsolete'];
 
 			$t_platforms[$t_platform->id] = $t_platform;
 		}
