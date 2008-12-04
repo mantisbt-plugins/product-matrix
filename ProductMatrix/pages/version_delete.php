@@ -22,7 +22,7 @@ helper_ensure_confirmed( plugin_lang_get( 'ensure_delete_version' ) .
 	$t_product->name . ' ' . $t_version->name, plugin_lang_get( 'delete' ) );
 
 PVMVersion::delete( $f_version_id );
-form_security_surge( 'ProductMatrix_version_delete' );
+form_security_purge( 'ProductMatrix_version_delete' );
 
 print_successful_redirect( plugin_page( 'product_view', true ) . '&id=' . $t_product->id );
 
