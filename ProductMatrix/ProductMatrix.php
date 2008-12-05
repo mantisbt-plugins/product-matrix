@@ -141,8 +141,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'affects' ), "
 				bug_id		I		NOTNULL UNSIGNED PRIMARY,
-				platform_id	I		NOTNULL UNSIGNED PRIMARY,
-				affected	L		NOTNULL UNSIGNED DEFAULT '0'
+				platform_id	I		NOTNULL UNSIGNED PRIMARY
 				" ) ),
 		);
 	}
