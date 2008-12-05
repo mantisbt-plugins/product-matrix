@@ -596,6 +596,10 @@ class PVMVersion {
 	}
 }
 
+/**
+ * Object representation of all product, platform, and version objects
+ * affected by an issue, and the bug status for each version.
+ */
 class ProductMatrix {
 	var $bug_id;
 	var $status;
@@ -604,6 +608,11 @@ class ProductMatrix {
 	var $__affects;
 	var $products;
 
+	/**
+	 * Initialize a matrix object.
+	 * @param int Bug ID
+	 * @param boolean Load product objects
+	 */
 	function __construct( $p_bug_id=0, $p_load_products=true ) {
 		$this->bug_id = $p_bug_id;
 		$this->__status = array();
@@ -640,6 +649,11 @@ class ProductMatrix {
 		}
 	}
 
+	/**
+	 * Save a matrix object to the database.
+	 * Log history entries for any affected platform or version status
+	 * that has changed state since the matrix was last saved.
+	 */
 	function save() {
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
@@ -695,6 +709,9 @@ class ProductMatrix {
 		}
 	}
 
+	/**
+	 * Load product objects for all versions affected by the bug.
+	 */
 	function load_products() {
 		$t_version_ids = array_keys( $this->status );
 		$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
@@ -732,6 +749,9 @@ class ProductMatrix {
 		}
 	}
 
+	/**
+	 * Log an affected platform change to the bug history.
+	 */
 	function history_log_platform( $t_platform_id, $t_affected ) {
 		$t_product_name = $this->platforms[ $t_platform_id ]->name;
 		$t_platform_name = $this->platforms[ $t_platform_id ]->platforms[ $t_platform_id ]->name;
@@ -747,6 +767,9 @@ class ProductMatrix {
 		plugin_history_log( $this->bug_id, $t_field, $t_history_string );
 	}
 
+	/**
+	 * Log an affected version status change to the bug history.
+	 */
 	function history_log_version( $t_version_id, $t_old, $t_new ) {
 		$t_status = plugin_config_get( 'status' );
 
@@ -799,6 +822,9 @@ class ProductMatrix {
 		}
 	}
 
+	/**
+	 * Display a tabular matrix of affected, products, platforms, and versions.
+	 */
 	function view() {
 		if ( count( $this->status ) < 1 || count( $this->products ) < 1 ) {
 			return null;
@@ -885,6 +911,10 @@ class ProductMatrix {
 		echo '</td></tr>';
 	}
 
+	/**
+	 * Display a form when updating bugs allowing the user to specify affected
+	 * products, platforms, and version statuses for a bug.
+	 */
 	function view_form() {
 		$t_products = PVMProduct::load_all( true );
 
@@ -991,6 +1021,10 @@ class ProductMatrix {
 		echo '</td></tr>';
 	}
 
+	/**
+	 * Display a form when reporting new bugs allowing the user to specify affected
+	 * products, platforms, and version statuses for a bug.
+	 */
 	function view_report_form() {
 		$t_products = PVMProduct::load_all( true );
 
@@ -1084,6 +1118,12 @@ class ProductMatrix {
 		echo '</td></tr>';
 	}
 
+	/**
+	 * Update the affected platform and version status matrices as indicated
+	 * by a form submitted by the user when reporting or updating a bug.
+	 * Does not save the changes to the database; ProductMatrix::save()
+	 * *must* be called to persist the changes to the matrices.
+	 */
 	function process_form() {
 		$t_products = PVMProduct::load_all( true );
 
