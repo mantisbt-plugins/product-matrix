@@ -424,6 +424,9 @@ class PVMPlatform {
 	}
 }
 
+/**
+ * Object represontation of a product version.
+ */
 class PVMVersion {
 	var $id;
 	var $parent_id = 0;
@@ -433,6 +436,12 @@ class PVMVersion {
 	var $released = false;
 	var $obsolete = false;
 
+	/**
+	 * Initialize a version object.
+	 * @param int Product ID
+	 * @param string Version name
+	 * @param int Parent version ID
+	 */
 	function __construct( $p_product_id, $p_name, $p_parent_id=0 ) {
 		$this->id = 0;
 		$this->parent_id = $p_parent_id;
@@ -441,6 +450,9 @@ class PVMVersion {
 		$this->date = date( 'Y-m-d' );
 	}
 
+	/**
+	 * Save a version to the database.
+	 */
 	function save() {
 		if ( is_blank( $this->name ) ) {
 			plugin_error( 'VersionNameEmpty', ERROR );
@@ -496,6 +508,11 @@ class PVMVersion {
 		}
 	}
 
+	/**
+	 * Load a version object from the database.
+	 * @param int Version ID
+	 * @return object Version object
+	 */
 	static function load( $p_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
@@ -517,6 +534,12 @@ class PVMVersion {
 		return $t_version;
 	}
 
+	/**
+	 * Load all version objects from the database associated
+	 * with the given product ID.
+	 * @param int Product ID
+	 * @return array Version objects
+	 */
 	static function load_by_product( $p_product_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
@@ -537,6 +560,10 @@ class PVMVersion {
 		return $t_versions;
 	}
 
+	/**
+	 * Delete a version object from the database.
+	 * @param int Version ID
+	 */
 	static function delete( $p_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
@@ -548,6 +575,11 @@ class PVMVersion {
 		db_query_bound( $t_query, array( $p_id ) );
 	}
 
+	/**
+	 * Delete all version objects from the database associated
+	 * with the given product ID.
+	 * @param int Product ID
+	 */
 	static function delete_by_product( $p_product_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
