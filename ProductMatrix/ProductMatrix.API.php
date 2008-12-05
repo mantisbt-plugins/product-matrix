@@ -276,12 +276,20 @@ class PVMProduct {
 	}
 }
 
+/**
+ * Object representation of a product platform.
+ */
 class PVMPlatform {
 	var $id;
 	var $product_id;
 	var $name;
 	var $obsolete;
 
+	/**
+	 * Initialize a platform object.
+	 * @param int Product ID
+	 * @param string Platform name
+	 */
 	function __construct( $p_product_id, $p_name ) {
 		$this->id = 0;
 		$this->product_id = $p_product_id;
@@ -289,6 +297,9 @@ class PVMPlatform {
 		$this->obsolete = false;
 	}
 
+	/**
+	 * Save a platform object to the database.
+	 */
 	function save() {
 		if ( is_blank( $this->name ) ) {
 			plugin_error( 'PlatformNameEmpty', ERROR );
@@ -329,6 +340,11 @@ class PVMPlatform {
 		}
 	}
 
+	/**
+	 * Load a platform object from the database.
+	 * @param int Platform ID
+	 * @return object Platform object
+	 */
 	static function load( $p_id ) {
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
 
@@ -348,6 +364,12 @@ class PVMPlatform {
 		return $t_platform;
 	}
 
+	/**
+	 * Load all platform objects from the database associated
+	 * with the given product ID.
+	 * @param int Product ID
+	 * @return array Platform objects
+	 */
 	static function load_by_product( $p_product_id ) {
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
 
@@ -366,6 +388,10 @@ class PVMPlatform {
 		return $t_platforms;
 	}
 
+	/**
+	 * Delete a platform object from the database.
+	 * @param int Platform ID
+	 */
 	static function delete( $p_id ) {
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
 		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
@@ -377,6 +403,11 @@ class PVMPlatform {
 		db_query_bound( $t_query, array( $p_id ) );
 	}
 
+	/**
+	 * Delete all platform object from the database associated
+	 * with the given product ID.
+	 * @param int Product ID
+	 */
 	static function delete_by_product( $p_product_id ) {
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
 		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
