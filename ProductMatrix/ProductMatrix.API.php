@@ -150,7 +150,7 @@ class PVMProduct {
 		return $t_products;
 	}
 
-	static function load_by_version_ids( $p_version_ids, $p_load_all_versions=false ) {
+	static function load_by_version_ids( $p_version_ids ) {
 		if ( !is_array( $p_version_ids ) ) {
 			if ( !is_numeric( $p_version_ids ) && is_blank( $p_version_ids ) ) {
 				return null;
@@ -186,19 +186,7 @@ class PVMProduct {
 			$t_product = new PVMProduct( $t_row['name'] );
 			$t_product->id = $t_row['id'];
 
-			# TODO: Replace this with code to only load the necessary version objects in a single query,
-			# rather than loading them in one query per-product and them deleting unneeded ones later.
 			$t_product->load_versions();
-
-			if ( !$p_load_all_versions ) {
-				$t_product_version_ids = array_keys( $t_product->versions );
-				foreach( $t_product_version_ids as $t_version_id ) {
-					if ( !in_array( $t_version_id, $p_version_ids ) ) {
-						unset( $t_product->versions[ $t_version_id ] );
-					}
-				}
-			}
-
 			$t_products[$t_product->id] = $t_product;
 		}
 
@@ -533,6 +521,7 @@ class ProductMatrix {
 
 		$this->load_products();
 		$this->products_to_versions();
+		$this->products_to_platforms();
 
 		foreach( $this->status as $t_version_id => $t_status ) {
 			if ( !isset( $this->__status[ $t_version_id ] ) ) { # new status
@@ -661,10 +650,36 @@ class ProductMatrix {
 		plugin_history_log( $this->bug_id, $t_field, $t_old, $t_new );
 	}
 
+	/**
+	 * Prune unused platforms and versions from products in the matrix.
+	 */
+	function prune() {
+		$t_platform_ids = array_keys( $this->affects );
+		$t_version_ids = array_keys( $this->status );
+
+		foreach( $this->products as $t_product ) {
+			$t_product_platform_ids = array_keys( $t_product->platforms );
+			foreach( $t_product_platform_ids as $t_platform_id ) {
+				if ( !in_array( $t_platform_id, $t_platform_ids ) ) {
+					unset( $t_product->platforms[ $t_platform_id ] );
+				}
+			}
+
+			$t_product_version_ids = array_keys( $t_product->versions );
+			foreach( $t_product_version_ids as $t_version_id ) {
+				if ( !in_array( $t_version_id, $t_version_ids ) ) {
+					unset( $t_product->versions[ $t_version_id ] );
+				}
+			}
+		}
+	}
+
 	function view() {
 		if ( count( $this->status ) < 1 || count( $this->products ) < 1 ) {
 			return null;
 		}
+
+		$this->prune();
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
@@ -709,7 +724,17 @@ class ProductMatrix {
 			echo '</tr>';
 		}
 
-		echo '</table>';
+		echo '<tr ', helper_alternate_class(), '><td></td>';
+
+		foreach( $this->products as $t_product ) {
+			if ( count( $t_product->platforms ) ) {
+				echo '<td class="category">Affects</td><td>', join( ', ', $t_product->platforms ), '</td>';
+			} else {
+				echo '<td></td><td></td>';
+			}
+		}
+
+		echo '</tr></table>';
 
 		collapse_closed( 'view', 'ProductMatrix' );
 
