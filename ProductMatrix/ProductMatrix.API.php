@@ -488,20 +488,21 @@ class ProductMatrix {
 	var $bug_id;
 	var $status;
 	var $__status;
+	var $affects;
+	var $__affects;
 	var $products;
 
 	function __construct( $p_bug_id=0, $p_load_products=true ) {
-		if ( !$p_bug_id ) {
-			$this->bug_id = $p_bug_id;
-			$this->__status = array();
-			$this->status = array();
-			$this->products = array();
-			return;
-		}
-
 		$this->bug_id = $p_bug_id;
 		$this->__status = array();
 		$this->status = array();
+		$this->__affects = array();
+		$this->affects = array();
+		$this->products = array();
+
+		if ( !$p_bug_id ) {
+			return;
+		}
 
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
