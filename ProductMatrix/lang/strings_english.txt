@@ -15,6 +15,13 @@ $s_plugin_ProductMatrix_ = '';
 $s_plugin_ProductMatrix_title = 'Product Version Matrix';
 $s_plugin_ProductMatrix_description = '';
 
+$s_plugin_ProductMatrix_product = 'Product';
+$s_plugin_ProductMatrix_platform = 'Platform';
+$s_plugin_ProductMatrix_version = 'Version';
+$s_plugin_ProductMatrix_parent = 'Parent';
+$s_plugin_ProductMatrix_released = 'Released';
+$s_plugin_ProductMatrix_obsolete = 'Obsolete';
+
 $s_plugin_ProductMatrix_product_status = 'Product Status';
 $s_plugin_ProductMatrix_status_na = 'N/A';
 
@@ -23,6 +30,7 @@ $s_plugin_ProductMatrix_delete = 'Delete';
 $s_plugin_ProductMatrix_ensure_delete_product = 'Are you sure want to delete this product: ';
 $s_plugin_ProductMatrix_ensure_delete_version = 'Are you sure want to delete this version: ';
 $s_plugin_ProductMatrix_ensure_delete_platform = 'Are you sure want to delete this platform: ';
+$s_plugin_ProductMatrix_ensure_delete_members = 'Are you sure want to delete the following from ';
 
 $s_plugin_ProductMatrix_history_version_tracked = 'Product Version Tracked';
 $s_plugin_ProductMatrix_history_version_ignored = 'Product Version Ignored';
