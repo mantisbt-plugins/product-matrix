@@ -11,6 +11,16 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+/**
+ * Product Version Matrix API
+ * @author John Reese
+ */
+
+/**
+ * Object representation of a product.
+ * A product can contain a list of platforms, and a hierarchical
+ * list of versions.
+ */
 class PVMProduct {
 	var $id;
 	var $name;
@@ -18,11 +28,19 @@ class PVMProduct {
 	var $versions = array();
 	var $version_tree = array();
 
+	/**
+	 * Initialize a product object.
+	 * @param string Product name
+	 */
 	function __construct( $p_name ) {
 		$this->id = 0;
 		$this->name = $p_name;
 	}
 
+	/**
+	 * Save a product to the database, and recursively save child
+	 * platforms and versions.
+	 */
 	function save() {
 		if ( is_blank( $this->name ) ) {
 			plugin_error( 'ProductNameEmpty', ERROR );
@@ -60,6 +78,9 @@ class PVMProduct {
 		}
 	}
 
+	/**
+	 * Load child versions and build a version tree.
+	 */
 	function load_versions() {
 		if ( 0 == $this->id ) {
 			plugin_error( 'ProductIDNotSet', ERROR );
@@ -69,6 +90,9 @@ class PVMProduct {
 		$this->build_version_tree();
 	}
 
+	/**
+	 * Build a hierarchical version tree of loaded versions.
+	 */
 	function build_version_tree() {
 		foreach( $this->versions as $t_version ) {
 			$t_parent_id = $t_version->parent_id;
@@ -80,6 +104,11 @@ class PVMProduct {
 		}
 	}
 
+	/**
+	 * Recursively generate a flat list of version/depth pairs
+	 * for representing the hierarchical structure for display.
+	 * @return array Array of version/depth pairs
+	 */
 	function version_tree_list() {
 		if ( !isset( $this->__version_tree_list ) ) {
 			$this->__version_tree_list = $this->version_tree_section( $this->version_tree[0] );
@@ -87,6 +116,11 @@ class PVMProduct {
 		return $this->__version_tree_list;
 	}
 
+	/**
+	 * Recursive portion of version_tree_list().
+	 * @param array Version tree
+	 * @return array Array of version/depth pairs
+	 */
 	private function version_tree_section( $t_versions, $t_depth=0 ) {
 		if ( !is_array( $t_versions ) || count( $t_versions ) < 1 ) {
 			return array();
@@ -103,6 +137,12 @@ class PVMProduct {
 		return $t_list;
 	}
 
+	/**
+	 * Load a product object from the database.
+	 * @param int Product ID
+	 * @param boolean Load child versions
+	 * @return object Product object
+	 */
 	static function load( $p_id, $p_load_versions=true ) {
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
 
@@ -127,6 +167,11 @@ class PVMProduct {
 		return $t_product;
 	}
 
+	/**
+	 * Load all product objects from the database.
+	 * @param boolean Load child versions
+	 * @return array Product objects
+	 */
 	static function load_all( $p_load_versions=false ) {
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
 
@@ -150,6 +195,12 @@ class PVMProduct {
 		return $t_products;
 	}
 
+	/**
+	 * Load all product objects from the database that have child
+	 * versions from a given list.
+	 * @param array Version IDs
+	 * @return array Product objects
+	 */
 	static function load_by_version_ids( $p_version_ids ) {
 		if ( !is_array( $p_version_ids ) ) {
 			if ( !is_numeric( $p_version_ids ) && is_blank( $p_version_ids ) ) {
@@ -194,6 +245,10 @@ class PVMProduct {
 		return $t_products;
 	}
 
+	/**
+	 * Delete a product object from the database.
+	 * @param int Product ID
+	 */
 	static function delete( $p_id ) {
 		PVMPlatform::delete_by_product( $p_id );
 		PVMVersion::delete_by_product( $p_id );
@@ -204,6 +259,11 @@ class PVMProduct {
 		db_query_bound( $t_query, array( $p_id ) );
 	}
 
+	/**
+	 * Display <option> tags for a dropdown list using all
+	 * of the product's child versions.
+	 * @param int Selected child version ID
+	 */
 	function select_versions( $p_default_id=0 ) {
 		echo '<option value="0">--</option>';
 		foreach( $this->version_tree_list() as $t_node ) {
