@@ -32,6 +32,8 @@ $s_plugin_ProductMatrix_ensure_delete_version = 'Are you sure want to delete thi
 $s_plugin_ProductMatrix_ensure_delete_platform = 'Are you sure want to delete this platform: ';
 $s_plugin_ProductMatrix_ensure_delete_members = 'Are you sure want to delete the following from ';
 
+$s_plugin_ProductMatrix_history_platform_affected = 'Platform Affected';
+$s_plugin_ProductMatrix_history_platform_unaffected = 'Platform Not Affected';
 $s_plugin_ProductMatrix_history_version_tracked = 'Product Version Tracked';
 $s_plugin_ProductMatrix_history_version_ignored = 'Product Version Ignored';
 $s_plugin_ProductMatrix_history_version_updated = 'Version Status Updated';

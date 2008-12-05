@@ -505,6 +505,7 @@ class ProductMatrix {
 		}
 
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
+		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
 
 		$t_query = "SELECT * FROM $t_status_table WHERE bug_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
@@ -512,6 +513,14 @@ class ProductMatrix {
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$this->status[ $t_row['version_id'] ] = $t_row['status'];
 			$this->__status[ $t_row['version_id'] ] = $t_row['status'];
+		}
+
+		$t_query = "SELECT * FROM $t_affects_table WHERE bug_id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
+
+		while( $t_row = db_fetch_array( $t_result ) ) {
+			$this->affects[ $t_row['platform_id'] ] = true;
+			$this->__affects[ $t_row['platform_id'] ] = true;
 		}
 
 		if ( $p_load_products ) {
@@ -531,14 +540,14 @@ class ProductMatrix {
 					VALUES ( " . join( ',', array( db_param(), db_param(), db_param() ) ) . ' )';
 				db_query_bound( $t_query, array( $this->bug_id, $t_version_id, $t_status ) );
 
-				$this->history_log( $t_version_id, null, $t_status );
+				$this->history_log_version( $t_version_id, null, $t_status );
 				$this->__status[ $t_version_id ] = $t_status;
 
 			} else if ( is_null( $t_status ) ) { # deleted status
 				$t_query = "DELETE FROM $t_status_table WHERE bug_id=" . db_param() . ' AND version_id=' . db_param();
 				db_query_bound( $t_query, array( $this->bug_id, $t_version_id ) );
 
-				$this->history_log( $t_version_id, $this->__status[ $t_version_id ], null );
+				$this->history_log_version( $t_version_id, $this->__status[ $t_version_id ], null );
 				unset( $this->status[ $t_version_id ] );
 				unset( $this->__status[ $t_version_id ] );
 
@@ -547,8 +556,27 @@ class ProductMatrix {
 					' WHERE bug_id=' . db_param() . ' AND version_id=' . db_param();
 				db_query_bound( $t_query, array( $t_status, $this->bug_id, $t_version_id ) );
 
-				$this->history_log( $t_version_id, $this->__status[ $t_version_id ], $t_status );
+				$this->history_log_version( $t_version_id, $this->__status[ $t_version_id ], $t_status );
 				$this->__status[ $t_version_id ] = $t_status;
+			}
+		}
+
+		foreach( $this->affects as $t_platform_id => $t_affected ) {
+			if ( !isset( $this->__affects[ $t_platform_id ] ) ) { # new platform
+				$t_query = "INSERT INTO $t_affects_table ( bug_id, platform_id )
+					VALUES ( " . join( ',', array( db_param(), db_param() ) ) . ' )';
+				db_query_bound( $t_query, array( $this->bug_id, $t_platform_id ) );
+
+				$this->history_log_platform( $t_platform_id, true );
+				$this->__affects[ $t_platform_id ] = true;
+
+			} else if ( false == $t_affected ) { # removed platform
+				$t_query = "DELETE FROM $t_affects_table WHERE bug_id=" . db_param() . ' AND platform_id=' . db_param();
+				db_query_bound( $t_query, array( $this->bug_id, $t_platform_id ) );
+
+				$this->history_log_platform( $t_platform_id, false );
+				unset( $this->affects[ $t_platform_id ] );
+				unset( $this->__affects[ $t_platform_id ] );
 			}
 		}
 	}
@@ -558,6 +586,9 @@ class ProductMatrix {
 		$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
 	}
 
+	/**
+	 * Create a reverse-association of version ID to products.
+	 */
 	function products_to_versions() {
 		if ( isset( $this->versions ) ) {
 			return;
@@ -571,7 +602,38 @@ class ProductMatrix {
 		}
 	}
 
-	function history_log( $t_version_id, $t_old, $t_new ) {
+	/**
+	 * Create a reverse-association of platform ID to products.
+	 */
+	function products_to_platforms() {
+		if ( isset( $this->platforms ) ) {
+			return;
+		}
+
+		$this->platforms = array();
+		foreach( $this->products as $t_product ) {
+			foreach( $t_product->platforms as $t_platform ) {
+				$this->platforms[ $t_platform->id ] = $t_product;
+			}
+		}
+	}
+
+	function history_log_platform( $t_platform_id, $t_affected ) {
+		$t_product_name = $this->platforms[ $t_platform_id ]->name;
+		$t_platform_name = $this->platforms[ $t_platform_id ]->platforms[ $t_platform_id ]->name;
+
+		$t_history_string = "$t_product_name $t_platform_name";
+
+		if ( $t_affected ) {
+			$t_field = 'history_platform_affected';
+		} else {
+			$t_field = 'history_platform_unaffected';
+		}
+
+		plugin_history_log( $this->bug_id, $t_field, $t_history_string );
+	}
+
+	function history_log_version( $t_version_id, $t_old, $t_new ) {
 		$t_status = plugin_config_get( 'status' );
 
 		$t_product_name = $this->versions[ $t_version_id ]->name;
