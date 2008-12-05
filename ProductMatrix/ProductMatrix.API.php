@@ -821,7 +821,26 @@ class ProductMatrix {
 			echo '</tr>';
 		}
 
-		echo '</table>';
+		echo '<tr ', helper_alternate_class(), '><td></td>';
+
+		foreach( $t_products as $t_product ) {
+			if ( count( $t_product->platforms ) ) {
+				echo '<td class="category">Affects</td><td>';
+				$t_first = true;
+				foreach( $t_product->platforms as $t_platform ) {
+					if ( !$t_first ) { echo '<br/>'; }
+					echo '<label><input type="checkbox" name="Product', $t_product->id, 'Platform' , $t_platform->id, '" ',
+						( isset( $this->affects[ $t_platform->id ] ) ? ' checked="checked"' : '' ), '/> ',
+						$t_platform->name, '</label>';
+					$t_first = false;
+				}
+				echo '</td>';
+			} else {
+				echo '<td></td><td></td>';
+			}
+		}
+
+		echo '</tr></table>';
 
 		collapse_closed( 'view', 'ProductMatrix' );
 
