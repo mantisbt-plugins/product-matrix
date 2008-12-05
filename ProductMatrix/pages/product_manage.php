@@ -50,7 +50,7 @@ html_page_top2();
 </td>
 <td></td>
 <td class="center">
-	<input type="checkbox" name="platform_<?php echo $t_platform->id ?>_delete" value="1"/>
+	<input type="checkbox" name="platform_<?php echo $t_platform->id ?>_delete" />
 </td>
 </tr>
 <?php } ?>
@@ -85,7 +85,7 @@ html_page_top2();
 	</select>
 </td>
 <td class="center">
-	<input type="checkbox" name="version_<?php echo $t_version->id ?>_delete" value="1"/>
+	<input type="checkbox" name="version_<?php echo $t_version->id ?>_delete" />
 </td>
 </tr>
 <?php } ?>
