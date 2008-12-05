@@ -32,11 +32,39 @@ html_page_top2();
 <td class="right"><?php print_bracket_link( plugin_page( 'product_view' ) . '&id=' . $t_product->id, 'Back' ) ?></td>
 </tr>
 
+<?php if ( count( $t_product->platforms ) > 0 ) { ?>
+<tr class="row-category">
+<td colspan="2">Platform</td>
+<td>Obsolete</td>
+<td></td>
+<td>Delete</td>
+</tr>
+
+<?php foreach( $t_product->platforms as $t_platform ) { ?>
+<tr <?php echo helper_alternate_class() ?>>
+<td colspan="2">
+	<input name="platform_<?php echo $t_platform->id ?>_name" value="<?php echo $t_platform->name ?>" size="15"/>
+</td>
+<td class="center <?php echo $t_platform->obsolete ? 'PVMobsolete' : '' ?>">
+	<input type="checkbox" name="platform_<?php echo $t_platform->id ?>_obsolete" <?php echo $t_platform->obsolete ? ' checked="checked"' : '' ?>/>
+</td>
+<td></td>
+<td class="center">
+	<input type="checkbox" name="platform_<?php echo $t_platform->id ?>_delete" value="1"/>
+</td>
+</tr>
+<?php } ?>
+
+<tr><td class="spacer"></td><tr>
+
+<?php } ?>
+
 <tr class="row-category">
 <td>Version</td>
 <td>Released</td>
 <td>Obsolete</td>
 <td>Parent</td>
+<td>Delete</td>
 </tr>
 
 <?php foreach( $t_product->version_tree_list() as $t_node ) { list( $t_version, $t_depth ) = $t_node; ?>
@@ -56,11 +84,14 @@ html_page_top2();
 	<?php $t_product->select_versions( $t_version->parent_id ) ?>
 	</select>
 </td>
+<td class="center">
+	<input type="checkbox" name="version_<?php echo $t_version->id ?>_delete" value="1"/>
+</td>
 </tr>
 <?php } ?>
 
 <tr>
-<td colspan="4" class="center">
+<td colspan="5" class="center">
 	<input type="submit" value="Update Product"/>
 </td>
 </tr>
