@@ -186,6 +186,7 @@ class PVMProduct {
 			$t_product = new PVMProduct( $t_row['name'] );
 			$t_product->id = $t_row['id'];
 
+			$t_product->platforms = PVMPlatform::load_by_product( $t_product->id );
 			$t_product->load_versions();
 			$t_products[$t_product->id] = $t_product;
 		}
@@ -518,6 +519,7 @@ class ProductMatrix {
 
 	function save() {
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
+		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
 
 		$this->load_products();
 		$this->products_to_versions();
@@ -611,7 +613,7 @@ class ProductMatrix {
 		$t_product_name = $this->platforms[ $t_platform_id ]->name;
 		$t_platform_name = $this->platforms[ $t_platform_id ]->platforms[ $t_platform_id ]->name;
 
-		$t_history_string = "$t_product_name $t_platform_name";
+		$t_history_string = "$t_product_name: $t_platform_name";
 
 		if ( $t_affected ) {
 			$t_field = 'history_platform_affected';
@@ -728,7 +730,14 @@ class ProductMatrix {
 
 		foreach( $this->products as $t_product ) {
 			if ( count( $t_product->platforms ) ) {
-				echo '<td class="category">Affects</td><td>', join( ', ', $t_product->platforms ), '</td>';
+				echo '<td class="category">Affects</td><td>';
+				$t_first = true;
+				foreach( $t_product->platforms as $t_platform ) {
+					if ( !$t_first ) { echo ', '; }
+					echo $t_platform->name;
+					$t_first = false;
+				}
+				echo '</td>';
 			} else {
 				echo '<td></td><td></td>';
 			}
@@ -914,7 +923,26 @@ class ProductMatrix {
 			echo '</tr>';
 		}
 
-		echo '</table>';
+		echo '<tr ', helper_alternate_class(), '><td></td>';
+
+		foreach( $t_products as $t_product ) {
+			if ( count( $t_product->platforms ) ) {
+				echo '<td class="category">Affects</td><td>';
+				$t_first = true;
+				foreach( $t_product->platforms as $t_platform ) {
+					if ( !$t_first ) { echo '<br/>'; }
+					echo '<label><input type="checkbox" name="Product', $t_product->id, 'Platform' , $t_platform->id, '" ',
+						( isset( $this->affects[ $t_platform->id ] ) ? ' checked="checked"' : '' ), '/> ',
+						$t_platform->name, '</label>';
+					$t_first = false;
+				}
+				echo '</td>';
+			} else {
+				echo '<td></td><td></td>';
+			}
+		}
+
+		echo '</tr></table>';
 
 		collapse_closed( 'view', 'ProductMatrix' );
 
@@ -933,14 +961,32 @@ class ProductMatrix {
 		echo '</td></tr>';
 	}
 
-	function process_form( $p_reload_products=true ) {
+	function process_form() {
 		$t_products = PVMProduct::load_all( true );
 
 		foreach( $t_products as $t_product ) {
-			$t_form_product = 'Product' . $t_product->id . 'Version';
+			$t_form_prefix = 'Product' . $t_product->id . 'Platform';
+
+			foreach( $t_product->platforms as $t_platform ) {
+				$t_form_item = $t_form_prefix . $t_platform->id;
+				$t_affects = gpc_get_bool( $t_form_item, 0 );
+
+				$t_affects_set = isset( $this->affects[$t_platform->id] );
+				$t_affects_cleared = $t_affects < 1;
+
+				if ( $t_affects_cleared ) {
+					if ( $t_affects_set ) {
+						$this->affects[$t_platform->id] = false;
+					}
+				} else {
+					$this->affects[$t_platform->id] = true;
+				}
+			}
+
+			$t_form_prefix = 'Product' . $t_product->id . 'Version';
 
 			foreach( $t_product->versions as $t_version ) {
-				$t_form_item = $t_form_product . $t_version->id;
+				$t_form_item = $t_form_prefix . $t_version->id;
 				$t_status = gpc_get_int( $t_form_item, 0 );
 
 				$t_status_set = isset( $this->status[$t_version->id] );
@@ -954,10 +1000,6 @@ class ProductMatrix {
 					$this->status[$t_version->id] = $t_status;
 				}
 			}
-		}
-
-		if ( $p_reload_products ) {
-			$this->load_products();
 		}
 	}
 }
