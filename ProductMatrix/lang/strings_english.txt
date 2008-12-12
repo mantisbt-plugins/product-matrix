@@ -26,7 +26,15 @@ $s_plugin_ProductMatrix_product_status = 'Product Status';
 $s_plugin_ProductMatrix_status_na = 'N/A';
 $s_plugin_ProductMatrix_common = 'Common';
 
+$s_plugin_ProductMatrix_configuration = 'Configuration';
+$s_plugin_ProductMatrix_view_threshold = 'View Threshold';
+$s_plugin_ProductMatrix_update_threshold = 'Update Threshold';
+$s_plugin_ProductMatrix_manage_threshold = 'Manage Threshold';
+$s_plugin_ProductMatrix_enabled_features = 'Enabled Features';
+$s_plugin_ProductMatrix_common_platform = 'Common Platform';
+
 $s_plugin_ProductMatrix_delete = 'Delete';
+$s_plugin_ProductMatrix_update = 'Update';
 
 $s_plugin_ProductMatrix_ensure_delete_product = 'Are you sure want to delete this product: ';
 $s_plugin_ProductMatrix_ensure_delete_version = 'Are you sure want to delete this version: ';

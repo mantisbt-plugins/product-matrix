@@ -14,7 +14,7 @@
 access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
 $t_can_manage = access_has_global_level( plugin_config_get( 'manage_threshold' ) );
 
-$t_products = PVMProduct::load_all();
+$t_products = PVMProduct::load_all( true );
 
 html_page_top1();
 html_page_top2();
@@ -25,15 +25,20 @@ html_page_top2();
 
 <tr>
 <td class="form-title">Products</td>
+<td class="right" colspan="2"><?php if ( $t_can_manage ) print_bracket_link( plugin_page( 'config_page' ), plugin_lang_get( 'configuration' ) ); ?></td>
 </tr>
 
 <tr class="row-category">
 <td>Name</td>
+<td>Versions</td>
+<td>Platforms</td>
 </tr>
 
 <?php foreach( $t_products as $t_product ) { ?>
 <tr <?php echo helper_alternate_class() ?>>
-<td><a href="<?php echo plugin_page( 'product_view' ), '&id=', $t_product->id ?>"><?php echo $t_product->name ?></a></td>
+<td class="center"><a href="<?php echo plugin_page( 'product_view' ), '&id=', $t_product->id ?>"><?php echo $t_product->name ?></a></td>
+<td class="center"><?php echo count( $t_product->versions ) ?></td>
+<td class="center"><?php echo count( $t_product->platforms ) ?></td>
 </tr>
 <?php } ?>
 

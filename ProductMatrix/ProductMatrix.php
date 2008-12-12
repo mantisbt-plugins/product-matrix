@@ -15,6 +15,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 	function register() {
 		$this->name = plugin_lang_get( 'title' );
 		$this->description = plugin_lang_get( 'description' );
+		$this->page = 'config_page';
 
 		$this->version = '0.1';
 		$this->requires = array(
@@ -41,6 +42,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 	function config() {
 		return array(
 			'view_threshold' => VIEWER,
+			'update_threshold' => DEVELOPER,
 			'manage_threshold' => MANAGER,
 
 			'common_platform' => ON,
@@ -89,30 +91,40 @@ class ProductMatrixPlugin extends MantisPlugin {
 	}
 
 	function view_bug( $p_event, $p_bug_id ) {
-		$matrix = new ProductMatrix( $p_bug_id );
-		$matrix->view();
+		if ( access_has_bug_level( plugin_config_get( 'view_threshold' ), $p_bug_id ) ) {
+			$matrix = new ProductMatrix( $p_bug_id );
+			$matrix->view();
+		}
 	}
 
 	function update_bug_form( $p_event, $p_bug_id ) {
-		$matrix = new ProductMatrix( $p_bug_id );
-		$matrix->view_form();
+		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+			$matrix = new ProductMatrix( $p_bug_id );
+			$matrix->view_form();
+		}
 	}
 
 	function update_bug( $p_event, $p_bug_data, $p_bug_id ) {
-		$matrix = new ProductMatrix( $p_bug_id, false );
-		$matrix->process_form();
-		$matrix->save();
+		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+			$matrix = new ProductMatrix( $p_bug_id, false );
+			$matrix->process_form();
+			$matrix->save();
+		}
 	}
 
 	function report_bug_form( $p_event ) {
-		$matrix = new ProductMatrix();
-		$matrix->view_report_form();
+		if ( access_has_project_level( plugin_config_get( 'update_threshold' ) ) ) {
+			$matrix = new ProductMatrix();
+			$matrix->view_report_form();
+		}
 	}
 
 	function report_bug( $p_event, $p_bug_data, $p_bug_id ) {
-		$matrix = new ProductMatrix( $p_bug_id, false );
-		$matrix->process_form();
-		$matrix->save();
+		if ( access_has_project_level( plugin_config_get( 'update_threshold' ) ) ) {
+			$matrix = new ProductMatrix( $p_bug_id, false );
+			$matrix->process_form();
+			$matrix->save();
+		}
 	}
 
 	function schema() {
