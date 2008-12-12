@@ -43,6 +43,8 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'view_threshold' => VIEWER,
 			'manage_threshold' => MANAGER,
 
+			'common_platform' => ON,
+
 			'status' => array(
 				10 => 'open',
 				30 => 'confirmed',
@@ -141,6 +143,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 				" ) ),
 			array( 'CreateTableSQL', array( plugin_table( 'affects' ), "
 				bug_id		I		NOTNULL UNSIGNED PRIMARY,
+				product_id	I		NOTNULL UNSIGNED PRIMARY,
 				platform_id	I		NOTNULL UNSIGNED PRIMARY
 				" ) ),
 		);

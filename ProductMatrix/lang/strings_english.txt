@@ -24,6 +24,7 @@ $s_plugin_ProductMatrix_obsolete = 'Obsolete';
 
 $s_plugin_ProductMatrix_product_status = 'Product Status';
 $s_plugin_ProductMatrix_status_na = 'N/A';
+$s_plugin_ProductMatrix_common = 'Common';
 
 $s_plugin_ProductMatrix_delete = 'Delete';
 

@@ -640,8 +640,8 @@ class ProductMatrix {
 		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
 
 		while( $t_row = db_fetch_array( $t_result ) ) {
-			$this->affects[ $t_row['platform_id'] ] = true;
-			$this->__affects[ $t_row['platform_id'] ] = true;
+			$this->affects[ $t_row['product_id'] ][ $t_row['platform_id'] ] = true;
+			$this->__affects[ $t_row['product_id'] ][ $t_row['platform_id'] ] = true;
 		}
 
 		if ( $p_load_products ) {
@@ -658,9 +658,8 @@ class ProductMatrix {
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
 
-		$this->load_products();
+		$this->load_products( true );
 		$this->products_to_versions();
-		$this->products_to_platforms();
 
 		foreach( $this->status as $t_version_id => $t_status ) {
 			if ( !isset( $this->__status[ $t_version_id ] ) ) { # new status
@@ -689,32 +688,40 @@ class ProductMatrix {
 			}
 		}
 
-		foreach( $this->affects as $t_platform_id => $t_affected ) {
-			if ( !isset( $this->__affects[ $t_platform_id ] ) ) { # new platform
-				$t_query = "INSERT INTO $t_affects_table ( bug_id, platform_id )
-					VALUES ( " . join( ',', array( db_param(), db_param() ) ) . ' )';
-				db_query_bound( $t_query, array( $this->bug_id, $t_platform_id ) );
+		foreach( $this->affects as $t_product_id => $t_platforms ) {
+			foreach( $t_platforms as $t_platform_id => $t_affected ) {
+				if ( !isset( $this->__affects[ $t_product_id ][ $t_platform_id ] ) ) { # new platform
+					$t_query = "INSERT INTO $t_affects_table ( bug_id, product_id, platform_id )
+						VALUES ( " . join( ',', array( db_param(), db_param(), db_param() ) ) . ' )';
+					db_query_bound( $t_query, array( $this->bug_id, $t_product_id, $t_platform_id ) );
 
-				$this->history_log_platform( $t_platform_id, true );
-				$this->__affects[ $t_platform_id ] = true;
+					$this->history_log_platform( $t_product_id, $t_platform_id, true );
+					$this->__affects[ $t_product_id ][ $t_platform_id ] = true;
 
-			} else if ( false == $t_affected ) { # removed platform
-				$t_query = "DELETE FROM $t_affects_table WHERE bug_id=" . db_param() . ' AND platform_id=' . db_param();
-				db_query_bound( $t_query, array( $this->bug_id, $t_platform_id ) );
+				} else if ( false == $t_affected ) { # removed platform
+					$t_query = "DELETE FROM $t_affects_table WHERE bug_id=" . db_param() .
+						' AND product_id=' . db_param() . ' AND platform_id=' . db_param();
+					db_query_bound( $t_query, array( $this->bug_id, $t_product_id, $t_platform_id ) );
 
-				$this->history_log_platform( $t_platform_id, false );
-				unset( $this->affects[ $t_platform_id ] );
-				unset( $this->__affects[ $t_platform_id ] );
+					$this->history_log_platform( $t_product_id, $t_platform_id, false );
+					unset( $this->affects[ $t_product_id ][ $t_platform_id ] );
+					unset( $this->__affects[ $t_product_id ][ $t_platform_id ] );
+				}
 			}
 		}
 	}
 
 	/**
 	 * Load product objects for all versions affected by the bug.
+	 * @param boolean Load all products
 	 */
-	function load_products() {
-		$t_version_ids = array_keys( $this->status );
-		$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
+	function load_products( $p_load_all=false ) {
+		if ( $p_load_all ) {
+			$this->products = PVMProduct::load_all( true );
+		} else {
+			$t_version_ids = array_keys( $this->status );
+			$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
+		}
 	}
 
 	/**
@@ -734,27 +741,15 @@ class ProductMatrix {
 	}
 
 	/**
-	 * Create a reverse-association of platform ID to products.
-	 */
-	function products_to_platforms() {
-		if ( isset( $this->platforms ) ) {
-			return;
-		}
-
-		$this->platforms = array();
-		foreach( $this->products as $t_product ) {
-			foreach( $t_product->platforms as $t_platform ) {
-				$this->platforms[ $t_platform->id ] = $t_product;
-			}
-		}
-	}
-
-	/**
 	 * Log an affected platform change to the bug history.
 	 */
-	function history_log_platform( $t_platform_id, $t_affected ) {
-		$t_product_name = $this->platforms[ $t_platform_id ]->name;
-		$t_platform_name = $this->platforms[ $t_platform_id ]->platforms[ $t_platform_id ]->name;
+	function history_log_platform( $t_product_id, $t_platform_id, $t_affected ) {
+		$t_product_name = $this->products[ $t_product_id ]->name;
+		if ( $t_platform_id > 0 ) {
+			$t_platform_name = $this->products[ $t_product_id ]->platforms[ $t_platform_id ]->name;
+		} else {
+			$t_platform_name = plugin_lang_get( 'common', 'ProductMatrix' );
+		}
 
 		$t_history_string = "$t_product_name: $t_platform_name";
 
@@ -802,10 +797,11 @@ class ProductMatrix {
 	 * Prune unused platforms and versions from products in the matrix.
 	 */
 	function prune() {
-		$t_platform_ids = array_keys( $this->affects );
 		$t_version_ids = array_keys( $this->status );
 
 		foreach( $this->products as $t_product ) {
+			$t_platform_ids = isset( $this->affects[ $t_product->id ] )
+				? array_keys( $this->affects[ $t_product->id ] ) : array();
 			$t_product_platform_ids = array_keys( $t_product->platforms );
 			foreach( $t_product_platform_ids as $t_platform_id ) {
 				if ( !in_array( $t_platform_id, $t_platform_ids ) ) {
@@ -831,6 +827,7 @@ class ProductMatrix {
 		}
 
 		$this->prune();
+		$t_common_enabled = plugin_config_get( 'common_platform' );
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
@@ -886,6 +883,9 @@ class ProductMatrix {
 					echo $t_platform->name;
 					$t_first = false;
 				}
+				if ( $t_common_enabled && isset( $this->affects[ $t_product->id ][0] ) ) {
+					echo ', ', plugin_lang_get( 'common', 'ProductMatrix' );
+				}
 				echo '</td>';
 			} else {
 				echo '<td></td><td></td>';
@@ -921,6 +921,8 @@ class ProductMatrix {
 		if ( count( $t_products ) < 1 ) {
 			return null;
 		}
+
+		$t_common_enabled = plugin_config_get( 'common_platform' );
 
 		$t_version_trees = array();
 		$t_version_count = 0;
@@ -992,9 +994,14 @@ class ProductMatrix {
 				foreach( $t_product->platforms as $t_platform ) {
 					if ( !$t_first ) { echo '<br/>'; }
 					echo '<label><input type="checkbox" name="Product', $t_product->id, 'Platform' , $t_platform->id, '" ',
-						( isset( $this->affects[ $t_platform->id ] ) ? ' checked="checked"' : '' ), '/> ',
+						( isset( $this->affects[ $t_product->id ][ $t_platform->id ] ) ? ' checked="checked"' : '' ), '/> ',
 						$t_platform->name, '</label>';
 					$t_first = false;
+				}
+				if ( $t_common_enabled ) {
+					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ',
+						( isset( $this->affects[ $t_product->id ][0] ) ? ' checked="checked"' : '' ), '/> ',
+						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
 				}
 				echo '</td>';
 			} else {
@@ -1031,6 +1038,8 @@ class ProductMatrix {
 		if ( count( $t_products ) < 1 ) {
 			return null;
 		}
+
+		$t_common_enabled = plugin_config_get( 'common_platform' );
 
 		$t_version_trees = array();
 		$t_version_count = 0;
@@ -1088,10 +1097,13 @@ class ProductMatrix {
 				$t_first = true;
 				foreach( $t_product->platforms as $t_platform ) {
 					if ( !$t_first ) { echo '<br/>'; }
-					echo '<label><input type="checkbox" name="Product', $t_product->id, 'Platform' , $t_platform->id, '" ',
-						( isset( $this->affects[ $t_platform->id ] ) ? ' checked="checked"' : '' ), '/> ',
+					echo '<label><input type="checkbox" name="Product', $t_product->id, 'Platform' , $t_platform->id, '"/>',
 						$t_platform->name, '</label>';
 					$t_first = false;
+				}
+				if ( $t_common_enabled ) {
+					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0"/>',
+						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
 				}
 				echo '</td>';
 			} else {
@@ -1125,24 +1137,42 @@ class ProductMatrix {
 	 * *must* be called to persist the changes to the matrices.
 	 */
 	function process_form() {
-		$t_products = PVMProduct::load_all( true );
+		$this->products = PVMProduct::load_all( true );
 
-		foreach( $t_products as $t_product ) {
+		$t_common_enabled = plugin_config_get( 'common_platform' );
+
+		foreach( $this->products as $t_product ) {
 			$t_form_prefix = 'Product' . $t_product->id . 'Platform';
 
 			foreach( $t_product->platforms as $t_platform ) {
 				$t_form_item = $t_form_prefix . $t_platform->id;
 				$t_affects = gpc_get_bool( $t_form_item, 0 );
 
-				$t_affects_set = isset( $this->affects[$t_platform->id] );
+				$t_affects_set = isset( $this->affects[$t_product->id][$t_platform->id] );
 				$t_affects_cleared = $t_affects < 1;
 
 				if ( $t_affects_cleared ) {
 					if ( $t_affects_set ) {
-						$this->affects[$t_platform->id] = false;
+						$this->affects[$t_product->id][$t_platform->id] = false;
 					}
 				} else {
-					$this->affects[$t_platform->id] = true;
+					$this->affects[$t_product->id][$t_platform->id] = true;
+				}
+			}
+
+			if ( $t_common_enabled ) {
+				$t_form_item = $t_form_prefix . '0';
+				$t_affects = gpc_get_bool( $t_form_item, 0 );
+
+				$t_affects_set = isset( $this->affects[$t_product->id][0] );
+				$t_affects_cleared = $t_affects < 1;
+
+				if ( $t_affects_cleared ) {
+					if ( $t_affects_set ) {
+						$this->affects[$t_product->id][0] = false;
+					}
+				} else {
+					$this->affects[$t_product->id][0] = true;
 				}
 			}
 
