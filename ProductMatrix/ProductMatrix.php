@@ -49,19 +49,31 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 			'status' => array(
 				10 => 'open',
-				30 => 'confirmed',
-				50 => 'in work',
-				70 => 'testing',
-				80 => 'suspended',
-				90 => 'resolved',
+				20 => 'confirmed',
+				30 => 'in work',
+				40 => 'testing',
+				50 => 'failed',
+				60 => 'resolved',
+				70 => 'suspended',
 				),
 			'status_color' => array(
 				10 => '#ffcdcd',
-				30 => '#ffeccd',
-				50 => '#feffcd',
-				70 => '#cde2ff',
-				80 => '#dadada',
-				90 => '#daf5e7',
+				20 => '#ffeccd',
+				30 => '#feffcd',
+				40 => '#cde2ff',
+				50 => '#efcdff',
+				60 => '#daf5e7',
+				70 => '#dadada',
+				),
+
+			'status_workflow' => array(
+				10 => array(),
+				20 => array(),
+				30 => array(),
+				40 => array(),
+				50 => array(),
+				60 => array(),
+				70 => array(),
 				),
 		);
 	}

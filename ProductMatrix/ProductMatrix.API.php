@@ -968,8 +968,14 @@ class ProductMatrix {
 						$t_status = 0;
 					}
 
-					echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
-					foreach( $t_status_array as $t_status_value => $t_status_name ) {
+					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
+
+					if ( isset( $t_possible_workflow[0] ) ) {
+						echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
+					}
+
+					foreach( $t_possible_workflow as $t_status_value => $t_status_name ) {
+						if ( $t_status_value < 1 ) { continue; }
 						echo '<option value="', $t_status_value, '"',
 							( $t_status == $t_status_value ? ' selected="selected"' : '' ),
 							'>', $t_status_name, '</option>';
@@ -1066,6 +1072,7 @@ class ProductMatrix {
 		echo '</tr>';
 
 		$t_status_array = plugin_config_get( 'status' );
+		$t_status_workflow = plugin_config_get( 'status_workflow' );
 		$t_status_colors = plugin_config_get( 'status_color' );
 		$t_status_default = array_shift( array_keys( $t_status_array ) );
 
@@ -1194,6 +1201,55 @@ class ProductMatrix {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Generate a list of status levels that are available in the current workflow configuration.
+	 * @param int Status
+	 * @return array Possible status levels, keyed as id=>name
+	 */
+	function generate_possible_workflow( $p_status ) {
+		static $s_status_array = null;
+		static $s_status_workflow = null;
+		static $s_workflows = array();
+
+		if ( isset( $s_workflows[ $p_status ] ) ) {
+			return $s_workflows[ $p_status ];
+		}
+
+		if ( is_null( $s_status_array ) ) {
+			$s_status_array = plugin_config_get( 'status' );
+		}
+		if ( is_null( $s_status_workflow ) ) {
+			$s_status_workflow = plugin_config_get( 'status_workflow' );
+		}
+
+		if ( $p_status == 0 || empty( $s_status_workflow[ $p_status ] ) ) {
+			$t_possible_workflow = $s_status_array;
+			$t_possible_workflow[0] = true;
+
+		} else {
+			$t_empty_workflow = false;
+
+			$t_possible_workflow = array();
+			sort( $t_available_workflow = $s_status_workflow[ $p_status ] );
+
+			foreach( $t_available_workflow as $t_available_status ) {
+				if ( $t_available_status == 0 ) {
+					$t_possible_workflow[0] = true;
+				}
+				if ( isset( $s_status_array[ $t_available_status ] ) ) {
+					$t_possible_workflow[ $t_available_status ] = $s_status_array[ $t_available_status ];
+				}
+			}
+
+			if ( !isset( $t_possible_workflow[ $p_status ] ) && isset( $s_status_array[ $p_status ] ) ) {
+				$t_possible_workflow[ $p_status ] = $s_status_array[ $p_status ];
+			}
+		}
+
+		$s_workflows[ $p_status ] = $t_possible_workflow;
+		return $t_possible_workflow;
 	}
 }
 
