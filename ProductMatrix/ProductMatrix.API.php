@@ -934,7 +934,7 @@ class ProductMatrix {
 		}
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
+			plugin_lang_get( 'product_status' ), '<input type="hidden" name="ProductMatrix" value="1"/></td><td colspan="5">';
 
 		collapse_open( 'view', 'ProductMatrix' );
 
@@ -1057,7 +1057,7 @@ class ProductMatrix {
 		}
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
+			plugin_lang_get( 'product_status' ), '<input type="hidden" name="ProductMatrix" value="1"/></td><td colspan="5">';
 
 		collapse_open( 'view', 'ProductMatrix' );
 
@@ -1145,6 +1145,10 @@ class ProductMatrix {
 	 */
 	function process_form() {
 		$this->products = PVMProduct::load_all( true );
+
+		if ( !gpc_get_int( 'ProductMatrix', 0 ) ) {
+			return;
+		}
 
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 
