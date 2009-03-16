@@ -1010,19 +1010,34 @@ class ProductMatrix {
 
 		echo '<tr ', helper_alternate_class(), '><td></td>';
 
+		$t_platform_temp_id = 0;
 		foreach( $t_products as $t_product ) {
 			if ( count( $t_product->platforms ) ) {
 				echo '<td class="category">Affects</td><td>';
+
 				$t_first = true;
+				$t_platform_temp_ids = array();
+
 				foreach( $t_product->platforms as $t_platform ) {
 					if ( !$t_first ) { echo '<br/>'; }
-					echo '<label><input type="checkbox" name="Product', $t_product->id, 'Platform' , $t_platform->id, '" ',
+					echo '<label><input type="checkbox" id="ProductPlatform', $t_platform_temp_id,
+						'" name="Product', $t_product->id, 'Platform' , $t_platform->id, '" ',
 						( isset( $this->affects[ $t_product->id ][ $t_platform->id ] ) ? ' checked="checked"' : '' ), '/> ',
 						$t_platform->name, '</label>';
+
 					$t_first = false;
+					$t_platform_temp_ids[] = $t_platform_temp_id;
+					$t_platform_temp_id++;
 				}
+
 				if ( $t_common_enabled ) {
-					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ',
+					$t_onclick = '';
+					foreach( $t_platform_temp_ids as $t_temp_id ) {
+						$t_onclick .= "document.getElementById('ProductPlatform$t_temp_id').checked = true;";
+					}
+					$t_onclick = "onclick=\" \n\nif ( this.checked ) {\n\t$t_onclick\n}\"";
+
+					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ', $t_onclick,
 						( isset( $this->affects[ $t_product->id ][0] ) ? ' checked="checked"' : '' ), '/> ',
 						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
 				}
@@ -1115,19 +1130,34 @@ class ProductMatrix {
 
 		echo '<tr ', helper_alternate_class(), '><td></td>';
 
+		$t_platform_temp_id = 0;
 		foreach( $t_products as $t_product ) {
 			if ( count( $t_product->platforms ) ) {
 				echo '<td class="category">Affects</td><td>';
+
 				$t_first = true;
+				$t_platform_temp_ids = array();
+
 				foreach( $t_product->platforms as $t_platform ) {
 					if ( !$t_first ) { echo '<br/>'; }
-					echo '<label><input type="checkbox" name="Product', $t_product->id, 'Platform' , $t_platform->id, '"/>',
+					echo '<label><input type="checkbox" id="ProductPlatform', $t_platform_temp_id,
+						'" name="Product', $t_product->id, 'Platform' , $t_platform->id, '"/>',
 						$t_platform->name, '</label>';
+
 					$t_first = false;
+					$t_platform_temp_ids[] = $t_platform_temp_id;
+					$t_platform_temp_id++;
 				}
+
 				if ( $t_common_enabled ) {
-					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0"/>',
-						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
+					$t_onclick = '';
+					foreach( $t_platform_temp_ids as $t_temp_id ) {
+						$t_onclick .= "document.getElementById('ProductPlatform$t_temp_id').checked = true;";
+					}
+					$t_onclick = "onclick=\" \n\nif ( this.checked ) {\n\t$t_onclick\n}\"";
+
+					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ',
+						$t_onclick, '/>', plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
 				}
 				echo '</td>';
 			} else {
