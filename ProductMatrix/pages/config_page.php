@@ -51,6 +51,9 @@ print_manage_menu();
 <td>
 	<label><input type="checkbox" name="common_platform" <?php echo ( plugin_config_get( 'common_platform' ) ? 'checked="checked" ' : '' ) ?>/>
 	<?php echo plugin_lang_get( 'common_platform' ) ?></label><br/>
+
+	<label><input type="checkbox" name="report_status" <?php echo ( plugin_config_get( 'report_status' ) ? 'checked="checked" ' : '' ) ?>/>
+	<?php echo plugin_lang_get( 'report_status' ) ?></label><br/>
 </td>
 </tr>
 

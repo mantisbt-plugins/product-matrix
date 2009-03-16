@@ -45,6 +45,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'update_threshold' => DEVELOPER,
 			'manage_threshold' => MANAGER,
 
+			'report_status' => OFF,
 			'common_platform' => ON,
 
 			'status' => array(
@@ -127,7 +128,11 @@ class ProductMatrixPlugin extends MantisPlugin {
 	function report_bug_form( $p_event ) {
 		if ( access_has_project_level( plugin_config_get( 'update_threshold' ) ) ) {
 			$matrix = new ProductMatrix();
-			$matrix->view_report_form();
+			if ( plugin_config_get( 'report_status' ) ) {
+				$matrix->view_form();
+			} else {
+				$matrix->view_report_form();
+			}
 		}
 	}
 
