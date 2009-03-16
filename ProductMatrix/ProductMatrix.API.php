@@ -17,6 +17,16 @@
  */
 
 /**
+ * Natural sorting comparison for objects with 'name' properties.
+ * @param object Object 1
+ * @param object Object 2
+ * @return int Standard comparison number
+ */
+function PVMNaturalSort( $p_object_1, $p_object_2 ) {
+	return strnatcmp( $p_object_1->name, $p_object_2->name );
+}
+
+/**
  * Object representation of a product.
  * A product can contain a list of platforms, and a hierarchical
  * list of versions.
@@ -175,7 +185,7 @@ class PVMProduct {
 	static function load_all( $p_load_versions=false ) {
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
 
-		$t_query = "SELECT * FROM $t_product_table ORDER BY name ASC";
+		$t_query = "SELECT * FROM $t_product_table";
 		$t_result = db_query_bound( $t_query );
 
 		$t_products = array();
@@ -191,6 +201,8 @@ class PVMProduct {
 
 			$t_products[ $t_product->id ] = $t_product;
 		}
+
+		uasort( $t_products, 'PVMNaturalSort' );
 
 		return $t_products;
 	}
@@ -228,8 +240,7 @@ class PVMProduct {
 
 		$t_query = "SELECT DISTINCT( p.id ), p.name FROM $t_product_table AS p
 			JOIN $t_version_table AS v ON p.id=v.product_id
-			WHERE v.id IN ( $t_version_list )
-			ORDER BY name ASC";
+			WHERE v.id IN ( $t_version_list )";
 		$t_result = db_query_bound( $t_query );
 
 		$t_products = array();
@@ -241,6 +252,8 @@ class PVMProduct {
 			$t_product->load_versions();
 			$t_products[$t_product->id] = $t_product;
 		}
+
+		uasort( $t_products, 'PVMNaturalSort' );
 
 		return $t_products;
 	}
@@ -373,7 +386,7 @@ class PVMPlatform {
 	static function load_by_product( $p_product_id ) {
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
 
-		$t_query = "SELECT * FROM $t_platform_table WHERE product_id=" . db_param() . ' ORDER BY name ASC';
+		$t_query = "SELECT * FROM $t_platform_table WHERE product_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_product_id ) );
 
 		$t_platforms = array();
@@ -384,6 +397,8 @@ class PVMPlatform {
 
 			$t_platforms[$t_platform->id] = $t_platform;
 		}
+
+		uasort( $t_platforms, 'PVMNaturalSort' );
 
 		return $t_platforms;
 	}
@@ -543,7 +558,7 @@ class PVMVersion {
 	static function load_by_product( $p_product_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
-		$t_query = "SELECT * FROM $t_version_table WHERE product_id=" . db_param() . ' ORDER BY name ASC';
+		$t_query = "SELECT * FROM $t_version_table WHERE product_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_product_id ) );
 
 		$t_versions = array();
@@ -556,6 +571,8 @@ class PVMVersion {
 
 			$t_versions[$t_version->id] = $t_version;
 		}
+
+		uasort( $t_versions, 'PVMNaturalSort' );
 
 		return $t_versions;
 	}
