@@ -176,6 +176,10 @@ class ProductMatrixPlugin extends MantisPlugin {
 				product_id	I		NOTNULL UNSIGNED PRIMARY,
 				platform_id	I		NOTNULL UNSIGNED PRIMARY
 				" ) ),
+			# 2009-04-10 - Allow versions to select what version they inherit status from
+			array( 'AddColumnSQL', array( plugin_table( 'version' ), "
+				inherit_id	I		NOTNULL UNSIGNED DEFAULT '0'
+				" ) ),
 		);
 	}
 }

@@ -445,6 +445,7 @@ class PVMPlatform {
 class PVMVersion {
 	var $id;
 	var $parent_id = 0;
+	var $inherit_id = 0;
 	var $product_id;
 	var $name;
 	var $date;
@@ -478,6 +479,7 @@ class PVMVersion {
 		if ( 0 == $this->id ) { #create
 			$t_query = "INSERT INTO $t_version_table (
 					parent_id,
+					inherit_id,
 					product_id,
 					name,
 					date,
@@ -489,10 +491,12 @@ class PVMVersion {
 					db_param() . ',' .
 					db_param() . ',' .
 					db_param() . ',' .
+					db_param() . ',' .
 					db_param() .
 				')';
 			db_query_bound( $t_query, array(
 				$this->parent_id,
+				$this->inherit_id,
 				$this->product_id,
 				$this->name,
 				db_timestamp( $this->date ),
@@ -505,6 +509,7 @@ class PVMVersion {
 		} else { #update
 			$t_query = "UPDATE $t_version_table SET
 					parent_id=" . db_param() . ',
+					inherit_id=' . db_param() . ',
 					product_id=' . db_param() . ',
 					name=' . db_param() . ',
 					date=' . db_param() . ',
@@ -513,6 +518,7 @@ class PVMVersion {
 				WHERE id=' . db_param();
 			db_query_bound( $t_query, array(
 				$this->parent_id,
+				$this->inherit_id,
 				$this->product_id,
 				$this->name,
 				db_timestamp( $this->date ),
@@ -542,6 +548,7 @@ class PVMVersion {
 
 		$t_version = new PVMVersion( $t_row['product_id'], $t_row['name'], $t_row['parent_id'] );
 		$t_version->id = $t_row['id'];
+		$t_version->inherit_id = $t_row['inherit_id'];
 		$t_version->date = $t_row['date'];
 		$t_version->released = $t_row['released'];
 		$t_version->obsolete = $t_row['obsolete'];
@@ -565,6 +572,7 @@ class PVMVersion {
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$t_version = new PVMVersion( $t_row['product_id'], $t_row['name'], $t_row['parent_id'] );
 			$t_version->id = $t_row['id'];
+			$t_version->inherit_id = $t_row['inherit_id'];
 			$t_version->date = $t_row['date'];
 			$t_version->released = $t_row['released'];
 			$t_version->obsolete = $t_row['obsolete'];
