@@ -287,6 +287,21 @@ class PVMProduct {
 				'>', str_pad( ' ', $t_depth+1, '-', STR_PAD_LEFT ), $t_version->name, '</option>';
 		}
 	}
+
+	/**
+	 * Display <option> tags for a dropdown list using all
+	 * of the version's child versions.
+	 * @param int Parent version ID
+	 * @param int Selected child version ID
+	 */
+	function select_child_versions( $p_version_id, $p_default_id=0 ) {
+		echo '<option value="0">auto</option>';
+		foreach( $this->version_tree[ $p_version_id ] as $t_version ) {
+			echo '<option value="', $t_version->id, '" ',
+				( $t_version->id == $p_default_id ? 'selected="selected" ' : '' ),
+				'>', $t_version->name, '</option>';
+		}
+	}
 }
 
 /**

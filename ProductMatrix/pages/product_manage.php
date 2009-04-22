@@ -13,6 +13,8 @@
 
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
+$t_reverse_inherit = plugin_config_get( 'reverse_inheritence' );
+
 $f_product_id = gpc_get_int( 'id' );
 $t_product = PVMProduct::load( $f_product_id );
 
@@ -36,7 +38,7 @@ html_page_top2();
 <tr class="row-category">
 <td colspan="2">Platform</td>
 <td>Obsolete</td>
-<td></td>
+<td <?php echo $t_reverse_inherit ? 'colspan="2"' : '' ?>></td>
 <td>Delete</td>
 </tr>
 
@@ -48,7 +50,7 @@ html_page_top2();
 <td class="center <?php echo $t_platform->obsolete ? 'PVMobsolete' : '' ?>">
 	<input type="checkbox" name="platform_<?php echo $t_platform->id ?>_obsolete" <?php echo $t_platform->obsolete ? ' checked="checked"' : '' ?>/>
 </td>
-<td></td>
+<td <?php echo $t_reverse_inherit ? 'colspan="2"' : '' ?>></td>
 <td class="center">
 	<input type="checkbox" name="platform_<?php echo $t_platform->id ?>_delete" />
 </td>
@@ -64,6 +66,9 @@ html_page_top2();
 <td>Released</td>
 <td>Obsolete</td>
 <td>Parent</td>
+<?php if ( $t_reverse_inherit ) { ?>
+<td>Inherit From</td>
+<?php } ?>
 <td>Delete</td>
 </tr>
 
@@ -84,6 +89,15 @@ html_page_top2();
 	<?php $t_product->select_versions( $t_version->parent_id ) ?>
 	</select>
 </td>
+<?php if ( $t_reverse_inherit ) { ?>
+<td>
+	<?php if ( count( $t_product->version_tree[ $t_version->id ] ) ) { ?>
+	<select name="version_<?php echo $t_version->id ?>_inherit_id">
+	<?php $t_product->select_child_versions( $t_version->id, $t_version->inherit_id ) ?>
+	</select>
+	<?php } ?>
+</td>
+<?php } ?>
 <td class="center">
 	<input type="checkbox" name="version_<?php echo $t_version->id ?>_delete" />
 </td>

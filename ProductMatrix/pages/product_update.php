@@ -14,6 +14,8 @@
 form_security_validate( 'ProductMatrix_product_update' );
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
+$t_reverse_inherit = plugin_config_get( 'reverse_inheritence' );
+
 $f_product_id = gpc_get_int( 'product_id' );
 $t_product = PVMProduct::load( $f_product_id );
 
@@ -38,6 +40,10 @@ foreach( $t_product->versions as $t_version ) {
 	$t_version->released = gpc_get_bool( $t_prefix . 'released', false );
 	$t_version->obsolete = gpc_get_bool( $t_prefix . 'obsolete', false );
 	$t_version->parent_id = gpc_get_int( $t_prefix . 'parent', 0 );
+
+	if ( $t_reverse_inherit ) {
+		$t_version->inherit_id = gpc_get_int( $t_prefix . 'inherit_id', 0 );
+	}
 
 	if ( gpc_get_bool( $t_prefix . 'delete', false ) ) {
 		$t_delete_versions[] = $t_version->id;
