@@ -27,6 +27,16 @@ function PVMNaturalSort( $p_object_1, $p_object_2 ) {
 }
 
 /**
+ * Reverse natural sorting comparison for objects with 'name' properties.
+ * @param object Object 1
+ * @param object Object 2
+ * @return int Standard comparison number
+ */
+function PVMNaturalSortReverse( $p_object_1, $p_object_2 ) {
+	return strnatcmp( $p_object_2->name, $p_object_1->name );
+}
+
+/**
  * Object representation of a product.
  * A product can contain a list of platforms, and a hierarchical
  * list of versions.
@@ -648,6 +658,8 @@ class ProductMatrix {
 	var $__affects;
 	var $products;
 
+	var $reverse_inheritence;
+
 	/**
 	 * Initialize a matrix object.
 	 * @param int Bug ID
@@ -687,6 +699,8 @@ class ProductMatrix {
 		if ( $p_load_products ) {
 			$this->load_products();
 		}
+
+		$this->reverse_inheritence = plugin_config_get( 'reverse_inheritence' );
 	}
 
 	/**
@@ -859,6 +873,50 @@ class ProductMatrix {
 	}
 
 	/**
+	 * Determine a version's status in the matrix, using reverse inheritence if needed.
+	 */
+	function version_status( $t_version_id ) {
+		# return status immediatly if no inheritence in use
+		if ( !$this->reverse_inheritence || isset( $this->status[ $t_version_id ] ) ) {
+			return $this->status[ $t_version_id ];
+		}
+
+		# handle dead versions
+		if ( !isset( $this->versions[ $t_version_id ] ) ) {
+			return null;
+		}
+
+		# get product/version info
+		$t_product = $this->versions[ $t_version_id ];
+		$t_inherit_id = $t_products->versions[ $t_version_id ]->inherit_id;
+
+		# see if the version has any children
+		if ( isset( $t_product->version_tree[ $t_version_id ] ) ) {
+			$t_version_tree = $t_product->version_tree[ $t_version_id ];
+
+			# recurse the version tree, either by specific inherit_id or latest by name
+			if ( count( $t_version_tree ) > 0 ) {
+				if ( $t_inherit_id && isset( $t_version_tree[ $t_inherit_id ] ) ) {
+					return $this->version_status( $t_inherit_id );
+
+				} else {
+					# sort children by version name, and find the first with a real status to inherit from
+					uasort( $t_version_tree, 'PVMNaturalSortReverse' );
+
+					foreach( $t_version_tree as $t_child_id => $t_child ) {
+						if ( $this->status[ $t_child_id ] ) break;
+					}
+
+					return $this->version_status( $t_child_id );
+				}
+			}
+		}
+
+		# no children, return current status
+		return $this->status[ $t_version_id ];
+	}
+
+	/**
 	 * Display a tabular matrix of affected, products, platforms, and versions.
 	 */
 	function view() {
@@ -866,13 +924,24 @@ class ProductMatrix {
 			return null;
 		}
 
-		$this->prune();
+		$this->products_to_versions();
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
-			$t_version_count = max( count( $t_product->versions ), $t_version_count );
-			$t_product->__versions = $t_product->versions;
+			$t_product->__versions = array();
+			$t_product->__status = array();
+
+			foreach( $t_product->versions as $t_version ) {
+				$t_status = $this->version_status( $t_version->id );
+
+				if ( $t_status ) {
+					$t_product->__versions[] = $t_version;
+					$t_product->__status[ $t_version->id ] = $t_status;
+				}
+			}
+
+			$t_version_count = max( count( $t_product->__versions ), $t_version_count );
 		}
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
@@ -899,7 +968,7 @@ class ProductMatrix {
 			foreach( $this->products as $t_product ) {
 				if ( count( $t_product->__versions ) ) {
 					$t_version = array_shift( $t_product->__versions );
-					$t_status = $this->status[$t_version->id];
+					$t_status = $t_product->__status[ $t_version->id ];
 
 					echo '<td class="category">', $t_version->name, '</td><td bgcolor="',
 						$t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
