@@ -673,6 +673,12 @@ class ProductMatrix {
 		$this->affects = array();
 		$this->products = array();
 
+		$this->reverse_inheritence = plugin_config_get( 'reverse_inheritence' );
+
+		if ( $p_load_products ) {
+			$this->load_products( true );
+		}
+
 		if ( !$p_bug_id ) {
 			return;
 		}
@@ -695,12 +701,6 @@ class ProductMatrix {
 			$this->affects[ $t_row['product_id'] ][ $t_row['platform_id'] ] = true;
 			$this->__affects[ $t_row['product_id'] ][ $t_row['platform_id'] ] = true;
 		}
-
-		if ( $p_load_products ) {
-			$this->load_products();
-		}
-
-		$this->reverse_inheritence = plugin_config_get( 'reverse_inheritence' );
 	}
 
 	/**
@@ -875,24 +875,24 @@ class ProductMatrix {
 	/**
 	 * Determine a version's status in the matrix, using reverse inheritence if needed.
 	 */
-	function version_status( $t_version_id ) {
+	function version_status( $p_version_id ) {
 		# return status immediatly if no inheritence in use
-		if ( !$this->reverse_inheritence || isset( $this->status[ $t_version_id ] ) ) {
-			return $this->status[ $t_version_id ];
+		if ( !$this->reverse_inheritence || isset( $this->status[ $p_version_id ] ) ) {
+			return $this->status[ $p_version_id ];
 		}
 
 		# handle dead versions
-		if ( !isset( $this->versions[ $t_version_id ] ) ) {
+		if ( !isset( $this->versions[ $p_version_id ] ) ) {
 			return null;
 		}
 
 		# get product/version info
-		$t_product = $this->versions[ $t_version_id ];
-		$t_inherit_id = $t_products->versions[ $t_version_id ]->inherit_id;
+		$t_product = $this->versions[ $p_version_id ];
+		$t_inherit_id = $t_products->versions[ $p_version_id ]->inherit_id;
 
 		# see if the version has any children
-		if ( isset( $t_product->version_tree[ $t_version_id ] ) ) {
-			$t_version_tree = $t_product->version_tree[ $t_version_id ];
+		if ( isset( $t_product->version_tree[ $p_version_id ] ) ) {
+			$t_version_tree = $t_product->version_tree[ $p_version_id ];
 
 			# recurse the version tree, either by specific inherit_id or latest by name
 			if ( count( $t_version_tree ) > 0 ) {
@@ -913,7 +913,25 @@ class ProductMatrix {
 		}
 
 		# no children, return current status
-		return $this->status[ $t_version_id ];
+		return $this->status[ $p_version_id ];
+	}
+
+	/**
+	 * Determine if a version status can be changed, adhering to inheritence if enabled.
+	 */
+	function version_mutable( $p_version_id ) {
+		# without inheritence, all versions are valid to set
+		if ( !$this->reverse_inheritence || isset( $this->status[ $p_version_id ] ) ) {
+			return true;
+		}
+
+		# see if the version has any children
+		$t_product = $this->versions[ $p_version_id ];
+		if ( isset( $t_product->version_tree[ $p_version_id ] ) && count( $t_product->version_tree[ $p_version_id ] ) > 0 ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -974,7 +992,7 @@ class ProductMatrix {
 						$t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
 
 				} else {
-					echo '<td></td><td></td>';
+					echo '<td colspan="2"></td>';
 				}
 			}
 
@@ -997,7 +1015,7 @@ class ProductMatrix {
 				}
 				echo '</td>';
 			} else {
-				echo '<td></td><td></td>';
+				echo '<td colspan="2"></td>';
 			}
 		}
 
@@ -1031,6 +1049,7 @@ class ProductMatrix {
 			return null;
 		}
 
+		$this->products_to_versions();
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 
 		$t_version_trees = array();
@@ -1068,32 +1087,37 @@ class ProductMatrix {
 				if( count( $t_version_trees[ $t_product->id ] ) ) {
 					list( $t_version, $t_depth ) = array_shift( $t_version_trees[ $t_product->id ] );
 
-					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>',
-						'<select name="Product', $t_product->id, 'Version', $t_version->id, '">';
+					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>';
 
-					if ( isset( $this->status[$t_version->id] ) ) {
-						$t_status = $this->status[$t_version->id];
-					} else {
-						$t_status = 0;
+					if ( $this->version_mutable( $t_version->id ) ) {
+						echo '<select name="Product', $t_product->id, 'Version', $t_version->id, '">';
+
+						if ( isset( $this->status[$t_version->id] ) ) {
+							$t_status = $this->status[$t_version->id];
+						} else {
+							$t_status = 0;
+						}
+
+						$t_possible_workflow = $this->generate_possible_workflow( $t_status );
+
+						if ( isset( $t_possible_workflow[0] ) ) {
+							echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
+						}
+
+						foreach( $t_possible_workflow as $t_status_value => $t_status_name ) {
+							if ( $t_status_value < 1 ) { continue; }
+							echo '<option value="', $t_status_value, '"',
+								( $t_status == $t_status_value ? ' selected="selected"' : '' ),
+								'>', $t_status_name, '</option>';
+						}
+
+						echo '</select>';
 					}
 
-					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
-
-					if ( isset( $t_possible_workflow[0] ) ) {
-						echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
-					}
-
-					foreach( $t_possible_workflow as $t_status_value => $t_status_name ) {
-						if ( $t_status_value < 1 ) { continue; }
-						echo '<option value="', $t_status_value, '"',
-							( $t_status == $t_status_value ? ' selected="selected"' : '' ),
-							'>', $t_status_name, '</option>';
-					}
-
-					echo '</select></td>';
+					echo '</td>';
 
 				} else {
-					echo '<td></td><td></td>';
+					echo '<td colspan="2"></td>';
 				}
 			}
 
@@ -1169,6 +1193,7 @@ class ProductMatrix {
 			return null;
 		}
 
+		$this->products_to_versions();
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 
 		$t_version_trees = array();
@@ -1208,9 +1233,13 @@ class ProductMatrix {
 				if( count( $t_version_trees[ $t_product->id ] ) ) {
 					list( $t_version, $t_depth ) = array_shift( $t_version_trees[ $t_product->id ] );
 
-					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>',
-						'<input type="checkbox" name="Product', $t_product->id, 'Version', $t_version->id, '" value="', $t_status_default, '"/>',
-						'</td>';
+					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>';
+
+					if ( $this->version_mutable( $t_version->id ) ) {
+						echo '<input type="checkbox" name="Product', $t_product->id, 'Version', $t_version->id, '" value="', $t_status_default, '"/>';
+					}
+
+					echo '</td>';
 
 				} else {
 					echo '<td></td><td></td>';
