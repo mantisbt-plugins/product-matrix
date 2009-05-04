@@ -1,6 +1,10 @@
-table.productmatrix {
+div.productmatrix {
+}
+
+table.pvmproduct {
 	border: solid 1px #000;
-	background: #FFF;
+	margin-right: 2px;
+	float: left;
 }
 
 .PVMreleased {

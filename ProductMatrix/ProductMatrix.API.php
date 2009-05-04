@@ -125,6 +125,41 @@ class PVMProduct {
 	}
 
 	/**
+	 * Build and return a full tree of loaded versions including recursed children.
+	 */
+	function full_version_tree() {
+		if ( !isset( $this->__full_version_tree ) ) {
+			$this->__full_version_tree = array();
+
+			foreach( $this->versions as $t_version ) {
+				$t_child_version_ids = array();
+				$t_queue = array( $t_version->id );
+
+				while( $t_next = array_shift( $t_queue ) ) {
+					if ( is_null( $t_next ) ) {
+						break;
+					}
+
+					if ( !isset( $this->version_tree[ $t_next ] ) ) {
+						continue;
+					}
+
+					$t_child_versions = $this->version_tree[ $t_next ];
+
+					foreach( $t_child_versions as $t_child_version ) {
+						$t_child_version_ids[] = $t_child_version->id;
+						$t_queue[] = $t_child_version->id;
+					}
+				}
+
+				$this->__full_version_tree[ $t_version->id ] = $t_child_version_ids;
+			}
+		}
+
+		return $this->__full_version_tree;
+	}
+
+	/**
 	 * Recursively generate a flat list of version/depth pairs
 	 * for representing the hierarchical structure for display.
 	 * @return array Array of version/depth pairs
@@ -944,6 +979,8 @@ class ProductMatrix {
 
 		$this->products_to_versions();
 		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
@@ -963,48 +1000,37 @@ class ProductMatrix {
 		}
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'product_status' ), '</td><td colspan="5">';
-
-		collapse_open( 'view', 'ProductMatrix' );
-
-		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
-		collapse_icon( 'view', 'ProductMatrix' );
-		echo '</td>';
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
 
 		foreach( $this->products as $t_product ) {
-			echo '<td colspan="2">', $t_product->name, '</td>';
-		}
+			echo '<table class="pvmproduct" cellspacing="1">',
+				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
 
-		echo '</tr>';
+			$t_product->full_version_tree();
 
-		$t_status_array = plugin_config_get( 'status' );
-		$t_status_colors = plugin_config_get( 'status_color' );
+			foreach( $t_product->version_tree_list() as $t_node ) {
+				list( $t_version, $t_depth ) = $t_node;
+				$t_status = $t_product->__status[ $t_version->id ];
 
-		for( $i = 0; $i < $t_version_count; $i++ ) {
-			echo '<tr ', helper_alternate_class(), '><td></td>';
-
-			foreach( $this->products as $t_product ) {
-				if ( count( $t_product->__versions ) ) {
-					$t_version = array_shift( $t_product->__versions );
-					$t_status = $t_product->__status[ $t_version->id ];
-
-					echo '<td class="category">', $t_version->name, '</td><td bgcolor="',
-						$t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
-
-				} else {
-					echo '<td colspan="2"></td>';
+				if ( !$t_status ) {
+					continue;
 				}
+
+				if ( isset( $t_product->__full_version_tree[ $t_version->id ] ) ) {
+					$t_collapse_ids = join( ':', $t_product->__full_version_tree[ $t_version->id ] );
+				} else {
+					$t_collapse_ids = '';
+				}
+
+				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids, '"><td class="category">',
+					str_pad( '', $t_depth, '-' ), $t_version->name, '</td><td bgcolor="',
+					$t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td></tr>';
+
 			}
 
-			echo '</tr>';
-		}
-
-		echo '<tr ', helper_alternate_class(), '><td></td>';
-
-		foreach( $this->products as $t_product ) {
 			if ( count( $t_product->platforms ) ) {
-				echo '<td class="category">Affects</td><td>';
 				$t_first = true;
+				echo '<td class="category">Affects</td><td>';
 				foreach( $t_product->platforms as $t_platform ) {
 					if ( !$t_first ) { echo ', '; }
 					echo $t_platform->name;
@@ -1017,25 +1043,11 @@ class ProductMatrix {
 			} else {
 				echo '<td colspan="2"></td>';
 			}
+
+			echo '</table>';
 		}
 
-		echo '</tr></table>';
-
-		collapse_closed( 'view', 'ProductMatrix' );
-
-		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
-		collapse_icon( 'view', 'ProductMatrix' );
-		echo '</td>';
-
-		foreach( $this->products as $t_product ) {
-			echo '<td>', $t_product->name, '</td>';
-		}
-
-		echo '</tr></table>';
-
-		collapse_end( 'view', 'ProductMatrix' );
-
-		echo '</td></tr>';
+		echo '</div></td></tr>';
 	}
 
 	/**
