@@ -82,7 +82,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 	function hooks() {
 		return array(
-			'EVENT_LAYOUT_RESOURCES'	=> 'css',
+			'EVENT_LAYOUT_RESOURCES'	=> 'resources',
 			'EVENT_MENU_MAIN'			=> 'menu',
 			'EVENT_VIEW_BUG_DETAILS'	=> 'view_bug',
 			'EVENT_UPDATE_BUG_FORM'		=> 'update_bug_form',
@@ -96,8 +96,14 @@ class ProductMatrixPlugin extends MantisPlugin {
 		require_once( 'ProductMatrix.API.php' );
 	}
 
-	function css() {
-		return '<link rel="stylesheet" href="' . plugin_file( 'default.css' ) . '" type="text/css" />';
+	function resources() {
+		$t_resources = '<link rel="stylesheet" href="' . plugin_file( 'default.css' ) . '" type="text/css" />';
+
+		if ( plugin_dependency( 'jQuery', '1.3', true ) ) {
+			$t_resources .= '<script type="text/javascript" src="' . plugin_file( 'behavior.js' ) . '"></script>';
+		}
+
+		return $t_resources;
 	}
 
 	function menu() {
