@@ -1049,8 +1049,6 @@ class ProductMatrix {
 					echo ', ', plugin_lang_get( 'common', 'ProductMatrix' );
 				}
 				echo '</td>';
-			} else {
-				echo '<td colspan="2"></td>';
 			}
 
 			echo '</table>';
