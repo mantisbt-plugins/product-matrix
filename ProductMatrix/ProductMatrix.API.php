@@ -938,11 +938,13 @@ class ProductMatrix {
 					# sort children by version name, and find the first with a real status to inherit from
 					uasort( $t_version_tree, 'PVMNaturalSortReverse' );
 
+					$t_child_status = 0;
 					foreach( $t_version_tree as $t_child_id => $t_child ) {
-						if ( $this->status[ $t_child_id ] ) break;
+						$t_child_status = $this->version_status( $t_child_id );
+						if ( $t_child_status ) break;
 					}
 
-					return $this->version_status( $t_child_id );
+					return $t_child_status;
 				}
 			}
 		}
@@ -1003,10 +1005,12 @@ class ProductMatrix {
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
 
 		foreach( $this->products as $t_product ) {
+			if ( count( $t_product->__versions ) < 1 ) {
+				continue;
+			}
+
 			echo '<table class="pvmproduct" cellspacing="1">',
 				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
-
-			$t_product->full_version_tree();
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
@@ -1016,15 +1020,20 @@ class ProductMatrix {
 					continue;
 				}
 
-				if ( isset( $t_product->__full_version_tree[ $t_version->id ] ) ) {
-					$t_collapse_ids = join( ':', $t_product->__full_version_tree[ $t_version->id ] );
+				if ( isset( $t_product->version_tree[ $t_version->id ] ) ) {
+					$t_collapse_versions = $t_product->version_tree[ $t_version->id ];
+					$t_collapse_ids = array();
+					foreach( $t_collapse_versions as $t_collapse_version ) {
+						$t_collapse_ids[] = $t_collapse_version->id;
+					}
+					$t_collapse_ids = join( ':', $t_collapse_ids );
 				} else {
 					$t_collapse_ids = '';
 				}
 
-				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids, '"><td class="category">',
-					str_pad( '', $t_depth, '-' ), $t_version->name, '</td><td bgcolor="',
-					$t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td></tr>';
+				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids,
+					'" depth="', $t_depth, '"><td class="category">', str_pad( '', $t_depth, '-' ), $t_version->name,
+					'</td><td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td></tr>';
 
 			}
 
