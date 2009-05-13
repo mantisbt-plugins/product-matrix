@@ -955,6 +955,8 @@ class ProductMatrix {
 
 	/**
 	 * Determine if a version status can be changed, adhering to inheritence if enabled.
+	 * @param int Version ID
+	 * @return boolean True if version status is mutable
 	 */
 	function version_mutable( $p_version_id ) {
 		# without inheritence, all versions are valid to set
@@ -969,6 +971,29 @@ class ProductMatrix {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Return a list of child version ids for a given version ID.
+	 * @param int Version ID
+	 * @return array Child version IDs
+	 */
+	function version_child_ids( $p_version_id ) {
+		$t_product = $this->versions[ $p_version_id ];
+
+		if ( isset( $t_product->version_tree[ $p_version_id ] ) ) {
+			$t_collapse_versions = $t_product->version_tree[ $p_version_id ];
+			$t_collapse_ids = array();
+
+			foreach( $t_collapse_versions as $t_collapse_version ) {
+				$t_collapse_ids[] = $t_collapse_version->id;
+			}
+
+			return $t_collapse_ids;
+
+		} else {
+			return array();
+		}
 	}
 
 	/**
@@ -1020,16 +1045,7 @@ class ProductMatrix {
 					continue;
 				}
 
-				if ( isset( $t_product->version_tree[ $t_version->id ] ) ) {
-					$t_collapse_versions = $t_product->version_tree[ $t_version->id ];
-					$t_collapse_ids = array();
-					foreach( $t_collapse_versions as $t_collapse_version ) {
-						$t_collapse_ids[] = $t_collapse_version->id;
-					}
-					$t_collapse_ids = join( ':', $t_collapse_ids );
-				} else {
-					$t_collapse_ids = '';
-				}
+				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
 				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids,
 					'" depth="', $t_depth, '"><td class="category">', str_pad( '', $t_depth, '-' ), $t_version->name,
