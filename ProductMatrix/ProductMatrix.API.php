@@ -1088,7 +1088,8 @@ class ProductMatrix {
 		$t_status_colors = plugin_config_get( 'status_color' );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',
+			'<input type="hidden" name="ProductMatrix" value="1"/>';
 
 		foreach( $this->products as $t_product ) {
 			echo '<table class="pvmproduct" cellspacing="0">',
@@ -1196,7 +1197,8 @@ class ProductMatrix {
 		$t_status_default = array_shift( array_keys( $t_status_array ) );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',
+			'<input type="hidden" name="ProductMatrix" value="1"/>';
 
 		foreach( $this->products as $t_product ) {
 			echo '<table class="pvmproduct" cellspacing="0">',
@@ -1346,7 +1348,7 @@ class ProductMatrix {
 			$s_status_workflow = plugin_config_get( 'status_workflow' );
 		}
 
-		if ( $p_status == 0 || empty( $s_status_workflow[ $p_status ] ) ) {
+		if ( ( $p_status == 0 && !isset( $s_status_workflow[ 0 ] ) ) || empty( $s_status_workflow[ $p_status ] ) ) {
 			$t_possible_workflow = $s_status_array;
 			$t_possible_workflow[0] = true;
 
