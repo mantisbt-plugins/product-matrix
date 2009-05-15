@@ -22,11 +22,12 @@ html_page_top2();
 ?>
 
 <br/>
-<table class="productmatrix width50" align="center" cellspacing="1">
-
+<table class="productmatrix width60" align="center" cellspacing="1">
 <tr>
 <td class="form-title" colspan="3">View Product: <?php echo $t_product->name ?></td>
-<td class="right"><?php print_bracket_link( plugin_page( 'products' ), 'Back' ) ?></td>
+<td class="right"><?php print_bracket_link( plugin_page( 'product_change_log&id=' ) . $f_product_id, 'Product Change Log' ) .
+	print_bracket_link( plugin_page( 'product_roadmap&id=' ) . $f_product_id, 'Product Roadmap' ) .
+	print_bracket_link( plugin_page( 'products' ), 'Back' ) ?></td>
 </tr>
 
 <?php if ( count( $t_product->platforms ) > 0 ) { ?>
@@ -44,6 +45,7 @@ html_page_top2();
 <td class="center"><?php if ( $t_can_manage ) {
 echo print_bracket_link( plugin_page( 'platform_delete' ) .
 	'&id=' . $t_platform->id . form_security_param( 'ProductMatrix_platform_delete' ), plugin_lang_get( 'delete' ) );
+
 } ?></td>
 </tr>
 <?php } ?>
@@ -66,7 +68,8 @@ echo print_bracket_link( plugin_page( 'platform_delete' ) .
 <td class="center <?php echo $t_version->released ? 'PVMreleased' : '' ?>"></td>
 <td class="center <?php echo $t_version->obsolete ? 'PVMobsolete' : '' ?>"></td>
 <td class="center"><?php if ( $t_can_manage ) {
-echo print_bracket_link( plugin_page( 'version_delete' ) .
+echo print_bracket_link( plugin_page ( 'product_roadmap&name=' ) . $t_version->name . '&id=' . $f_product_id, 'Version Roadmap') .
+print_bracket_link( plugin_page( 'version_delete' ) .
 	'&id=' . $t_version->id . form_security_param( 'ProductMatrix_version_delete' ), plugin_lang_get( 'delete' ) );
 } ?></td>
 </tr>
@@ -97,7 +100,7 @@ echo print_bracket_link( plugin_page( 'version_delete' ) .
 <br/>
 <form method="post" action="<?php echo plugin_page( 'version_add' ) ?>">
 <?php echo form_security_field( 'ProductMatrix_version_add' ) ?>
-<table class="width50" align="center" cellspacing="1">
+<table class="width60" align="center" cellspacing="1">
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
 
 <tr>
@@ -132,7 +135,7 @@ echo print_bracket_link( plugin_page( 'version_delete' ) .
 <br/>
 <form method="post" action="<?php echo plugin_page( 'platform_add' ) ?>">
 <?php echo form_security_field( 'ProductMatrix_platform_add' ) ?>
-<table class="width50" align="center" cellspacing="1">
+<table class="width60" align="center" cellspacing="1">
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
 
 <tr>
