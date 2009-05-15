@@ -1022,8 +1022,6 @@ class ProductMatrix {
 					$t_product->__status[ $t_version->id ] = $t_status;
 				}
 			}
-
-			$t_version_count = max( count( $t_product->__versions ), $t_version_count );
 		}
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
@@ -1048,7 +1046,7 @@ class ProductMatrix {
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
 				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids,
-					'" depth="', $t_depth, '"><td class="category">', str_pad( '', $t_depth, '-' ), $t_version->name,
+					'" depth="', $t_depth, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name,
 					'</td><td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td></tr>';
 
 			}
@@ -1087,84 +1085,53 @@ class ProductMatrix {
 		$this->products_to_versions();
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 
-		$t_version_trees = array();
-		$t_version_count = 0;
-		foreach( $t_products as $t_product ) {
-			$t_version_tree = $t_product->version_tree_list();
-
-			$t_version_count = max( count( $t_version_tree ), $t_version_count );
-			$t_version_trees[ $t_product->id ] = $t_version_tree;
-		}
-
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'product_status' ), '<input type="hidden" name="ProductMatrix" value="1"/></td><td colspan="5">';
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
 
-		collapse_open( 'view', 'ProductMatrix' );
+		foreach( $this->products as $t_product ) {
+			echo '<table class="pvmproduct" cellspacing="1">',
+				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
 
-		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
-		collapse_icon( 'view', 'ProductMatrix' );
-		echo '</td>';
+			foreach( $t_product->version_tree_list() as $t_node ) {
+				list( $t_version, $t_depth ) = $t_node;
+				$t_status = $t_product->__status[ $t_version->id ];
 
-		foreach( $t_products as $t_product ) {
-			echo '<td colspan="2">', $t_product->name, '</td>';
-		}
+				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
-		echo '</tr>';
+				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids,
+					'" depth="', $t_depth, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name,
+					'</td><td>';
 
-		$t_status_array = plugin_config_get( 'status' );
-		$t_status_colors = plugin_config_get( 'status_color' );
+				if ( $this->version_mutable( $t_version->id ) ) {
+					echo '<select name="Product', $t_product->id, 'Version', $t_version->id, '">';
 
-		for( $i = 0; $i < $t_version_count; $i++ ) {
-			echo '<tr ', helper_alternate_class(), '><td></td>';
-
-			foreach( $t_products as $t_product ) {
-				$t_shown = false;
-				if( count( $t_version_trees[ $t_product->id ] ) ) {
-					list( $t_version, $t_depth ) = array_shift( $t_version_trees[ $t_product->id ] );
-
-					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>';
-
-					if ( $this->version_mutable( $t_version->id ) ) {
-						echo '<select name="Product', $t_product->id, 'Version', $t_version->id, '">';
-
-						if ( isset( $this->status[$t_version->id] ) ) {
-							$t_status = $this->status[$t_version->id];
-						} else {
-							$t_status = 0;
-						}
-
-						$t_possible_workflow = $this->generate_possible_workflow( $t_status );
-
-						if ( isset( $t_possible_workflow[0] ) ) {
-							echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
-						}
-
-						foreach( $t_possible_workflow as $t_status_value => $t_status_name ) {
-							if ( $t_status_value < 1 ) { continue; }
-							echo '<option value="', $t_status_value, '"',
-								( $t_status == $t_status_value ? ' selected="selected"' : '' ),
-								'>', $t_status_name, '</option>';
-						}
-
-						echo '</select>';
+					if ( isset( $this->status[$t_version->id] ) ) {
+						$t_status = $this->status[$t_version->id];
+					} else {
+						$t_status = 0;
 					}
 
-					echo '</td>';
+					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
 
-				} else {
-					echo '<td colspan="2"></td>';
+					if ( isset( $t_possible_workflow[0] ) ) {
+						echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
+					}
+
+					foreach( $t_possible_workflow as $t_status_value => $t_status_name ) {
+						if ( $t_status_value < 1 ) { continue; }
+						echo '<option value="', $t_status_value, '"',
+							( $t_status == $t_status_value ? ' selected="selected"' : '' ),
+							'>', $t_status_name, '</option>';
+					}
+
+					echo '</select>';
 				}
+
+				echo '</td></tr>';
 			}
 
-			echo '</tr>';
-		}
-
-		echo '<tr ', helper_alternate_class(), '><td></td>';
-
-		$t_platform_temp_id = 0;
-		foreach( $t_products as $t_product ) {
 			if ( count( $t_product->platforms ) ) {
-				echo '<td class="category">Affects</td><td>';
+				echo '<tr><td class="category">Affects</td><td>';
 
 				$t_first = true;
 				$t_platform_temp_ids = array();
@@ -1192,29 +1159,13 @@ class ProductMatrix {
 						( isset( $this->affects[ $t_product->id ][0] ) ? ' checked="checked"' : '' ), '/> ',
 						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
 				}
-				echo '</td>';
-			} else {
-				echo '<td></td><td></td>';
+				echo '</td></tr>';
 			}
+
+			echo '</table>';
 		}
 
-		echo '</tr></table>';
-
-		collapse_closed( 'view', 'ProductMatrix' );
-
-		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
-		collapse_icon( 'view', 'ProductMatrix' );
-		echo '</td>';
-
-		foreach( $t_products as $t_product ) {
-			echo '<td>', $t_product->name, '</td>';
-		}
-
-		echo '</tr></table>';
-
-		collapse_end( 'view', 'ProductMatrix' );
-
-		echo '</td></tr>';
+		echo '</div></td></tr>';
 	}
 
 	/**
