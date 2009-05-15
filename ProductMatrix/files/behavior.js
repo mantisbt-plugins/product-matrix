@@ -20,7 +20,7 @@ $(document).ready( function() {
 	versions.each( function(index) {
 			$(this).attr("collapsed", "yes");
 
-			if ( $(this).attr("depth") != "0" ) {
+			if ( $(this).hasClass("pvmchild") ) {
 				$(this).hide();
 			}
 		});
@@ -32,6 +32,9 @@ $(document).ready( function() {
 	function PVMStatusCollapse( item, action ) {
 		var children = $(item).attr("collapse").split(":");
 
+		/**
+		 * Filters out the status rows that are children of the given row.
+		 */
 		function PVMStatusCollapseFilter(index) {
 			var item_name = $(this).attr("id");
 

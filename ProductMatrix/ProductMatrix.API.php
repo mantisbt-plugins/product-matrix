@@ -1032,7 +1032,7 @@ class ProductMatrix {
 				continue;
 			}
 
-			echo '<table class="pvmproduct" cellspacing="1">',
+			echo '<table class="pvmproduct" cellspacing="0">',
 				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
@@ -1045,15 +1045,15 @@ class ProductMatrix {
 
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
-				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids,
-					'" depth="', $t_depth, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name,
+				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
+					'" collapse="', $t_collapse_ids, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td>',
 					'</td><td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td></tr>';
 
 			}
 
 			if ( count( $t_product->platforms ) ) {
 				$t_first = true;
-				echo '<td class="category">Affects</td><td>';
+				echo '<tr class="pvmaffected"><td class="category">Affects</td><td>';
 				foreach( $t_product->platforms as $t_platform ) {
 					if ( !$t_first ) { echo ', '; }
 					echo $t_platform->name;
@@ -1062,7 +1062,7 @@ class ProductMatrix {
 				if ( $t_common_enabled && isset( $this->affects[ $t_product->id ][0] ) ) {
 					echo ', ', plugin_lang_get( 'common', 'ProductMatrix' );
 				}
-				echo '</td>';
+				echo '</td></tr>';
 			}
 
 			echo '</table>';
@@ -1084,12 +1084,14 @@ class ProductMatrix {
 
 		$this->products_to_versions();
 		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
 
 		foreach( $this->products as $t_product ) {
-			echo '<table class="pvmproduct" cellspacing="1">',
+			echo '<table class="pvmproduct" cellspacing="0">',
 				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
@@ -1098,18 +1100,17 @@ class ProductMatrix {
 
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
-				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus" collapse="', $t_collapse_ids,
-					'" depth="', $t_depth, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name,
-					'</td><td>';
+				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
+					'" collapse="', $t_collapse_ids, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td>';
 
 				if ( $this->version_mutable( $t_version->id ) ) {
-					echo '<select name="Product', $t_product->id, 'Version', $t_version->id, '">';
-
 					if ( isset( $this->status[$t_version->id] ) ) {
 						$t_status = $this->status[$t_version->id];
 					} else {
 						$t_status = 0;
 					}
+
+					echo '<td bgcolor="', $t_status_colors[$t_status], '"><select name="Product', $t_product->id, 'Version', $t_version->id, '">';
 
 					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
 
@@ -1124,14 +1125,23 @@ class ProductMatrix {
 							'>', $t_status_name, '</option>';
 					}
 
-					echo '</select>';
+					echo '</select></td>';
+
+				} else {
+					$t_status = $this->version_status( $t_version->id );
+
+					if ( is_null( $t_status ) ) {
+						echo '<td>', plugin_lang_get( 'status_na' ), '</td>';
+					} else {
+						echo '<td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
+					}
 				}
 
-				echo '</td></tr>';
+				echo '</tr>';
 			}
 
 			if ( count( $t_product->platforms ) ) {
-				echo '<tr><td class="category">Affects</td><td>';
+				echo '<tr class="pvmaffected"><td class="category">Affects</td><td>';
 
 				$t_first = true;
 				$t_platform_temp_ids = array();

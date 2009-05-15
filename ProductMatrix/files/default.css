@@ -7,6 +7,15 @@ table.pvmproduct {
 	float: left;
 }
 
+table.pvmproduct tr.pvmtoplevel td,
+table.pvmproduct tr.pvmaffected td {
+	border-top: 1px solid #888;
+}
+
+table.pvmproduct tr.pvmchild td {
+	border-top: 1px solid #aaa;
+}
+
 .PVMreleased {
 	background: #DFD;
 }
