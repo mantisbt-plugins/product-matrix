@@ -121,8 +121,19 @@ print_bracket_link( plugin_page( 'version_delete' ) .
 	</select>
 </td>
 </tr>
+
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category">Migrate Status</td>
+<td>
+	<select name="migrate_id">
+	<?php $t_product->select_versions() ?>
+	</select>
+</td>
+</tr>
+
 <?php } else { ?>
-<input type="hidden" name="parent_id" value="0"/></td>
+<input type="hidden" name="parent_id" value="0"/>
+<input type="hidden" name="migrate_id" value="0"/>
 <?php } ?>
 
 <tr>

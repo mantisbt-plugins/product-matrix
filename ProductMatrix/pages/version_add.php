@@ -18,19 +18,21 @@ $f_product_id = gpc_get_int( 'product_id' );
 
 $f_version_name = gpc_get_string( 'version_name' );
 $f_parent_id = gpc_get_int( 'parent_id' );
+$f_migrate_id = gpc_get_int( 'migrate_id' );
 
 $t_product = PVMProduct::load( $f_product_id );
 
-if ( 0 != $f_parent_id ) {
-	if ( !isset( $t_product->versions[ $f_parent_id ] ) ) {
-		trigger_error( ERROR_GENERIC, ERROR );
-	}
-
-	$t_version = new PVMVersion( $t_product->id, $f_version_name, $f_parent_id );
-
-} else {
-	$t_version = new PVMVersion( $t_product->id, $f_version_name );
+if ( 0 != $f_parent_id && !isset( $t_product->versions[ $f_parent_id ] ) ) {
+	$f_parent_id = 0;
+	trigger_error( ERROR_GENERIC, ERROR );
 }
+
+if ( 0 != $f_migrate_id && !isset( $t_product->versions[ $f_migrate_id ] ) ) {
+	$f_migrate_id = 0;
+	trigger_error( ERROR_GENERIC, ERROR );
+}
+
+$t_version = new PVMVersion( $t_product->id, $f_version_name, $f_parent_id, $f_migrate_id );
 
 $t_version->save();
 form_security_purge( 'ProductMatrix_version_add' );

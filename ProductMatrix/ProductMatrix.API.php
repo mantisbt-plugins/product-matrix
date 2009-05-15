@@ -512,18 +512,21 @@ class PVMVersion {
 	var $released = false;
 	var $obsolete = false;
 
+	var $migrate_id = 0;
+
 	/**
 	 * Initialize a version object.
 	 * @param int Product ID
 	 * @param string Version name
 	 * @param int Parent version ID
 	 */
-	function __construct( $p_product_id, $p_name, $p_parent_id=0 ) {
+	function __construct( $p_product_id, $p_name, $p_parent_id=0, $p_migrate_id=0 ) {
 		$this->id = 0;
 		$this->parent_id = $p_parent_id;
 		$this->product_id = $p_product_id;
 		$this->name = $p_name;
 		$this->date = date( 'Y-m-d' );
+		$this->migrate_id = $p_migrate_id;
 	}
 
 	/**
@@ -535,6 +538,7 @@ class PVMVersion {
 		}
 
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
+		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
 		if ( 0 == $this->id ) { #create
 			$t_query = "INSERT INTO $t_version_table (
@@ -565,6 +569,14 @@ class PVMVersion {
 			) );
 
 			$this->id = db_insert_id( $t_version_table );
+
+			# handle migrating existing version statuses to the new version
+			if ( $this->migrate_id ) {
+				$t_query = "INSERT INTO $t_status_table ( bug_id, version_id, status )
+					SELECT bug_id, " . db_param() . ", status
+					FROM $t_status_table WHERE version_id=" . db_param();
+				db_query_bound( $t_query, array( $this->id, $this->migrate_id ) );
+			}
 
 		} else { #update
 			$t_query = "UPDATE $t_version_table SET
