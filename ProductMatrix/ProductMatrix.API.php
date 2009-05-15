@@ -1191,66 +1191,36 @@ class ProductMatrix {
 
 		$this->products_to_versions();
 		$t_common_enabled = plugin_config_get( 'common_platform' );
-
-		$t_version_trees = array();
-		$t_version_count = 0;
-		foreach( $t_products as $t_product ) {
-			$t_version_tree = $t_product->version_tree_list();
-
-			$t_version_count = max( count( $t_version_tree ), $t_version_count );
-			$t_version_trees[ $t_product->id ] = $t_version_tree;
-		}
-
-		echo '<tr ', helper_alternate_class(), '><td class="category">',
-			plugin_lang_get( 'product_status' ), '<input type="hidden" name="ProductMatrix" value="1"/></td><td colspan="5">';
-
-		collapse_open( 'view', 'ProductMatrix' );
-
-		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
-		collapse_icon( 'view', 'ProductMatrix' );
-		echo '</td>';
-
-		foreach( $t_products as $t_product ) {
-			echo '<td colspan="2">', $t_product->name, '</td>';
-		}
-
-		echo '</tr>';
-
 		$t_status_array = plugin_config_get( 'status' );
-		$t_status_workflow = plugin_config_get( 'status_workflow' );
 		$t_status_colors = plugin_config_get( 'status_color' );
 		$t_status_default = array_shift( array_keys( $t_status_array ) );
 
-		for( $i = 0; $i < $t_version_count; $i++ ) {
-			echo '<tr ', helper_alternate_class(), '><td></td>';
+		echo '<tr ', helper_alternate_class(), '><td class="category">',
+			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
 
-			foreach( $t_products as $t_product ) {
-				$t_shown = false;
-				if( count( $t_version_trees[ $t_product->id ] ) ) {
-					list( $t_version, $t_depth ) = array_shift( $t_version_trees[ $t_product->id ] );
+		foreach( $this->products as $t_product ) {
+			echo '<table class="pvmproduct" cellspacing="0">',
+				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
 
-					echo '<td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td><td>';
+			foreach( $t_product->version_tree_list() as $t_node ) {
+				list( $t_version, $t_depth ) = $t_node;
 
-					if ( $this->version_mutable( $t_version->id ) ) {
-						echo '<input type="checkbox" name="Product', $t_product->id, 'Version', $t_version->id, '" value="', $t_status_default, '"/>';
-					}
+				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
-					echo '</td>';
+				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
+					'" collapse="', $t_collapse_ids, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td>';
 
+				if ( $this->version_mutable( $t_version->id ) ) {
+					echo '<td><input type="checkbox" name="Product', $t_product->id, 'Version', $t_version->id, '" value="', $t_status_default, '"/></td>';
 				} else {
-					echo '<td></td><td></td>';
+					echo '<td></td>';
 				}
+
+				echo '</tr>';
 			}
 
-			echo '</tr>';
-		}
-
-		echo '<tr ', helper_alternate_class(), '><td></td>';
-
-		$t_platform_temp_id = 0;
-		foreach( $t_products as $t_product ) {
 			if ( count( $t_product->platforms ) ) {
-				echo '<td class="category">Affects</td><td>';
+				echo '<tr class="pvmaffected"><td class="category">Affects</td><td>';
 
 				$t_first = true;
 				$t_platform_temp_ids = array();
@@ -1258,7 +1228,7 @@ class ProductMatrix {
 				foreach( $t_product->platforms as $t_platform ) {
 					if ( !$t_first ) { echo '<br/>'; }
 					echo '<label><input type="checkbox" id="ProductPlatform', $t_platform_temp_id,
-						'" name="Product', $t_product->id, 'Platform' , $t_platform->id, '"/>',
+						'" name="Product', $t_product->id, 'Platform' , $t_platform->id, '"/> ',
 						$t_platform->name, '</label>';
 
 					$t_first = false;
@@ -1273,32 +1243,16 @@ class ProductMatrix {
 					}
 					$t_onclick = "onclick=\" \n\nif ( this.checked ) {\n\t$t_onclick\n}\"";
 
-					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ',
-						$t_onclick, '/>', plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
+					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ', $t_onclick, '/> ',
+						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
 				}
-				echo '</td>';
-			} else {
-				echo '<td></td><td></td>';
+				echo '</td></tr>';
 			}
+
+			echo '</table>';
 		}
 
-		echo '</tr></table>';
-
-		collapse_closed( 'view', 'ProductMatrix' );
-
-		echo '<table class="productmatrix" cellspacing="1"><tr class="row-category"><td>';
-		collapse_icon( 'view', 'ProductMatrix' );
-		echo '</td>';
-
-		foreach( $t_products as $t_product ) {
-			echo '<td>', $t_product->name, '</td>';
-		}
-
-		echo '</tr></table>';
-
-		collapse_end( 'view', 'ProductMatrix' );
-
-		echo '</td></tr>';
+		echo '</div></td></tr>';
 	}
 
 	/**
