@@ -162,7 +162,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 				parent_id	I		NOTNULL UNSIGNED DEFAULT '0',
 				product_id	I		NOTNULL UNSIGNED DEFAULT '0',
 				name		C(128)	NOTNULL DEFAULT \" '' \",
-				date		T		NOTNULL DEFAULT '" . db_null_date() . "',
+				date		T		NOTNULL,
 				released	L		NOTNULL DEFAULT '0',
 				obsolete	L		NOTNULL DEFAULT '0'
 				" ) ),

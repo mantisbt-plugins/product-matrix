@@ -37,6 +37,22 @@ function PVMNaturalSortReverse( $p_object_1, $p_object_2 ) {
 }
 
 /**
+ * Reimplementation of the DATETIME column handling that has been
+ * removed from MantisBT 1.2.x.
+ */
+function PVMDBDate( $p_date=null, $p_gmt=false ) {
+	global $g_db;
+
+	if( null !== $p_date ) {
+		$p_timestamp = $g_db->UnixTimeStamp( $p_date, $p_gmt );
+	} else {
+		$p_timestamp = time();
+	}
+	return $g_db->BindTimeStamp( $p_timestamp );
+}
+
+
+/**
  * Object representation of a product.
  * A product can contain a list of platforms, and a hierarchical
  * list of versions.
@@ -563,7 +579,7 @@ class PVMVersion {
 				$this->inherit_id,
 				$this->product_id,
 				$this->name,
-				db_timestamp( $this->date ),
+				PVMDBDate( $this->date ),
 				db_prepare_bool( $this->released ),
 				db_prepare_bool( $this->obsolete ),
 			) );
@@ -593,7 +609,7 @@ class PVMVersion {
 				$this->inherit_id,
 				$this->product_id,
 				$this->name,
-				db_timestamp( $this->date ),
+				PVMDBDate( $this->date ),
 				db_prepare_bool( $this->released ),
 				db_prepare_bool( $this->obsolete ),
 				$this->id
