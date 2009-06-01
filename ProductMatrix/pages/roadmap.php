@@ -13,7 +13,7 @@
 
 access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
 
-html_page_top1( plugin_lang_get( 'product_roadmap' ) );  #title
+html_page_top1( plugin_lang_get( 'roadmap' ) );  #title
 html_page_top2();
 
 require_once( config_get_global( 'plugin_path' ) . 'ProductMatrix/ProductMatrix.RoadmapAPI.php' );

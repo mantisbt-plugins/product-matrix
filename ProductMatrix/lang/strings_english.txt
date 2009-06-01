@@ -49,8 +49,8 @@ $s_plugin_ProductMatrix_history_version_tracked = 'Product Version Tracked';
 $s_plugin_ProductMatrix_history_version_ignored = 'Product Version Ignored';
 $s_plugin_ProductMatrix_history_version_updated = 'Version Status Updated';
 $s_plugin_ProductMatrix_roadmap_product_version = 'Version: ';
-$s_plugin_ProductMatrix_product_roadmap = 'Roadmap';
-$s_plugin_ProductMatrix_product_change_log = 'Change Log';
+$s_plugin_ProductMatrix_roadmap = 'Roadmap';
+$s_plugin_ProductMatrix_change_log = 'Change Log';
 
 # Core strings updated to new meanings
 $s_actiongroup_menu_update_target_version = 'Update Target Milestone';

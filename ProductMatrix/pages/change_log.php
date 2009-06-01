@@ -15,7 +15,7 @@ access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
 
 require_once( config_get_global( 'plugin_path' ) . 'ProductMatrix/ProductMatrix.RoadmapAPI.php' );
 
-html_page_top1( plugin_lang_get( 'product_change_log' ) );  #title
+html_page_top1( plugin_lang_get( 'change_log' ) );  #title
 html_page_top2();
 
 $f_product_id = gpc_get_int( 'id' );
