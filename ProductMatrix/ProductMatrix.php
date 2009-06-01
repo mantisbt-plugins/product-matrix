@@ -21,6 +21,9 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$this->requires = array(
 			'MantisCore' => '1.2.0',
 		);
+		$this->uses = array(
+			'jQuery' => '1.3',
+		);
 
 		$this->author = 'John Reese';
 		$this->contact = 'jreese@leetcode.net';
