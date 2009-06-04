@@ -133,6 +133,8 @@ class ProductMatrixPlugin extends MantisPlugin {
 			$matrix->process_form();
 			$matrix->save();
 		}
+
+		return $p_bug_data;
 	}
 
 	function report_bug_form( $p_event ) {
