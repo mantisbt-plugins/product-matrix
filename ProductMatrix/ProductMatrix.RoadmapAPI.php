@@ -76,7 +76,7 @@ function PRM_product_version_get_all_rows( $p_product_id ) {
 
 	for( $i = 0; $i < $t_count; $i++ ) {
 		$t_row = db_fetch_array( $t_result );
-		$t_row['date'] = db_unixtimestamp( $t_row['date'] );
+		$t_row['date'] = PVMDBDate( $t_row['date'] );
 		$t_rows[] = $t_row;
 	}
 
