@@ -93,6 +93,15 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'EVENT_UPDATE_BUG'			=> 'update_bug',
 			'EVENT_REPORT_BUG_FORM'		=> 'report_bug_form',
 			'EVENT_REPORT_BUG'			=> 'report_bug',
+			'EVENT_FILTER_FIELDS'		=> 'filter_fields',
+		);
+	}
+
+	function filter_fields( $p_event ) {
+		require_once( 'ProductMatrix.FilterAPI.php' );
+		return array(
+			'PVMProductFilter',
+			'PVMVersionFilter',
 		);
 	}
 
