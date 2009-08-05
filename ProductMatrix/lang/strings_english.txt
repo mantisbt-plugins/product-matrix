@@ -34,6 +34,7 @@ $s_plugin_ProductMatrix_enabled_features = 'Enabled Features';
 $s_plugin_ProductMatrix_common_platform = 'Common Platform';
 $s_plugin_ProductMatrix_report_status = 'Select version status when reporting';
 $s_plugin_ProductMatrix_reverse_inheritence = 'Reverse Inheritence';
+$s_plugin_ProductMatrix_product_status = 'Product Status';
 
 $s_plugin_ProductMatrix_delete = 'Delete';
 $s_plugin_ProductMatrix_update = 'Update';

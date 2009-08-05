@@ -32,6 +32,7 @@ maybe_set_option( 'manage_threshold', $f_manage_threshold );
 maybe_set_option( 'common_platform', gpc_get_bool( 'common_platform', OFF ) );
 maybe_set_option( 'reverse_inheritence', gpc_get_bool( 'reverse_inheritence', OFF ) );
 maybe_set_option( 'report_status', gpc_get_bool( 'report_status', OFF ) );
+maybe_set_option( 'product_status', gpc_get_bool( 'product_status', OFF ) );
 
 form_security_purge( 'plugin_ProductMatrix_config_update' );
 print_successful_redirect( plugin_page( 'config_page', true ) );

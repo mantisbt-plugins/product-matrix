@@ -935,6 +935,40 @@ class ProductMatrix {
 		}
 	}
 
+
+	/**
+	 * Returns the top level status for a given product
+	 *
+	 * @param object $p_product
+	 * @param bool $p_view_form
+	 * @return string top level status
+	 */
+	function product_status( $p_product, $p_view_form = false ){
+
+		if( $p_view_form ){
+			foreach( $p_product->versions as $t_version ) {
+					$t_status = $this->version_status( $t_version->id );
+
+				if ( $t_status ) {
+					$t_product->__versions[] = $t_version;
+					$t_product->__status[ $t_version->id ] = $t_status;
+				}
+			}
+		}
+
+		foreach( $p_product->version_tree_list() as $t_node ) {
+			list( $t_version, $t_depth ) = $t_node;
+
+			if( $t_depth < 1 ){
+				if( isset( $p_product->__status[$t_version->id] ) ){
+					$t_status = $p_product->__status[ $t_version->id ];
+				}
+			}
+		}
+
+		return $t_status;
+	}
+
 	/**
 	 * Determine a version's status in the matrix, using reverse inheritence if needed.
 	 */
@@ -1050,7 +1084,13 @@ class ProductMatrix {
 					$t_product->__status[ $t_version->id ] = $t_status;
 				}
 			}
+
+			#Sets Product Top Level Status
+			if( plugin_config_get( 'product_status' ) ){
+				$t_product->top_status = $this->product_status( $t_product );
+			}
 		}
+
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
@@ -1061,7 +1101,11 @@ class ProductMatrix {
 			}
 
 			echo '<table class="pvmproduct" cellspacing="0">',
-				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
+
+				'<tr class="row-category">
+					<td>', $t_product->name, '</td>
+					<td bgcolor=', $t_status_colors[$t_product->top_status], '>', $t_status_array[$t_product->top_status], '</td>
+				</tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
@@ -1120,8 +1164,16 @@ class ProductMatrix {
 			'<input type="hidden" name="ProductMatrix" value="1"/>';
 
 		foreach( $this->products as $t_product ) {
+
+			#Sets Product Top Level Status
+			if( plugin_config_get( 'product_status' ) ){
+				$t_product->top_status = $this->product_status( $t_product, $t_view_form = true );
+			}
+
 			echo '<table class="pvmproduct" cellspacing="0">',
-				'<tr class="row-category"><td colspan="2">', $t_product->name, '</td></tr>';
+				'<tr class="row-category"><td>', $t_product->name, '</td>
+				<td bgcolor=', $t_status_colors[$t_product->top_status], '>', $t_status_array[$t_product->top_status], '</td>
+				</tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
@@ -1403,5 +1455,6 @@ class ProductMatrix {
 		$s_workflows[ $p_status ] = $t_possible_workflow;
 		return $t_possible_workflow;
 	}
+
 }
 

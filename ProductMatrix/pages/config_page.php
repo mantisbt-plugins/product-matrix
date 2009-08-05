@@ -57,6 +57,9 @@ print_manage_menu();
 
 	<label><input type="checkbox" name="report_status" <?php echo ( plugin_config_get( 'report_status' ) ? 'checked="checked" ' : '' ) ?>/>
 	<?php echo plugin_lang_get( 'report_status' ) ?></label><br/>
+
+	<label><input type="checkbox" name="product_status" <?php echo ( plugin_config_get( 'product_status' ) ? 'checked="checked" ' : '' ) ?>/>
+	<?php echo plugin_lang_get( 'product_status' ) ?></label><br/>
 </td>
 </tr>
 
