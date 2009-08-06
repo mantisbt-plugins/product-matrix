@@ -736,7 +736,7 @@ class ProductMatrix {
 		$this->affects = array();
 		$this->products = array();
 
-		$this->reverse_inheritence = plugin_config_get( 'reverse_inheritence' );
+		$this->reverse_inheritence = config_get( 'plugin_ProductMatrix_reverse_inheritence' );
 
 		if ( $p_load_products ) {
 			$this->load_products( true );
@@ -883,7 +883,7 @@ class ProductMatrix {
 	 * Log an affected version status change to the bug history.
 	 */
 	function history_log_version( $t_version_id, $t_old, $t_new ) {
-		$t_status = plugin_config_get( 'status' );
+		$t_status = config_get( 'plugin_ProductMatrix_status' );
 
 		$t_product_name = $this->versions[ $t_version_id ]->name;
 		$t_version_name = $this->versions[ $t_version_id ]->versions[ $t_version_id ]->name;
@@ -1067,9 +1067,9 @@ class ProductMatrix {
 		}
 
 		$this->products_to_versions();
-		$t_common_enabled = plugin_config_get( 'common_platform' );
-		$t_status_array = plugin_config_get( 'status' );
-		$t_status_colors = plugin_config_get( 'status_color' );
+		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
+		$t_status_array = config_get( 'plugin_ProductMatrix_status' );
+		$t_status_colors = config_get( 'plugin_ProductMatrix_status_color' );
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
@@ -1086,7 +1086,7 @@ class ProductMatrix {
 			}
 
 			#Sets Product Top Level Status
-			if( plugin_config_get( 'product_status' ) ){
+			if( config_get( 'plugin_ProductMatrix_product_status' ) ){
 				$t_product->top_status = $this->product_status( $t_product );
 			}
 		}
@@ -1155,9 +1155,9 @@ class ProductMatrix {
 		}
 
 		$this->products_to_versions();
-		$t_common_enabled = plugin_config_get( 'common_platform' );
-		$t_status_array = plugin_config_get( 'status' );
-		$t_status_colors = plugin_config_get( 'status_color' );
+		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
+		$t_status_array = config_get( 'plugin_ProductMatrix_status' );
+		$t_status_colors = config_get( 'plugin_ProductMatrix_status_color' );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',
@@ -1166,7 +1166,7 @@ class ProductMatrix {
 		foreach( $this->products as $t_product ) {
 
 			#Sets Product Top Level Status
-			if( plugin_config_get( 'product_status' ) ){
+			if( config_get( 'plugin_ProductMatrix_product_status' ) ){
 				$t_product->top_status = $this->product_status( $t_product, $t_view_form = true );
 			}
 
@@ -1271,9 +1271,9 @@ class ProductMatrix {
 		}
 
 		$this->products_to_versions();
-		$t_common_enabled = plugin_config_get( 'common_platform' );
-		$t_status_array = plugin_config_get( 'status' );
-		$t_status_colors = plugin_config_get( 'status_color' );
+		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
+		$t_status_array = config_get( 'plugin_ProductMatrix_status' );
+		$t_status_colors = config_get( 'plugin_ProductMatrix_status_color' );
 		$t_status_default = array_shift( array_keys( $t_status_array ) );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
@@ -1350,7 +1350,7 @@ class ProductMatrix {
 			return;
 		}
 
-		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
 
 		foreach( $this->products as $t_product ) {
 			$t_form_prefix = 'Product' . $t_product->id . 'Platform';
@@ -1422,10 +1422,10 @@ class ProductMatrix {
 		}
 
 		if ( is_null( $s_status_array ) ) {
-			$s_status_array = plugin_config_get( 'status' );
+			$s_status_array = config_get( 'plugin_ProductMatrix_status' );
 		}
 		if ( is_null( $s_status_workflow ) ) {
-			$s_status_workflow = plugin_config_get( 'status_workflow' );
+			$s_status_workflow = config_get( 'plugin_ProductMatrix_status_workflow' );
 		}
 
 		if ( ( $p_status == 0 && !isset( $s_status_workflow[ 0 ] ) ) || empty( $s_status_workflow[ $p_status ] ) ) {
