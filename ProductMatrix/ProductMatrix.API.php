@@ -79,7 +79,7 @@ class PVMProduct {
 	 */
 	function save() {
 		if ( is_blank( $this->name ) ) {
-			plugin_error( 'ProductNameEmpty', ERROR );
+			plugin_error( 'ProductNameEmpty', ERROR, 'ProductMatrix' );
 		}
 
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
@@ -119,7 +119,7 @@ class PVMProduct {
 	 */
 	function load_versions() {
 		if ( 0 == $this->id ) {
-			plugin_error( 'ProductIDNotSet', ERROR );
+			plugin_error( 'ProductIDNotSet', ERROR, 'ProductMatrix' );
 		}
 
 		$this->versions = PVMVersion::load_by_product( $this->id );
@@ -221,7 +221,7 @@ class PVMProduct {
 		$t_result = db_query_bound( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
-			plugin_error( 'ProductNotFound', ERROR );
+			plugin_error( 'ProductNotFound', ERROR, 'ProductMatrix' );
 		}
 
 		$t_row = db_fetch_array( $t_result );
@@ -391,7 +391,7 @@ class PVMPlatform {
 	 */
 	function save() {
 		if ( is_blank( $this->name ) ) {
-			plugin_error( 'PlatformNameEmpty', ERROR );
+			plugin_error( 'PlatformNameEmpty', ERROR, 'ProductMatrix' );
 		}
 
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
@@ -441,7 +441,7 @@ class PVMPlatform {
 		$t_result = db_query_bound( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
-			plugin_error( 'PlatformNotFound', ERROR );
+			plugin_error( 'PlatformNotFound', ERROR, 'ProductMatrix' );
 		}
 
 		$t_row = db_fetch_array( $t_result );
@@ -550,7 +550,7 @@ class PVMVersion {
 	 */
 	function save() {
 		if ( is_blank( $this->name ) ) {
-			plugin_error( 'VersionNameEmpty', ERROR );
+			plugin_error( 'VersionNameEmpty', ERROR, 'ProductMatrix' );
 		}
 
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
@@ -629,7 +629,7 @@ class PVMVersion {
 		$t_result = db_query_bound( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
-			plugin_error( 'VersionNotFound', ERROR );
+			plugin_error( 'VersionNotFound', ERROR, 'ProductMatrix' );
 		}
 
 		$t_row = db_fetch_array( $t_result );
@@ -729,6 +729,8 @@ class ProductMatrix {
 	 * @param boolean Load product objects
 	 */
 	function __construct( $p_bug_id=0, $p_load_products=true ) {
+		plugin_push_current( 'ProductMatrix' );
+
 		$this->bug_id = $p_bug_id;
 		$this->__status = array();
 		$this->status = array();
@@ -736,18 +738,19 @@ class ProductMatrix {
 		$this->affects = array();
 		$this->products = array();
 
-		$this->reverse_inheritence = config_get( 'plugin_ProductMatrix_reverse_inheritence' );
+		$this->reverse_inheritence = plugin_config_get( 'reverse_inheritence' );
 
 		if ( $p_load_products ) {
 			$this->load_products( true );
 		}
 
 		if ( !$p_bug_id ) {
+			plugin_pop_current();
 			return;
 		}
 
-		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
-		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
+		$t_status_table = plugin_table( 'status' );
+		$t_affects_table = plugin_table( 'affects' );
 
 		$t_query = "SELECT * FROM $t_status_table WHERE bug_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
@@ -764,6 +767,8 @@ class ProductMatrix {
 			$this->affects[ $t_row['product_id'] ][ $t_row['platform_id'] ] = true;
 			$this->__affects[ $t_row['product_id'] ][ $t_row['platform_id'] ] = true;
 		}
+
+		plugin_pop_current();
 	}
 
 	/**
@@ -861,11 +866,13 @@ class ProductMatrix {
 	 * Log an affected platform change to the bug history.
 	 */
 	function history_log_platform( $t_product_id, $t_platform_id, $t_affected ) {
+		plugin_push_current( 'ProductMatrix' );
+
 		$t_product_name = $this->products[ $t_product_id ]->name;
 		if ( $t_platform_id > 0 ) {
 			$t_platform_name = $this->products[ $t_product_id ]->platforms[ $t_platform_id ]->name;
 		} else {
-			$t_platform_name = plugin_lang_get( 'common', 'ProductMatrix' );
+			$t_platform_name = plugin_lang_get( 'common' );
 		}
 
 		$t_history_string = "$t_product_name: $t_platform_name";
@@ -877,13 +884,17 @@ class ProductMatrix {
 		}
 
 		plugin_history_log( $this->bug_id, $t_field, $t_history_string );
+
+		plugin_pop_current();
 	}
 
 	/**
 	 * Log an affected version status change to the bug history.
 	 */
 	function history_log_version( $t_version_id, $t_old, $t_new ) {
-		$t_status = config_get( 'plugin_ProductMatrix_status' );
+		plugin_push_current( 'ProductMatrix' );
+
+		$t_status = plugin_config_get( 'status' );
 
 		$t_product_name = $this->versions[ $t_version_id ]->name;
 		$t_version_name = $this->versions[ $t_version_id ]->versions[ $t_version_id ]->name;
@@ -908,6 +919,8 @@ class ProductMatrix {
 		}
 
 		plugin_history_log( $this->bug_id, $t_field, $t_old, $t_new );
+
+		plugin_pop_current();
 	}
 
 	/**
@@ -1066,10 +1079,12 @@ class ProductMatrix {
 			return null;
 		}
 
+		plugin_push_current( 'ProductMatrix' );
+
 		$this->products_to_versions();
-		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
-		$t_status_array = config_get( 'plugin_ProductMatrix_status' );
-		$t_status_colors = config_get( 'plugin_ProductMatrix_status_color' );
+		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
@@ -1086,7 +1101,7 @@ class ProductMatrix {
 			}
 
 			#Sets Product Top Level Status
-			if( config_get( 'plugin_ProductMatrix_product_status' ) ){
+			if( plugin_config_get( 'product_status' ) ){
 				$t_product->top_status = $this->product_status( $t_product );
 			}
 		}
@@ -1132,7 +1147,7 @@ class ProductMatrix {
 					$t_first = false;
 				}
 				if ( $t_common_enabled && isset( $this->affects[ $t_product->id ][0] ) ) {
-					echo ', ', plugin_lang_get( 'common', 'ProductMatrix' );
+					echo ', ', plugin_lang_get( 'common' );
 				}
 				echo '</td></tr>';
 			}
@@ -1141,6 +1156,8 @@ class ProductMatrix {
 		}
 
 		echo '</div></td></tr>';
+
+		plugin_pop_current();
 	}
 
 	/**
@@ -1154,10 +1171,12 @@ class ProductMatrix {
 			return null;
 		}
 
+		plugin_push_current( 'ProductMatrix' );
+
 		$this->products_to_versions();
-		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
-		$t_status_array = config_get( 'plugin_ProductMatrix_status' );
-		$t_status_colors = config_get( 'plugin_ProductMatrix_status_color' );
+		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',
@@ -1166,7 +1185,7 @@ class ProductMatrix {
 		foreach( $this->products as $t_product ) {
 
 			#Sets Product Top Level Status
-			if( config_get( 'plugin_ProductMatrix_product_status' ) ){
+			if( plugin_config_get( 'product_status' ) ){
 				$t_product->top_status = $this->product_status( $t_product, $t_view_form = true );
 			}
 
@@ -1248,7 +1267,7 @@ class ProductMatrix {
 
 					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ', $t_onclick,
 						( isset( $this->affects[ $t_product->id ][0] ) ? ' checked="checked"' : '' ), '/> ',
-						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
+						plugin_lang_get( 'common' ), '</label>';
 				}
 				echo '</td></tr>';
 			}
@@ -1257,6 +1276,8 @@ class ProductMatrix {
 		}
 
 		echo '</div></td></tr>';
+
+		plugin_pop_current();
 	}
 
 	/**
@@ -1270,10 +1291,12 @@ class ProductMatrix {
 			return null;
 		}
 
+		plugin_push_current( 'ProductMatrix' );
+
 		$this->products_to_versions();
-		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
-		$t_status_array = config_get( 'plugin_ProductMatrix_status' );
-		$t_status_colors = config_get( 'plugin_ProductMatrix_status_color' );
+		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_status_array = plugin_config_get( 'status' );
+		$t_status_colors = plugin_config_get( 'status_color' );
 		$t_status_default = array_shift( array_keys( $t_status_array ) );
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
@@ -1326,7 +1349,7 @@ class ProductMatrix {
 					$t_onclick = "onclick=\" \n\nif ( this.checked ) {\n\t$t_onclick\n}\"";
 
 					echo '<br/><label><input type="checkbox" name="Product', $t_product->id, 'Platform0" ', $t_onclick, '/> ',
-						plugin_lang_get( 'common', 'ProductMatrix' ), '</label>';
+						plugin_lang_get( 'common' ), '</label>';
 				}
 				echo '</td></tr>';
 			}
@@ -1335,6 +1358,8 @@ class ProductMatrix {
 		}
 
 		echo '</div></td></tr>';
+
+		plugin_pop_current();
 	}
 
 	/**
@@ -1350,7 +1375,11 @@ class ProductMatrix {
 			return;
 		}
 
-		$t_common_enabled = config_get( 'plugin_ProductMatrix_common_platform' );
+		plugin_push_current( 'ProductMatrix' );
+
+		$t_common_enabled = plugin_config_get( 'common_platform' );
+
+		plugin_pop_current();
 
 		foreach( $this->products as $t_product ) {
 			$t_form_prefix = 'Product' . $t_product->id . 'Platform';
@@ -1421,12 +1450,16 @@ class ProductMatrix {
 			return $s_workflows[ $p_status ];
 		}
 
+		plugin_push_current( 'ProductMatrix' );
+
 		if ( is_null( $s_status_array ) ) {
-			$s_status_array = config_get( 'plugin_ProductMatrix_status' );
+			$s_status_array = plugin_config_get( 'status' );
 		}
 		if ( is_null( $s_status_workflow ) ) {
-			$s_status_workflow = config_get( 'plugin_ProductMatrix_status_workflow' );
+			$s_status_workflow = plugin_config_get( 'status_workflow' );
 		}
+
+		plugin_pop_current();
 
 		if ( ( $p_status == 0 && !isset( $s_status_workflow[ 0 ] ) ) || empty( $s_status_workflow[ $p_status ] ) ) {
 			$t_possible_workflow = $s_status_array;
