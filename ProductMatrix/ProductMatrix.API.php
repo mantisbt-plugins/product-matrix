@@ -952,31 +952,20 @@ class ProductMatrix {
 	/**
 	 * Returns the top level status for a given product
 	 *
-	 * @param object $p_product
-	 * @param bool $p_view_form
+	 * @param int Product ID
 	 * @return string top level status
 	 */
-	function product_status( $p_product, $p_view_form = false ){
-
-		if( $p_view_form ){
-			foreach( $p_product->versions as $t_version ) {
-					$t_status = $this->version_status( $t_version->id );
-
-				if ( $t_status ) {
-					$t_product->__versions[] = $t_version;
-					$t_product->__status[ $t_version->id ] = $t_status;
-				}
-			}
+	function product_status( $p_product_id ){
+		if ( is_null( $this->versions ) ) {
+			$this->products_to_versions();
 		}
 
-		foreach( $p_product->version_tree_list() as $t_node ) {
-			list( $t_version, $t_depth ) = $t_node;
+		$t_versions = $this->products[ $p_product_id ]->version_tree[0];
+		$t_status = 0;
 
-			if( $t_depth < 1 ){
-				if( isset( $p_product->__status[$t_version->id] ) ){
-					$t_status = $p_product->__status[ $t_version->id ];
-				}
-			}
+		while( count( $t_versions ) && !$t_status ) {
+			$t_version = array_pop( $t_versions );
+			$t_status = $this->version_status( $t_version->id );
 		}
 
 		return $t_status;
@@ -1102,7 +1091,7 @@ class ProductMatrix {
 
 			#Sets Product Top Level Status
 			if( plugin_config_get( 'product_status' ) ){
-				$t_product->top_status = $this->product_status( $t_product );
+				$t_product->top_status = $this->product_status( $t_product->id );
 			}
 		}
 
@@ -1186,7 +1175,7 @@ class ProductMatrix {
 
 			#Sets Product Top Level Status
 			if( plugin_config_get( 'product_status' ) ){
-				$t_product->top_status = $this->product_status( $t_product, $t_view_form = true );
+				$t_product->top_status = $this->product_status( $t_product->id );
 			}
 
 			echo '<table class="pvmproduct" cellspacing="0">',
