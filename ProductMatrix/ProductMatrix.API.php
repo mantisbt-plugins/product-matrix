@@ -996,20 +996,22 @@ class ProductMatrix {
 			# recurse the version tree, either by specific inherit_id or latest by name
 			if ( count( $t_version_tree ) > 0 ) {
 				if ( $t_inherit_id && isset( $t_version_tree[ $t_inherit_id ] ) ) {
-					return $this->version_status( $t_inherit_id );
-
-				} else {
-					# sort children by version name, and find the first with a real status to inherit from
-					uasort( $t_version_tree, 'PVMNaturalSortReverse' );
-
-					$t_child_status = 0;
-					foreach( $t_version_tree as $t_child_id => $t_child ) {
-						$t_child_status = $this->version_status( $t_child_id );
-						if ( $t_child_status ) break;
+					$t_inherited_status = $this->version_status( $t_inherit_id );
+					if ( !is_null( $t_inherited_status ) ) {
+						return $t_inherited_status;
 					}
-
-					return $t_child_status;
 				}
+
+				# sort children by version name, and find the first with a real status to inherit from
+				uasort( $t_version_tree, 'PVMNaturalSortReverse' );
+
+				$t_child_status = 0;
+				foreach( $t_version_tree as $t_child_id => $t_child ) {
+					$t_child_status = $this->version_status( $t_child_id );
+					if ( $t_child_status ) break;
+				}
+
+				return $t_child_status;
 			}
 		}
 
