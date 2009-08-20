@@ -987,7 +987,7 @@ class ProductMatrix {
 
 		# get product/version info
 		$t_product = $this->versions[ $p_version_id ];
-		$t_inherit_id = $t_products->versions[ $p_version_id ]->inherit_id;
+		$t_inherit_id = $t_product->versions[ $p_version_id ]->inherit_id;
 
 		# see if the version has any children
 		if ( isset( $t_product->version_tree[ $p_version_id ] ) ) {
