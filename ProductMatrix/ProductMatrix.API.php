@@ -1155,7 +1155,7 @@ class ProductMatrix {
 	 * Display a form when updating bugs allowing the user to specify affected
 	 * products, platforms, and version statuses for a bug.
 	 */
-	function view_form() {
+	function view_form( $p_status_default=null ) {
 		$t_products = PVMProduct::load_all( true );
 
 		if ( count( $t_products ) < 1 ) {
@@ -1168,6 +1168,7 @@ class ProductMatrix {
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 		$t_status_array = plugin_config_get( 'status' );
 		$t_status_colors = plugin_config_get( 'status_color' );
+		$t_status_default = $p_status_default === null ? 0 : $p_status_default;
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',
@@ -1198,7 +1199,7 @@ class ProductMatrix {
 					if ( isset( $this->status[$t_version->id] ) ) {
 						$t_status = $this->status[$t_version->id];
 					} else {
-						$t_status = 0;
+						$t_status = $t_status_default;
 					}
 
 					echo '<td bgcolor="', $t_status_colors[$t_status], '"><select name="Product', $t_product->id, 'Version', $t_version->id, '">';
@@ -1222,7 +1223,11 @@ class ProductMatrix {
 					$t_status = $this->version_status( $t_version->id );
 
 					if ( is_null( $t_status ) ) {
-						echo '<td>', plugin_lang_get( 'status_na' ), '</td>';
+						if ( $t_status_default > 0 ) {
+							echo '<td bgcolor="', $t_status_colors[$t_status_default],'">', $t_status_array[$t_status_default], '</td>';
+						} else {
+							echo '<td>', plugin_lang_get( 'status_na' ), '</td>';
+						}
 					} else {
 						echo '<td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
 					}
@@ -1275,7 +1280,7 @@ class ProductMatrix {
 	 * Display a form when reporting new bugs allowing the user to specify affected
 	 * products, platforms, and version statuses for a bug.
 	 */
-	function view_report_form() {
+	function view_report_form( $p_status_default=null ) {
 		$t_products = PVMProduct::load_all( true );
 
 		if ( count( $t_products ) < 1 ) {
@@ -1288,7 +1293,7 @@ class ProductMatrix {
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 		$t_status_array = plugin_config_get( 'status' );
 		$t_status_colors = plugin_config_get( 'status_color' );
-		$t_status_default = array_shift( array_keys( $t_status_array ) );
+		$t_status_default = $p_status_default === null ? array_shift( array_keys( $t_status_array ) ) : $p_status_default;
 
 		echo '<tr ', helper_alternate_class(), '><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',

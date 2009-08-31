@@ -81,6 +81,8 @@ class ProductMatrixPlugin extends MantisPlugin {
 				60 => array(),
 				70 => array(),
 				),
+
+			'status_default' => 0,
 		);
 	}
 
@@ -152,9 +154,9 @@ class ProductMatrixPlugin extends MantisPlugin {
 		if ( access_has_project_level( plugin_config_get( 'update_threshold' ) ) ) {
 			$matrix = new ProductMatrix();
 			if ( plugin_config_get( 'report_status' ) ) {
-				$matrix->view_form();
+				$matrix->view_form( plugin_config_get( 'status_default', 0 ) );
 			} else {
-				$matrix->view_report_form();
+				$matrix->view_report_form( plugin_config_get( 'status_default', 0 ) );
 			}
 		}
 	}

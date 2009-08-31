@@ -18,6 +18,8 @@ html_page_top1( plugin_lang_get( 'title' ) );
 html_page_top2();
 
 print_manage_menu();
+
+$t_status_default = plugin_config_get( 'status_default' );
 ?>
 
 <br/>
@@ -42,6 +44,18 @@ print_manage_menu();
 <tr <?php echo helper_alternate_class() ?>>
 <td class="category"><?php echo plugin_lang_get( 'manage_threshold' ) ?></td>
 <td><select name="manage_threshold"><?php print_enum_string_option_list( 'access_levels', plugin_config_get( 'manage_threshold' ) ) ?></select></td>
+</tr>
+
+<tr><td class="spacer"></td></tr>
+
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category"><?php echo plugin_lang_get( 'status_default' ) ?></td>
+<td><select name="status_default">
+	<option value="0"><?php echo plugin_lang_get( 'status_na' ) ?></option>
+	<?php foreach( plugin_config_get( 'status' ) as $t_status_id => $t_status_name ) { ?>
+	<option value="<?php echo (int) $t_status_id ?>" <?php echo $t_status_default == $t_status_id ? 'selected="selected"' : '' ?>><?php echo string_display_line( $t_status_name ) ?></option>
+	<?php } ?>
+</select></td>
 </tr>
 
 <tr><td class="spacer"></td></tr>

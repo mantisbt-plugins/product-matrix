@@ -29,6 +29,8 @@ maybe_set_option( 'view_threshold', $f_view_threshold );
 maybe_set_option( 'update_threshold', $f_update_threshold );
 maybe_set_option( 'manage_threshold', $f_manage_threshold );
 
+maybe_set_option( 'status_default', gpc_get_int( 'status_default' ) );
+
 maybe_set_option( 'common_platform', gpc_get_bool( 'common_platform', OFF ) );
 maybe_set_option( 'reverse_inheritence', gpc_get_bool( 'reverse_inheritence', OFF ) );
 maybe_set_option( 'report_status', gpc_get_bool( 'report_status', OFF ) );
