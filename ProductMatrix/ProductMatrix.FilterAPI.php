@@ -125,3 +125,56 @@ class PVMVersionFilter extends MantisFilter {
 	}
 }
 
+class PVMStatusFilter extends MantisFilter {
+	public $field = 'status';
+	public $title = 'Product Version Status';
+	public $type = FILTER_TYPE_MULTI_INT;
+	public $default = array();
+
+	private $status_array;
+
+	public function __construct() {
+		plugin_push_current( 'ProductMatrix' );
+		$this->status_array = plugin_config_get( 'status' );
+		plugin_pop_current();
+	}
+
+	public function query( $p_filter_input ) {
+		if ( !is_array( $p_filter_input ) ) {
+			return;
+		}
+
+		$t_statuses = array();
+
+		foreach( $p_filter_input as $t_status ) {
+			if ( isset( $this->status_array[ $t_status ] ) ) {
+				$t_statuses[] = $t_status;
+			}
+		}
+
+		$t_statuses = join( ',', $t_statuses );
+
+		$t_bug_table = db_get_table( 'mantis_bug_table' );
+		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
+
+		$t_query = array(
+			'join' => "LEFT JOIN $t_status_table ON $t_bug_table.id=$t_status_table.bug_id",
+			'where' => "$t_status_table.status IN ( $t_statuses )",
+		);
+
+		return $t_query;
+	}
+
+	public function display( $p_filter_value ) {
+		if ( isset( $this->status_array[ $p_filter_value ] ) ) {
+			return $this->status_array[ $p_filter_value ];
+		}
+
+		return $p_filter_value;
+	}
+
+	public function options() {
+		return $this->status_array;
+	}
+}
+

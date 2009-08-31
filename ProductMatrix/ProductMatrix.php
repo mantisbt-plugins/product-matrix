@@ -102,6 +102,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 		return array(
 			'PVMProductFilter',
 			'PVMVersionFilter',
+			'PVMStatusFilter',
 		);
 	}
 
