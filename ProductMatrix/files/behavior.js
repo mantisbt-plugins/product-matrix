@@ -26,6 +26,10 @@ $(document).ready( function() {
 			}
 		});
 
+	products.each( function(index) {
+			$(this).attr("collapsed", "yes");
+		});
+
 	/**
 	 * Handle collapsing of child version status rows based on the list of
 	 * child ids in the 'collapse' attribute.
@@ -106,6 +110,26 @@ $(document).ready( function() {
 
 	// Add the collapse-all behavior to product labels
 	products.addClass('clickable').click( function() {
-			} );
+			var statuses = $(this).siblings("tr.clickable");
+			var collapsed = $(this).attr("collapsed");
+
+			if ( collapsed == "yes" ) {
+				statuses.each( function(index) {
+						$(this).fadeIn(speed);
+						$(this).attr("collapsed", "no");
+					} );
+				$(this).attr("collapsed", "no");
+
+			} else if ( collapsed == "no" ) {
+				statuses.each( function(index) {
+						if ( $(this).hasClass("pvmtoplevel") ) {
+						} else {
+							$(this).fadeOut(speed);
+						}
+						$(this).attr("collapsed", "yes");
+					} );
+				$(this).attr("collapsed", "yes");
+			}
+		} );
 } );
 
