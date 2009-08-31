@@ -15,7 +15,7 @@ class PVMProductFilter extends MantisFilter {
 	public $field = 'product';
 	public $title = 'Product';
 	public $type = FILTER_TYPE_MULTI_INT;
-	public $default = META_FILTER_ANY;
+	public $default = array();
 
 	public function query( $p_filter_input ) {
 		if ( !is_array( $p_filter_input ) ) {
@@ -71,7 +71,7 @@ class PVMVersionFilter extends MantisFilter {
 	public $field = 'version';
 	public $title = 'Version';
 	public $type = FILTER_TYPE_MULTI_INT;
-	public $default = META_FILTER_ANY;
+	public $default = array();
 
 	public function query( $p_filter_input ) {
 		if ( !is_array( $p_filter_input ) ) {
