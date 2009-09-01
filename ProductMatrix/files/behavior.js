@@ -19,7 +19,7 @@ $(document).ready( function() {
 
 	// default all children versions to collapsed 
 	versions.each( function(index) {
-			$(this).attr("collapsed", "yes");
+			$(this).addClass("pvmcollapsed");
 
 			if ( $(this).hasClass("pvmchild") ) {
 				$(this).hide();
@@ -27,7 +27,7 @@ $(document).ready( function() {
 		});
 
 	products.each( function(index) {
-			$(this).attr("collapsed", "yes");
+			$(this).addClass("pvmcollapsed");
 		});
 
 	/**
@@ -54,7 +54,7 @@ $(document).ready( function() {
 		}
 
 		var statuses = versions.filter( PVMStatusCollapseFilter );
-		var collapsed = $(item).attr("collapsed");
+		var collapsed = $(item).hasClass("pvmcollapsed") ? "yes" : "no";
 
 		// initial action
 		if ( action == "" ) {
@@ -64,14 +64,14 @@ $(document).ready( function() {
 				statuses.each( function(index) {
 						PVMStatusCollapse( this, "expand" );
 					});
-				$(item).attr("collapsed", "no");
+				$(item).removeClass("pvmcollapsed");
 
 			// collapse a block
 			} else if ( collapsed == "no" ) {
 				statuses.each( function(index) {
 						PVMStatusCollapse( this, "collapse" );
 					});
-				$(item).attr("collapsed", "yes");
+				$(item).addClass("pvmcollapsed");
 			}
 
 		// expanding child blocks
@@ -111,14 +111,14 @@ $(document).ready( function() {
 	// Add the collapse-all behavior to product labels
 	products.addClass('clickable').click( function() {
 			var statuses = $(this).siblings("tr.clickable");
-			var collapsed = $(this).attr("collapsed");
+			var collapsed = $(this).hasClass("pvmcollapsed") ? "yes" : "no";
 
 			if ( collapsed == "yes" ) {
 				statuses.each( function(index) {
 						$(this).fadeIn(speed);
-						$(this).attr("collapsed", "no");
+						$(this).removeClass("pvmcollapsed");
 					} );
-				$(this).attr("collapsed", "no");
+				$(this).removeClass("pvmcollapsed");
 
 			} else if ( collapsed == "no" ) {
 				statuses.each( function(index) {
@@ -126,9 +126,9 @@ $(document).ready( function() {
 						} else {
 							$(this).fadeOut(speed);
 						}
-						$(this).attr("collapsed", "yes");
+						$(this).addClass("pvmcollapsed");
 					} );
-				$(this).attr("collapsed", "yes");
+				$(this).addClass("pvmcollapsed");
 			}
 		} );
 } );

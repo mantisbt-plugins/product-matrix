@@ -16,6 +16,18 @@ table.pvmproduct tr.pvmchild td {
 	border-top: 1px solid #aaa;
 }
 
+table.pvmproduct tr.clickable td:first-child {
+	background: #c8c8e8 url('/workspace/mantisbt/plugin_file.php?file=ProductMatrix/collapse.png') no-repeat;
+	background-position: 3px 50%;
+	padding-left: 15px;
+}
+
+table.pvmproduct tr.pvmcollapsed td:first-child {
+	background: #c8c8e8 url('/workspace/mantisbt/plugin_file.php?file=ProductMatrix/expand.png') no-repeat;
+	background-position: 3px 50%;
+	padding-left: 15px;
+}
+
 .PVMreleased {
 	background: #DFD;
 }
