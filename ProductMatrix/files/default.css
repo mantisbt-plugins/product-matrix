@@ -28,27 +28,27 @@ table.pvmproduct tr.pvmcollapsed td:first-child {
 	padding-left: 15px;
 }
 
-table.pvmproduct tr.pvmstatus td.pvmdepth1 {
+table.pvmproduct tr.pvmstatusrow td.pvmdepth1 {
 	background-position: 15px 50%;
 	padding-left: 26px;
 }
 
-table.pvmproduct tr.pvmstatus td.pvmdepth2 {
+table.pvmproduct tr.pvmstatusrow td.pvmdepth2 {
 	background-position: 26px 50%;
 	padding-left: 37px;
 }
 
-table.pvmproduct tr.pvmstatus td.pvmdepth3 {
+table.pvmproduct tr.pvmstatusrow td.pvmdepth3 {
 	background-position: 37px 50%;
 	padding-left: 48px;
 }
 
-table.pvmproduct tr.pvmstatus td.pvmdepth4 {
+table.pvmproduct tr.pvmstatusrow td.pvmdepth4 {
 	background-position: 48px 50%;
 	padding-left: 59px;
 }
 
-table.pvmproduct tr.pvmstatus td.pvmdepth5 {
+table.pvmproduct tr.pvmstatusrow td.pvmdepth5 {
 	background-position: 59px 50%;
 	padding-left: 70px;
 }

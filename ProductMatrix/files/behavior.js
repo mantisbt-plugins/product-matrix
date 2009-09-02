@@ -14,11 +14,11 @@
 
 $(document).ready( function() {
 	var speed = 200;
-	var versions = $('tr.pvmstatus');
+	var statusrows = $('tr.pvmstatusrow');
 	var products = $('table.pvmproduct tr.row-category');
 
 	// default all children versions to collapsed 
-	versions.each( function(index) {
+	statusrows.each( function(index) {
 			if ( $(this).hasClass("pvmchild") ) {
 				$(this).hide();
 			}
@@ -57,7 +57,7 @@ $(document).ready( function() {
 			return false;
 		}
 
-		var statuses = versions.filter( PVMStatusCollapseFilter );
+		var statuses = statusrows.filter( PVMStatusCollapseFilter );
 		var collapsed = $(item).hasClass("pvmcollapsed") ? "yes" : "no";
 
 		// initial action
@@ -112,11 +112,11 @@ $(document).ready( function() {
 	}
 
 	// Add the collapse behavior to appropriate rows
-	versions.addClass('clickable').click( function() { PVMStatusCollapse( this, "" ); } );
+	statusrows.click( function() { PVMStatusCollapse( this, "" ); } );
 
 	// Add the collapse-all behavior to product labels
-	products.addClass('clickable').click( function() {
-			var statuses = $(this).siblings("tr.clickable");
+	products.click( function() {
+			var statuses = $(this).siblings("tr.pvmstatusrow");
 			var collapsed = $(this).hasClass("pvmcollapsed") ? "yes" : "no";
 
 			if ( collapsed == "yes" ) {
