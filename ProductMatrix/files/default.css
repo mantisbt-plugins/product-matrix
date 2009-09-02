@@ -16,10 +16,6 @@ table.pvmproduct tr.pvmchild td {
 	border-top: 1px solid #aaa;
 }
 
-table.pvmproduct tr.clickable td:first-child {
-	padding-left: 15px;
-}
-
 table.pvmproduct tr.pvmexpanded td:first-child {
 	background: #c8c8e8 url('/workspace/mantisbt/plugin_file.php?file=ProductMatrix/collapse.png') no-repeat;
 	background-position: 4px 50%;
