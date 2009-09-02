@@ -1124,7 +1124,7 @@ class ProductMatrix {
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
 				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
-					'" collapse="', $t_collapse_ids, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td>',
+					'" collapse="', $t_collapse_ids, '"><td class="category pvmdepth', $t_depth, '">', $t_version->name, '</td>',
 					'</td><td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td></tr>';
 
 			}

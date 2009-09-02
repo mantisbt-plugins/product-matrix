@@ -19,14 +19,17 @@ $(document).ready( function() {
 
 	// default all children versions to collapsed 
 	versions.each( function(index) {
-			$(this).addClass("pvmcollapsed");
-
 			if ( $(this).hasClass("pvmchild") ) {
 				$(this).hide();
+			}
+			if ( $(this).attr("collapse") != "" ) {
+				$(this).removeClass("pvmexpanded");
+				$(this).addClass("pvmcollapsed");
 			}
 		});
 
 	products.each( function(index) {
+			$(this).removeClass("pvmexpanded");
 			$(this).addClass("pvmcollapsed");
 		});
 
@@ -35,6 +38,7 @@ $(document).ready( function() {
 	 * child ids in the 'collapse' attribute.
 	 */
 	function PVMStatusCollapse( item, action ) {
+		if ( $(item).attr("collapse") == "" && action == "" ) { return; }
 		var children = $(item).attr("collapse").split(":");
 
 		/**
@@ -65,12 +69,14 @@ $(document).ready( function() {
 						PVMStatusCollapse( this, "expand" );
 					});
 				$(item).removeClass("pvmcollapsed");
+				$(item).addClass("pvmexpanded");
 
 			// collapse a block
 			} else if ( collapsed == "no" ) {
 				statuses.each( function(index) {
 						PVMStatusCollapse( this, "collapse" );
 					});
+				$(item).removeClass("pvmexpanded");
 				$(item).addClass("pvmcollapsed");
 			}
 
@@ -116,9 +122,13 @@ $(document).ready( function() {
 			if ( collapsed == "yes" ) {
 				statuses.each( function(index) {
 						$(this).fadeIn(speed);
-						$(this).removeClass("pvmcollapsed");
+						if ( $(this).attr("collapse") != "" ) {
+							$(this).removeClass("pvmcollapsed");
+							$(this).addClass("pvmexpanded");
+						}
 					} );
 				$(this).removeClass("pvmcollapsed");
+				$(this).addClass("pvmexpanded");
 
 			} else if ( collapsed == "no" ) {
 				statuses.each( function(index) {
@@ -126,8 +136,12 @@ $(document).ready( function() {
 						} else {
 							$(this).fadeOut(speed);
 						}
-						$(this).addClass("pvmcollapsed");
+						if ( $(this).attr("collapse") != "" ) {
+							$(this).removeClass("pvmexpanded");
+							$(this).addClass("pvmcollapsed");
+						}
 					} );
+				$(this).removeClass("pvmexpanded");
 				$(this).addClass("pvmcollapsed");
 			}
 		} );
