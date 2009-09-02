@@ -1193,7 +1193,7 @@ class ProductMatrix {
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
 				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
-					'" collapse="', $t_collapse_ids, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td>';
+					'" collapse="', $t_collapse_ids, '"><td class="category pvmdepth', $t_depth, '">', $t_version->name, '</td>';
 
 				if ( $this->version_mutable( $t_version->id ) ) {
 					if ( isset( $this->status[$t_version->id] ) ) {
@@ -1309,7 +1309,7 @@ class ProductMatrix {
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
 				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatus ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
-					'" collapse="', $t_collapse_ids, '"><td class="category">', str_pad( '', $t_depth, '-' ), ' ', $t_version->name, '</td>';
+					'" collapse="', $t_collapse_ids, '"><td class="category', $t_depth, '">', $t_version->name, '</td>';
 
 				if ( $this->version_mutable( $t_version->id ) ) {
 					echo '<td><input type="checkbox" name="Product', $t_product->id, 'Version', $t_version->id, '" value="', $t_status_default, '"/></td>';
