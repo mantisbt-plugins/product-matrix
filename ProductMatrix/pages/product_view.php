@@ -79,7 +79,7 @@ print_bracket_link( plugin_page( 'version_delete' ) .
 <td colspan="2">
 	<?php if ( $t_can_manage ) { ?>
 	<form method="post" action="<?php echo plugin_page( 'product_manage' ), '&id=', $t_product->id ?>">
-	<input type="submit" value="Update Product"/>
+	<input type="submit" value="Edit Product"/>
 	</form>
 	<?php } ?>
 </td>
