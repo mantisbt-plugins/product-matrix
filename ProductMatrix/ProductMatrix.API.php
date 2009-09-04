@@ -16,6 +16,9 @@
  * @author John Reese
  */
 
+define( 'PVM_REPORT', 2 );
+define( 'PVM_UPDATE', 3 );
+
 /**
  * Natural sorting comparison for objects with 'name' properties.
  * @param object Object 1

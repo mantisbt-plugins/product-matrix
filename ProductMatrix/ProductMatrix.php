@@ -52,6 +52,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'common_platform' => ON,
 			'reverse_inheritence' => OFF,
 			'product_status' => OFF,
+			'status_cascade' => ON,
 
 			'status' => array(
 				10 => 'open',

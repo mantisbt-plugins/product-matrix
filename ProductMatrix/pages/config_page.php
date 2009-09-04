@@ -20,6 +20,7 @@ html_page_top2();
 print_manage_menu();
 
 $t_status_default = plugin_config_get( 'status_default' );
+$t_status_cascade = plugin_config_get( 'status_cascade' );
 ?>
 
 <br/>
@@ -55,6 +56,16 @@ $t_status_default = plugin_config_get( 'status_default' );
 	<?php foreach( plugin_config_get( 'status' ) as $t_status_id => $t_status_name ) { ?>
 	<option value="<?php echo (int) $t_status_id ?>" <?php echo $t_status_default == $t_status_id ? 'selected="selected"' : '' ?>><?php echo string_display_line( $t_status_name ) ?></option>
 	<?php } ?>
+</select></td>
+</tr>
+
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category"><?php echo plugin_lang_get( 'status_cascade' ) ?></td>
+<td><select name="status_cascade">
+	<option value="<?php echo OFF ?>" <?php echo $t_status_cascade == OFF ? 'selected="selected"' : ''?>><?php echo plugin_lang_get( 'status_cascade_off' ) ?></option>
+	<option value="<?php echo ON ?>" <?php echo $t_status_cascade == ON ? 'selected="selected"' : ''?>><?php echo plugin_lang_get( 'status_cascade_on' ) ?></option>
+	<option value="<?php echo PVM_REPORT ?>" <?php echo $t_status_cascade == PVM_REPORT ? 'selected="selected"' : ''?>><?php echo plugin_lang_get( 'status_cascade_report' ) ?></option>
+	<option value="<?php echo PVM_UPDATE ?>" <?php echo $t_status_cascade == PVM_UPDATE ? 'selected="selected"' : ''?>><?php echo plugin_lang_get( 'status_cascade_edit' ) ?></option>
 </select></td>
 </tr>
 
