@@ -15,6 +15,7 @@
 $(document).ready( function() {
 	var speed = 200;
 	var statusrows = $('tr.pvmstatusrow');
+	var versions = $('tr.pvmstatusrow td.category');
 	var products = $('table.pvmproduct tr.row-category');
 
 	// default all children versions to collapsed 
@@ -111,9 +112,6 @@ $(document).ready( function() {
 		}
 	}
 
-	// Add the collapse behavior to appropriate rows
-	statusrows.click( function() { PVMStatusCollapse( this, "" ); } );
-
 	// Add the collapse-all behavior to product labels
 	products.click( function() {
 			var statuses = $(this).siblings("tr.pvmstatusrow");
@@ -145,5 +143,9 @@ $(document).ready( function() {
 				$(this).addClass("pvmcollapsed");
 			}
 		} );
+
+	// Add the collapse behavior to appropriate rows
+	versions.click( function() { PVMStatusCollapse( $(this).parent(), "" ); } );
+
 } );
 
