@@ -16,6 +16,7 @@ $(document).ready( function() {
 	var speed = 200;
 	var statusrows = $('tr.pvmstatusrow');
 	var versions = $('tr.pvmstatusrow td.category');
+	var statuses = $('table.pvmcascade tr.pvmstatusrow td select');
 	var products = $('table.pvmproduct tr.row-category');
 
 	// default all children versions to collapsed 
@@ -35,6 +36,76 @@ $(document).ready( function() {
 		});
 
 	/**
+	 * Get a list of child status rows for a given row.
+	 */
+	function PVMChildRows( item ) {
+		if ( $(item).attr("collapse") == "" ) { return null; }
+
+		var children = $(item).attr("collapse").split(":");
+
+		/**
+		 * Filters out the status rows that are children of the given row.
+		 */
+		function PVMChildRowFilter(index) {
+			var item_name = $(this).attr("id");
+
+			for( var i=0; i < children.length; i++) {
+				var child_name = "pvmversion" + children[ i ];
+				if ( item_name == child_name ) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		return statusrows.filter( PVMChildRowFilter );
+	}
+
+	/**
+	 * Given a status row, a new status, and an old status,
+	 * cascade the status change "recursively" to all child
+	 * status rows that are currently the same status as the
+	 * given old status.  Child rows not sharing the old
+	 * status will not be changed, and will not be recursively
+	 * searched.
+	 */
+	function PVMCascade( item, newValue, oldValue ) {
+		var childrows = PVMChildRows( item );
+
+		for( var i = 0; i < childrows.length; i++ ) {
+			var row = childrows[i];
+			var status = $(row).children().children("select").get(0);
+			if ( status.value == oldValue || status.value == 0 ) {
+				status.value = newValue;
+				var morerows = PVMChildRows( row );
+				if ( morerows != null ) {
+					for( var j = 0; j < morerows.length; j++ ) {
+						childrows.push( morerows[j] );
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Whenever the user focuses the status selection, save
+	 * the current status for later use.
+	 */
+	statuses.focus( function() {
+			this.oldValue = this.value;
+		});
+
+	/**
+	 * When the user changes the status selection, cascade
+	 * the change to child status rows.
+	 */
+	statuses.change( function(e) {
+			var statusrow = $(this).parents('tr.pvmstatusrow');
+			PVMCascade( statusrow, this.value, this.oldValue );
+		});
+
+	/**
 	 * Handle collapsing of child version status rows based on the list of
 	 * child ids in the 'collapse' attribute.
 	 */
@@ -48,7 +119,7 @@ $(document).ready( function() {
 		function PVMStatusCollapseFilter(index) {
 			var item_name = $(this).attr("id");
 
-			for( i=0; i < children.length; i++) {
+			for( var i=0; i < children.length; i++) {
 				var child_name = "pvmversion" + children[ i ];
 				if ( item_name == child_name ) {
 					return true;
