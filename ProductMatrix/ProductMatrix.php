@@ -137,7 +137,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 	function update_bug_form( $p_event, $p_bug_id ) {
 		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			$matrix = new ProductMatrix( $p_bug_id );
-			$matrix->view_form();
+			$matrix->view_form( PVM_UPDATE );
 		}
 	}
 
@@ -155,7 +155,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 		if ( access_has_project_level( plugin_config_get( 'update_threshold' ) ) ) {
 			$matrix = new ProductMatrix();
 			if ( plugin_config_get( 'report_status' ) ) {
-				$matrix->view_form( plugin_config_get( 'status_default', 0 ) );
+				$matrix->view_form( PVM_REPORT, plugin_config_get( 'status_default', 0 ) );
 			} else {
 				$matrix->view_report_form( plugin_config_get( 'status_default', 0 ) );
 			}

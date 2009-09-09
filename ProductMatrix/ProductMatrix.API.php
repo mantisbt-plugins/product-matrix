@@ -1158,7 +1158,7 @@ class ProductMatrix {
 	 * Display a form when updating bugs allowing the user to specify affected
 	 * products, platforms, and version statuses for a bug.
 	 */
-	function view_form( $p_status_default=null ) {
+	function view_form( $p_type, $p_status_default=null ) {
 		$t_products = PVMProduct::load_all( true );
 
 		if ( count( $t_products ) < 1 ) {
@@ -1168,6 +1168,7 @@ class ProductMatrix {
 		plugin_push_current( 'ProductMatrix' );
 
 		$this->products_to_versions();
+		$t_cascade = ( $t_cascade = plugin_config_get( 'status_cascade' ) ) == ON || $t_cascade == $p_type;
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 		$t_status_array = plugin_config_get( 'status' );
 		$t_status_colors = plugin_config_get( 'status_color' );
@@ -1184,7 +1185,7 @@ class ProductMatrix {
 				$t_product->top_status = $this->product_status( $t_product->id );
 			}
 
-			echo '<table class="pvmproduct" cellspacing="0">',
+			echo '<table class="pvmproduct', ( $t_cascade ? ' pvmcascade' : '' ), '" cellspacing="0">',
 				'<tr class="row-category"><td>', $t_product->name, '</td>
 				<td bgcolor=', $t_status_colors[$t_product->top_status], '>', $t_status_array[$t_product->top_status], '</td>
 				</tr>';
@@ -1198,11 +1199,12 @@ class ProductMatrix {
 				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatusrow ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
 					'" collapse="', $t_collapse_ids, '"><td class="category pvmdepth', $t_depth, '">', $t_version->name, '</td>';
 
-				if ( $this->version_mutable( $t_version->id ) ) {
+				if ( $this->version_mutable( $t_version->id ) || $t_cascade ) {
 					if ( isset( $this->status[$t_version->id] ) ) {
 						$t_status = $this->status[$t_version->id];
 					} else {
-						$t_status = $t_status_default;
+						$t_status = $this->version_status( $t_version->id );
+						$t_status = $t_status > 0 ? $t_status : $t_status_default;
 					}
 
 					echo '<td bgcolor="', $t_status_colors[$t_status], '"><select name="Product', $t_product->id, 'Version', $t_version->id, '">';
