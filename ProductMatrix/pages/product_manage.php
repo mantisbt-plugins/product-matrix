@@ -27,7 +27,7 @@ html_page_top2();
 <?php echo form_security_field( 'ProductMatrix_product_update' ) ?>
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
 
-<table class="productmatrix" align="center" cellspacing="1">
+<table class="productmatrix width90" align="center" cellspacing="1">
 
 <tr>
 <td class="form-title" colspan="3">Manage Product: <input name="product_name" value="<?php echo $t_product->name ?>"/></td>
