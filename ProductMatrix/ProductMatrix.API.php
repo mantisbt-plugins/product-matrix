@@ -1140,9 +1140,11 @@ class ProductMatrix {
 				$t_first = true;
 				echo '<tr class="pvmaffected"><td class="category">Affects</td><td>';
 				foreach( $t_product->platforms as $t_platform ) {
-					if ( !$t_first ) { echo ', '; }
-					echo $t_platform->name;
-					$t_first = false;
+					if ( isset( $this->affects[ $t_product->id ][ $t_platform->id ] ) ) {
+						if ( !$t_first ) { echo ', '; }
+						echo $t_platform->name;
+						$t_first = false;
+					}
 				}
 				if ( $t_common_enabled && isset( $this->affects[ $t_product->id ][0] ) ) {
 					echo ', ', plugin_lang_get( 'common' );
