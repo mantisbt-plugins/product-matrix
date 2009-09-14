@@ -904,16 +904,18 @@ class ProductMatrix {
 
 		$t_history_string = "$t_product_name $t_version_name: ";
 
+		lang_push();
+
 		if ( is_null( $t_old ) ) {
 			$t_field = 'history_version_tracked';
 
-			$t_old = $t_history_string . $t_status[ $t_new ];
-			$t_new = null;
+			$t_old = $t_history_string . plugin_lang_get( 'status_na' );
+			$t_new = $t_status[ $t_new ];
 		} else if ( is_null( $t_new ) ) {
 			$t_field = 'history_version_ignored';
 
 			$t_old = $t_history_string . $t_status[ $t_old ];
-			$t_new = null;
+			$t_new = plugin_lang_get( 'status_na' );
 		} else {
 			$t_field = 'history_version_updated';
 
@@ -922,6 +924,8 @@ class ProductMatrix {
 		}
 
 		plugin_history_log( $this->bug_id, $t_field, $t_old, $t_new );
+
+		lang_pop();
 
 		plugin_pop_current();
 	}
