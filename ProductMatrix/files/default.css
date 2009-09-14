@@ -17,13 +17,13 @@ table.pvmproduct tr.pvmchild td {
 }
 
 table.pvmproduct tr.pvmexpanded td:first-child {
-	background: #c8c8e8 url('/workspace/mantisbt/plugin_file.php?file=ProductMatrix/collapse.png') no-repeat;
+	background: #c8c8e8 url('plugin_file.php?file=ProductMatrix/collapse.png') no-repeat;
 	background-position: 4px 50%;
 	padding-left: 15px;
 }
 
 table.pvmproduct tr.pvmcollapsed td:first-child {
-	background: #c8c8e8 url('/workspace/mantisbt/plugin_file.php?file=ProductMatrix/expand.png') no-repeat;
+	background: #c8c8e8 url('plugin_file.php?file=ProductMatrix/expand.png') no-repeat;
 	background-position: 4px 50%;
 	padding-left: 15px;
 }
