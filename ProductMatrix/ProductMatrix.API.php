@@ -779,12 +779,14 @@ class ProductMatrix {
 	 * Log history entries for any affected platform or version status
 	 * that has changed state since the matrix was last saved.
 	 */
-	function save() {
+	function save( $t_form_type=OFF ) {
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
 
 		$this->load_products( true );
 		$this->products_to_versions();
+
+		event_signal( 'EVENT_PRODUCTMATRIX_PRESAVE', array( $this, $t_form_type ) );
 
 		foreach( $this->status as $t_version_id => $t_status ) {
 			if ( !isset( $this->__status[ $t_version_id ] ) ) { # new status

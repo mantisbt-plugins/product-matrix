@@ -17,7 +17,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$this->description = plugin_lang_get( 'description' );
 		$this->page = 'config_page';
 
-		$this->version = '0.1';
+		$this->version = '0.2';
 		$this->requires = array(
 			'MantisCore' => '1.2.0',
 		);
@@ -39,6 +39,12 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'VersionNameEmpty' => 'The version\'s name must not be empty.',
 			'PlatformNameEmpty' => 'The platform\'s name must not be empty.',
 			'ProductIDNotSet' => 'The product has an invalid ID.',
+		);
+	}
+
+	function events() {
+		return array(
+			'EVENT_PRODUCTMATRIX_PRESAVE' => EVENT_TYPE_EXECUTE,
 		);
 	}
 
@@ -145,7 +151,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			$matrix = new ProductMatrix( $p_bug_id, false );
 			$matrix->process_form();
-			$matrix->save();
+			$matrix->save( PVM_UPDATE );
 		}
 
 		return $p_bug_data;
@@ -166,7 +172,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 		if ( access_has_project_level( plugin_config_get( 'update_threshold' ) ) ) {
 			$matrix = new ProductMatrix( $p_bug_id, false );
 			$matrix->process_form();
-			$matrix->save();
+			$matrix->save( PVM_REPORT );
 		}
 	}
 
