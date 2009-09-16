@@ -1205,7 +1205,8 @@ class ProductMatrix {
 				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatusrow ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
 					'" collapse="', $t_collapse_ids, '"><td class="category pvmdepth', $t_depth, '">', $t_version->name, '</td>';
 
-				if ( $this->version_mutable( $t_version->id ) || $t_cascade ) {
+				$t_mutable = $this->version_mutable( $t_version->id );
+				if ( $t_mutable || $t_cascade ) {
 					if ( isset( $this->status[$t_version->id] ) ) {
 						$t_status = $this->status[$t_version->id];
 					} else {
@@ -1213,7 +1214,8 @@ class ProductMatrix {
 						$t_status = $t_status > 0 ? $t_status : $t_status_default;
 					}
 
-					echo '<td bgcolor="', $t_status_colors[$t_status], '"><select name="Product', $t_product->id, 'Version', $t_version->id, '">';
+					echo '<td bgcolor="', $t_status_colors[$t_status], '"><select ',
+						( $t_mutable ? 'name="Product' . $t_product->id . 'Version' . $t_version->id : '' ), '">';
 
 					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
 
