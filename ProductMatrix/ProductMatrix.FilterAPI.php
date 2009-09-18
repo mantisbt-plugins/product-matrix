@@ -114,9 +114,20 @@ class PVMVersionFilter extends MantisFilter {
 			$t_products = PVMProduct::load_all( true );
 			$s_options = array();
 
+			$t_status_table = plugin_table( 'status', 'ProductMatrix' );
+
+			$t_versions = array();
+			$t_query = "SELECT DISTINCT version_id FROM $t_status_table";
+			$t_result = db_query_bound( $t_query );
+			while( $t_row = db_fetch_array( $t_result ) ) {
+				$t_versions[ $t_row['version_id'] ] = true;
+			}
+
 			foreach( $t_products as $t_product ) {
 				foreach( $t_product->versions as $t_id => $t_version ) {
-					$s_options[ $t_id ] = $t_product->name . $t_version->name;
+					if ( isset( $t_versions[ $t_id ] ) ) {
+						$s_options[ $t_id ] = $t_product->name . $t_version->name;
+					}
 				}
 			}
 		}
