@@ -1217,7 +1217,7 @@ class ProductMatrix {
 					}
 
 					echo '<td bgcolor="', $t_status_colors[$t_status], '"><select ',
-						( $t_mutable ? 'name="Product' . $t_product->id . 'Version' . $t_version->id : '' ), '">';
+						( $t_mutable ? 'name="Product' . $t_product->id . 'Version' . $t_version->id . '"' : '' ), '>';
 
 					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
 
