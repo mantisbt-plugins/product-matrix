@@ -163,6 +163,10 @@ class PVMStatusFilter extends MantisFilter {
 			}
 		}
 
+		if ( count( $t_statuses ) < 1 ) {
+			return;
+		}
+
 		$t_statuses = join( ',', $t_statuses );
 
 		$t_bug_table = db_get_table( 'mantis_bug_table' );
