@@ -110,7 +110,7 @@ class PVMVersionFilter extends MantisFilter {
 	public function options() {
 		static $s_options = null;
 
-		if ( is_null( $s_products ) ) {
+		if ( is_null( $s_options ) ) {
 			$t_products = PVMProduct::load_all( true );
 			$s_options = array();
 
@@ -126,7 +126,7 @@ class PVMVersionFilter extends MantisFilter {
 			foreach( $t_products as $t_product ) {
 				foreach( $t_product->versions as $t_id => $t_version ) {
 					if ( isset( $t_versions[ $t_id ] ) ) {
-						$s_options[ $t_id ] = $t_product->name . $t_version->name;
+						$s_options[ $t_id ] = $t_product->name . ' ' . $t_version->name;
 					}
 				}
 			}
@@ -190,6 +190,69 @@ class PVMStatusFilter extends MantisFilter {
 
 	public function options() {
 		return $this->status_array;
+	}
+}
+
+class PVMStatusColumnFilter extends MantisFilter {
+	public $field = 'statuscolumn';
+	public $title = 'Version Status Column';
+	public $type = FILTER_TYPE_MULTI_INT;
+	public $default = array();
+
+	public static function inputs( $p_inputs=null ) {
+		static $s_inputs = array();
+
+		if ( func_num_args() ) {
+			$s_inputs = $p_inputs;
+		} else {
+			return $s_inputs;
+		}
+	}
+
+	public function validate( $p_filter_input ) {
+		self::inputs( $p_filter_input );
+		return true;
+	}
+
+	public function query( $p_filter_input ) {
+	}
+
+	public function display( $p_filter_value ) {
+		$t_options = $this->options();
+
+		if ( isset( $t_options[ $p_filter_value ] ) ) {
+			return $t_options[ $p_filter_value ];
+		}
+
+		return $p_filter_value;
+	}
+
+	public function options() {
+		static $s_options = null;
+
+		if ( is_null( $s_options ) ) {
+			$t_products = PVMProduct::load_all( true );
+			$s_options = array();
+
+			$t_status_table = plugin_table( 'status', 'ProductMatrix' );
+
+			$t_versions = array();
+			$t_query = "SELECT DISTINCT version_id FROM $t_status_table";
+			$t_result = db_query_bound( $t_query );
+			while( $t_row = db_fetch_array( $t_result ) ) {
+				$t_versions[ $t_row['version_id'] ] = true;
+			}
+
+			foreach( $t_products as $t_product ) {
+				foreach( $t_product->versions as $t_id => $t_version ) {
+					if ( isset( $t_versions[ $t_id ] ) ) {
+						$s_options[ $t_id ] = $t_product->name . ' ' . $t_version->name;
+					}
+				}
+			}
+		}
+
+		return $s_options;
 	}
 }
 

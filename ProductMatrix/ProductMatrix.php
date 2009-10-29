@@ -105,6 +105,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'EVENT_FILTER_FIELDS'		=> 'filter_fields',
 			'EVENT_ACCOUNT_PREF_UPDATE_FORM'	=> 'update_prefs_form',
 			'EVENT_ACCOUNT_PREF_UPDATE'	=> 'update_prefs',
+			'EVENT_FILTER_COLUMNS'		=> 'filter_columns',
 		);
 	}
 
@@ -114,7 +115,64 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'PVMProductFilter',
 			'PVMVersionFilter',
 			'PVMStatusFilter',
+			'PVMStatusColumnFilter',
 		);
+	}
+
+	function filter_columns( $p_event ) {
+		require_once( 'ProductMatrix.FilterAPI.php' );
+		require_once( 'ProductMatrix.ColumnAPI.php' );
+
+		$t_class_definitions = '';
+		$t_columns = array();
+		$t_column_names = array();
+		$t_products = PVMProduct::load_all();
+		$t_version_names = array();
+		$t_inputs = PVMStatusColumnFilter::inputs();
+
+		if ( count( $t_inputs ) < 1 ) {
+			return;
+		}
+
+		$t_version_table = plugin_table( 'version' );
+		$t_query = "SELECT id, product_id, name FROM $t_version_table";
+		$t_result = db_query_bound( $t_query );
+		while( $t_row = db_fetch_array( $t_result ) ) {
+			$t_names[ $t_row['id'] ] = $t_products[ $t_row['product_id'] ]->name . ' ' . $t_row['name'];
+		}
+
+		foreach( $t_inputs as $t_input ) {
+			$t_id = (int) $t_input;
+			if ( $t_id < 1 ) {
+				continue;
+			}
+
+			$t_class = 'PVMStatusColumn' . $t_id;
+			$t_title = $t_names[$t_id];
+
+			$t_class_definitions .= <<<EOC
+class ${t_class} extends PVMStatusColumn {
+	public \$title = '${t_title}';
+	public \$column = 'status${t_id}';
+	public \$id = ${t_id};
+}
+EOC;
+
+			$t_columns[] = $t_class;
+			$t_column_names[] = 'productmatrix_status' . $t_id;
+		}
+
+		if ( count( $t_columns ) > 0 ) {
+			$t_project_id = helper_get_current_project();
+			$t_user_id = auth_get_current_user_id();
+			$t_user_columns = config_get( 'view_issues_page_columns', $t_project_id, $t_user_id );
+			$t_user_columns = array_merge( $t_user_columns, $t_column_names );
+			config_set_cache( 'view_issues_page_columns', serialize($t_user_columns), CONFIG_TYPE_COMPLEX, $t_user_id, $t_project_id );
+
+			eval( $t_class_definitions );
+			return $t_columns;
+		}
+
 	}
 
 	function init() {
