@@ -17,7 +17,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$this->description = plugin_lang_get( 'description' );
 		$this->page = 'config_page';
 
-		$this->version = '0.2';
+		$this->version = '0.3';
 		$this->requires = array(
 			'MantisCore' => '1.2.0',
 		);
@@ -103,6 +103,8 @@ class ProductMatrixPlugin extends MantisPlugin {
 			'EVENT_REPORT_BUG_FORM'		=> 'report_bug_form',
 			'EVENT_REPORT_BUG'			=> 'report_bug',
 			'EVENT_FILTER_FIELDS'		=> 'filter_fields',
+			'EVENT_ACCOUNT_PREF_UPDATE_FORM'	=> 'update_prefs_form',
+			'EVENT_ACCOUNT_PREF_UPDATE'	=> 'update_prefs',
 		);
 	}
 
@@ -176,6 +178,22 @@ class ProductMatrixPlugin extends MantisPlugin {
 		}
 	}
 
+	function update_prefs_form( $p_event, $p_user_id ) {
+		$t_user_prefs = new PVMUserPrefs( $p_user_id );
+
+		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'versions_sort_order' ),
+			'</td><td><input type="radio" name="version_order" value=', ASCENDING, ' ', check_checked( $t_user_prefs->version_order, ASCENDING ), '/>Ascending',
+			'<input type="radio" name="version_order" value=', DESCENDING, ' ',  check_checked( $t_user_prefs->version_order, DESCENDING ), '/>Descending</td></tr>';
+	}
+
+	function update_prefs( $p_event, $p_user_id ) {
+		$f_order = gpc_get_int( 'version_order', ASCENDING );
+
+		$t_user_prefs = new PVMUserPrefs( $p_user_id );
+		$t_user_prefs->version_order = $f_order;
+		$t_user_prefs->save();
+	}
+
 	function schema() {
 		return array(
 			array( 'CreateTableSQL', array( plugin_table( 'product' ), "
@@ -210,6 +228,12 @@ class ProductMatrixPlugin extends MantisPlugin {
 			# 2009-04-10 - Allow versions to select what version they inherit status from
 			array( 'AddColumnSQL', array( plugin_table( 'version' ), "
 				inherit_id	I		NOTNULL UNSIGNED DEFAULT '0'
+				" ) ),
+
+			# 2009-10-30 - Add user preference for version display order
+			array( 'CreateTableSQL', array( plugin_table( 'user' ), "
+				user_id			I		NOTNULL UNSIGNED PRIMARY,
+				version_order	I		NOTNULL UNSIGNED
 				" ) ),
 		);
 	}

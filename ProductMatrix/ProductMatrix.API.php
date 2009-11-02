@@ -54,6 +54,54 @@ function PVMDBDate( $p_date=null, $p_gmt=false ) {
 	return $g_db->BindTimeStamp( $p_timestamp );
 }
 
+/**
+ * Object representation of ProductMatrix user preferences.
+ */
+class PVMUserPrefs {
+
+	var $user_id;
+	var $version_order;
+
+	/**
+	 * Initialize a user preferences object.
+	 * @param int User id
+	 */
+	function __construct( $p_user_id=null ) {
+
+		if( is_null( $p_user_id ) ) {
+			$p_user_id = auth_get_current_user_id();
+		}
+		$this->user_id = $p_user_id;
+
+		$t_user_table = plugin_table( 'user', 'ProductMatrix' );
+		$t_query = "SELECT * FROM $t_user_table WHERE user_id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $p_user_id ) );
+
+		if ( db_num_rows ( $t_result ) < 1 ) {
+			$this->version_order = ASCENDING;
+		} else {
+			$t_row = db_fetch_array( $t_result );
+			$this->version_order = $t_row['version_order'];
+		}
+	}
+
+	/**
+	 * Save preferences to the database
+	 */
+	function save() {
+		$t_user_table = plugin_table( 'user', 'ProductMatrix' );
+		$t_query = "SELECT * FROM $t_user_table WHERE user_id=" . db_param();
+		$t_result = db_query_bound( $t_query, array( $this->user_id ) );
+
+		if ( db_num_rows ( $t_result ) < 1 ) {
+			$t_query = "INSERT INTO $t_user_table ( user_id, version_order ) VALUES ( " . db_param() . ', ' . db_param() . ' )';
+			db_query_bound ( $t_query, array( $this->user_id, $this->version_order ) );
+		} else {
+			$t_query = "UPDATE $t_user_table SET version_order=" . db_param() . ' WHERE user_id=' . db_param();
+			db_query_bound ( $t_query, array( $this->version_order, $this->user_id ) );
+		}
+	}
+}
 
 /**
  * Object representation of a product.
@@ -655,6 +703,7 @@ class PVMVersion {
 	 */
 	static function load_by_product( $p_product_id ) {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
+		$t_user_prefs = new PVMUserPrefs();
 
 		$t_query = "SELECT * FROM $t_version_table WHERE product_id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_product_id ) );
@@ -671,7 +720,11 @@ class PVMVersion {
 			$t_versions[$t_version->id] = $t_version;
 		}
 
-		uasort( $t_versions, 'PVMNaturalSort' );
+		if ( $t_user_prefs->version_order == ASCENDING ) {
+			uasort( $t_versions, 'PVMNaturalSort' );
+		} else {
+			uasort( $t_versions, 'PVMNaturalSortReverse' );
+		}
 
 		return $t_versions;
 	}

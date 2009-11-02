@@ -59,6 +59,8 @@ $s_plugin_ProductMatrix_roadmap_product_version = 'Version: ';
 $s_plugin_ProductMatrix_roadmap = 'Roadmap';
 $s_plugin_ProductMatrix_change_log = 'Change Log';
 
+$s_plugin_ProductMatrix_versions_sort_order = 'Versions Sort Order';
+
 # Core strings updated to new meanings
 $s_actiongroup_menu_update_target_version = 'Update Target Milestone';
 $s_actiongroup_menu_update_fixed_in_version = 'Update Fixed in Milestone';
