@@ -984,13 +984,13 @@ class ProductMatrix {
 	 * Determine a version's status in the matrix, using reverse inheritence if needed.
 	 */
 	function version_status( $p_version_id ) {
-		# return status immediatly if no inheritence in use
-		if ( !$this->reverse_inheritence || isset( $this->status[ $p_version_id ] ) ) {
+		# return status immediatly if set
+		if ( isset( $this->status[ $p_version_id ] ) ) {
 			return $this->status[ $p_version_id ];
 		}
 
-		# handle dead versions
-		if ( !isset( $this->versions[ $p_version_id ] ) ) {
+		# return null if not using reverse inheritence or dead version
+		if ( !$this->reverse_inheritence || !isset( $this->versions[ $p_version_id ] ) ) {
 			return null;
 		}
 
@@ -1024,8 +1024,8 @@ class ProductMatrix {
 			}
 		}
 
-		# no children, return current status
-		return $this->status[ $p_version_id ];
+		# no children, and status not set
+		return null;
 	}
 
 	/**
