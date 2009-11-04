@@ -65,15 +65,20 @@ class PVMStatusColumn extends MantisColumn {
 	 * @param BugData Bug object
 	 */
 	public function display( $p_bug, $p_columns_target ) {
-		static $status;
+		static $status, $color;
 
 		if ( !isset( $status ) ) {
-			$status = MantisEnum::getAssocArrayIndexedByValues(config_get_global('status_enum_string'));
+			plugin_push_current( 'ProductMatrix' );
+
+			$status = plugin_config_get('status');
+			$color = plugin_config_get('status_color');
+
+			plugin_pop_current();
 		}
 
 		if ( isset( self::$cache[ $p_bug->id ][ $this->id ] ) ) {
 			$t_status = self::$cache[ $p_bug->id ][ $this->id ];
-			echo $status[ $t_status ];
+			echo '<span class="pvmstatuscolumn" statuscolor="', $color[ $t_status ], '">', $status[ $t_status ], '</span>';
 		}
 	}
 }

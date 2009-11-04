@@ -218,5 +218,11 @@ $(document).ready( function() {
 	// Add the collapse behavior to appropriate rows
 	versions.click( function() { PVMStatusCollapse( $(this).parent(), "" ); } );
 
+	// Custom columns behavior
+	$("td span.pvmstatuscolumn").each( function() {
+			$(this).parents("td")
+				.css("background", $(this).attr("statuscolor"))
+				.css("text-align", "center");
+		} );
 } );
 
