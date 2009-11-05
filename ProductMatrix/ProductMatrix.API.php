@@ -1177,9 +1177,9 @@ class ProductMatrix {
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
-				$t_status = $t_product->__status[ $t_version->id ];
-
-				if ( !$t_status ) {
+				if ( isset( $t_product->__status[ $t_version->id ] ) ) {
+					$t_status = $t_product->__status[ $t_version->id ];
+				} else {
 					continue;
 				}
 
