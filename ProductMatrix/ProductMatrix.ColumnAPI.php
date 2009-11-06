@@ -14,6 +14,8 @@
 class PVMStatusColumn extends MantisColumn {
 	public $title = 'Version Status';
 	public $column = 'status';
+	public $sortable = true;
+
 	public $id = 0;
 
 	protected static $ids = array();
@@ -80,6 +82,17 @@ class PVMStatusColumn extends MantisColumn {
 			$t_status = self::$cache[ $p_bug->id ][ $this->id ];
 			echo '<span class="pvmstatuscolumn" statuscolor="', $color[ $t_status ], '">', $status[ $t_status ], '</span>';
 		}
+	}
+
+	public function sortquery( $p_dir ) {
+		$t_version_id = $this->id;
+		$t_bug_table = db_get_table( 'mantis_bug_table' );
+		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
+
+		return array(
+			'join' => "LEFT JOIN $t_status_table pvmst ON $t_bug_table.id=pvmst.bug_id AND pvmst.version_id=$t_version_id",
+			'order' => "pvmst.status $p_dir",
+		);
 	}
 }
 

@@ -125,7 +125,6 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 		$t_class_definitions = '';
 		$t_columns = array();
-		$t_column_names = array();
 		$t_products = PVMProduct::load_all();
 		$t_version_names = array();
 		$t_inputs = PVMStatusColumnFilter::inputs();
@@ -159,16 +158,9 @@ class ${t_class} extends PVMStatusColumn {
 EOC;
 
 			$t_columns[] = $t_class;
-			$t_column_names[] = 'productmatrix_status' . $t_id;
 		}
 
 		if ( count( $t_columns ) > 0 ) {
-			$t_project_id = helper_get_current_project();
-			$t_user_id = auth_get_current_user_id();
-			$t_user_columns = config_get( 'view_issues_page_columns', $t_project_id, $t_user_id );
-			$t_user_columns = array_merge( $t_user_columns, $t_column_names );
-			config_set_cache( 'view_issues_page_columns', serialize($t_user_columns), CONFIG_TYPE_COMPLEX, $t_user_id, $t_project_id );
-
 			eval( $t_class_definitions );
 			return $t_columns;
 		}

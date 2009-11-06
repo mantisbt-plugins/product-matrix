@@ -211,6 +211,25 @@ class PVMStatusColumnFilter extends MantisFilter {
 
 	public function validate( $p_filter_input ) {
 		self::inputs( $p_filter_input );
+
+		$t_column_names = array();
+		foreach( $p_filter_input as $t_input ) {
+			$t_id = (int) $t_input;
+			if ( $t_id < 1 ) {
+				continue;
+			}
+
+			$t_column_names[] = 'productmatrix_status' . $t_id;
+		}
+
+		if ( count( $t_column_names ) > 0 ) {
+			$t_project_id = helper_get_current_project();
+			$t_user_id = auth_get_current_user_id();
+			$t_user_columns = config_get( 'view_issues_page_columns', $t_project_id, $t_user_id );
+			$t_user_columns = array_unique( array_merge( $t_user_columns, $t_column_names ) );
+			config_set_cache( 'view_issues_page_columns', serialize($t_user_columns), CONFIG_TYPE_COMPLEX, $t_user_id, $t_project_id );
+		}
+
 		return true;
 	}
 
