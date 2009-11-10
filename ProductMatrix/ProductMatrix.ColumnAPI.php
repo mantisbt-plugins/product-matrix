@@ -67,13 +67,16 @@ class PVMStatusColumn extends MantisColumn {
 	 * @param BugData Bug object
 	 */
 	public function display( $p_bug, $p_columns_target ) {
-		static $status, $color;
+		static $status, $color, $na;
 
 		if ( !isset( $status ) ) {
 			plugin_push_current( 'ProductMatrix' );
 
 			$status = plugin_config_get('status');
 			$color = plugin_config_get('status_color');
+			if ( plugin_config_get( 'status_column_show_na' ) ) {
+				$na = plugin_lang_get( 'status_na' );
+			}
 
 			plugin_pop_current();
 		}
@@ -81,6 +84,8 @@ class PVMStatusColumn extends MantisColumn {
 		if ( isset( self::$cache[ $p_bug->id ][ $this->id ] ) ) {
 			$t_status = self::$cache[ $p_bug->id ][ $this->id ];
 			echo '<span class="pvmstatuscolumn" statuscolor="', $color[ $t_status ], '">', $status[ $t_status ], '</span>';
+		} else if ( $na ) {
+			echo '<span class="pvmstatuscolumn" statuscolor="#FFFFFF">', $na, '</span>';
 		}
 	}
 
