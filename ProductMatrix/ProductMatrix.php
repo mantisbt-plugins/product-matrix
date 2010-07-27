@@ -286,6 +286,12 @@ EOC;
 				user_id			I		NOTNULL UNSIGNED PRIMARY,
 				version_order	I		NOTNULL UNSIGNED
 				" ) ),
+
+			# 2010-07-27 - Add support for project-specific products
+			array( 'CreateTableSQL', array( plugin_table( 'product_projects' ), "
+				product_id		I		NOTNULL UNSIGNED PRIMARY,
+				project_id		I		NOTNULL UNSIGNED PRIMARY
+				" ) ),
 		);
 	}
 }
