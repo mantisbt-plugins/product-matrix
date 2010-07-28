@@ -114,6 +114,7 @@ class PVMProduct {
 	var $platforms = array();
 	var $versions = array();
 	var $version_tree = array();
+	var $projects = null;
 
 	/**
 	 * Initialize a product object.
@@ -162,6 +163,26 @@ class PVMProduct {
 			}
 
 			$t_platform->save();
+		}
+
+		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
+
+		$t_query = "DELETE FROM $t_project_table WHERE product_id=" . db_param();
+		db_query_bound( $t_query, array( $this->id ) );
+
+		if ( is_array( $this->projects ) ) {
+			$t_query = "INSERT INTO $t_project_table (product_id, project_id) VALUES ";
+			$t_values = array();
+			$t_params = array();
+
+			foreach( $this->projects as $t_project_id ) {
+				$t_values[] = '(' . db_param() . ', ' . db_param() . ')';
+				$t_params[] = $this->id;
+				$t_params[] = $t_project_id;
+			}
+
+			$t_query .= implode( ', ', $t_values );
+			db_query_bound( $t_query, $t_params );
 		}
 	}
 
@@ -267,6 +288,7 @@ class PVMProduct {
 	 */
 	static function load( $p_id, $p_load_versions=true ) {
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
+		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
 
 		$t_query = "SELECT * FROM $t_product_table WHERE id=" . db_param();
 		$t_result = db_query_bound( $t_query, array( $p_id ) );
@@ -285,6 +307,8 @@ class PVMProduct {
 		if ( $p_load_versions ) {
 			$t_product->load_versions();
 		}
+
+		PVMProduct::load_projects( $t_product );
 
 		return $t_product;
 	}
@@ -313,6 +337,44 @@ class PVMProduct {
 
 			$t_products[ $t_product->id ] = $t_product;
 		}
+
+		PVMProduct::load_projects( $t_products );
+
+		uasort( $t_products, 'PVMNaturalSort' );
+
+		return $t_products;
+	}
+
+	/**
+	 * Load all product objects from the database for a given project.
+	 * @param int Project ID
+	 * @param boolean Load child versions
+	 * @return array Product objects
+	 */
+	static function load_by_project( $p_project_id, $p_load_versions=false ) {
+		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
+		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
+
+		$t_query = "SELECT $t_product_table.* FROM $t_product_table
+			LEFT JOIN $t_project_table ON $t_product_table.id=$t_project_table.product_id
+			WHERE $t_project_table.project_id IS NULL OR $t_project_table.project_id=" . db_param();
+		$t_result = db_query_bound( $t_query );
+
+		$t_products = array();
+		while( $t_row = db_fetch_array( $t_result ) ) {
+			$t_product = new PVMProduct( $t_row['name'] );
+			$t_product->id = $t_row['id'];
+
+			$t_product->platforms = PVMPlatform::load_by_product( $t_product->id );
+
+			if ( $p_load_versions ) {
+				$t_product->load_versions();
+			}
+
+			$t_products[ $t_product->id ] = $t_product;
+		}
+
+		PVMProduct::load_projects( $t_products );
 
 		uasort( $t_products, 'PVMNaturalSort' );
 
@@ -365,9 +427,42 @@ class PVMProduct {
 			$t_products[$t_product->id] = $t_product;
 		}
 
+		PVMProduct::load_projects( $t_products );
+
 		uasort( $t_products, 'PVMNaturalSort' );
 
 		return $t_products;
+	}
+
+	static function load_projects( $p_products ) {
+		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
+
+		if ( is_array( $p_products ) ) {
+			$t_query = "SELECT product_id, project_id FROM $t_project_table";
+			$t_result = db_query_bound( $t_query );
+
+			while( $t_row = db_fetch_array( $t_result ) ) {
+				$t_product_id = $t_row['product_id'];
+
+				if ( is_null( $p_products[ $t_product_id ]->projects ) ) {
+					$p_products[ $t_product_id ]->projects = array();
+				}
+
+				$p_products[ $t_product_id ]->projects[] = $t_row['project_id'];
+			}
+
+		} else {
+			$t_query = "SELECT project_id FROM $t_project_table WHERE product_id=" . db_param();
+			$t_result = db_query_bound( $t_query, array( $p_products->id ) );
+
+			if ( db_num_rows( $t_result ) > 0 ) {
+				$p_products->projects = array();
+
+				while( $t_row = db_fetch_array( $t_result ) ) {
+					$p_products->projects[] = $t_row['project_id'];
+				}
+			}
+		}
 	}
 
 	/**
@@ -379,6 +474,10 @@ class PVMProduct {
 		PVMVersion::delete_by_product( $p_id );
 
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
+		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
+
+		$t_query = "DELETE FROM $t_project_table WHERE product_id=" . db_param();
+		db_query_bound( $t_query, array( $p_id ) );
 
 		$t_query = "DELETE FROM $t_product_table WHERE id=" . db_param();
 		db_query_bound( $t_query, array( $p_id ) );
