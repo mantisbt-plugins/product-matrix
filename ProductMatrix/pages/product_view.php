@@ -164,6 +164,38 @@ print_bracket_link( plugin_page( 'version_delete' ) .
 
 </table>
 </form>
+
+<br/>
+<form method="post" action="<?php echo plugin_page( 'projects_update' ) ?>">
+<?php echo form_security_field( 'ProductMatrix_projects_update' ) ?>
+<table class="width60" align="center" cellspacing="1">
+<input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
+
+<tr>
+<td class="form-title" colspan="2">Select Projects</td>
+</tr>
+
+<tr <?php echo helper_alternate_class() ?>>
+<td class="category">Projects</td>
+<td>
+<select name="project_ids[]" multiple="multiple">
+<?php
+	if ( is_null( $t_product->projects ) ) {
+		print_project_option_list( ALL_PROJECTS );
+	} else {
+		print_project_option_list( $t_product->projects );
+	}
+?>
+</select>
+</td>
+</tr>
+
+<tr>
+<td class="center" colspan="2"><input type="submit"/></td>
+</tr>
+
+</table>
+</form>
 <?php } ?>
 
 <?php
