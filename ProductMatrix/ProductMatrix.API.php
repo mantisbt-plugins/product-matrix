@@ -996,7 +996,12 @@ class ProductMatrix {
 	 */
 	function load_products( $p_load_all=false ) {
 		if ( $p_load_all ) {
-			$this->products = PVMProduct::load_all( true );
+			if ( $this->bug_id > 0 ) {
+				$this->products = PVMProduct::load_by_project( bug_get_field( $this->bug_id, "project_id" ), true );
+			} else {
+				$this->products = PVMProduct::load_by_project( helper_get_current_project(), true );
+			}
+
 		} else {
 			$t_version_ids = array_keys( $this->status );
 			$this->products = PVMProduct::load_by_version_ids( $t_version_ids );
