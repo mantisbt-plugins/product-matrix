@@ -358,7 +358,7 @@ class PVMProduct {
 		$t_query = "SELECT $t_product_table.* FROM $t_product_table
 			LEFT JOIN $t_project_table ON $t_product_table.id=$t_project_table.product_id
 			WHERE $t_project_table.project_id IS NULL OR $t_project_table.project_id=" . db_param();
-		$t_result = db_query_bound( $t_query );
+		$t_result = db_query_bound( $t_query, array( $p_project_id ) );
 
 		$t_products = array();
 		while( $t_row = db_fetch_array( $t_result ) ) {
