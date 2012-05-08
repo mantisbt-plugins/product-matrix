@@ -54,7 +54,7 @@ class PVMProductFilter extends MantisFilter {
 	public function options() {
 		static $s_options = null;
 
-		if ( is_null( $s_products ) ) {
+		if ( is_null( $s_options ) ) {
 			$t_products = PVMProduct::load_all();
 			$s_options = array();
 
