@@ -69,6 +69,7 @@ echo print_bracket_link( plugin_page( 'platform_delete' ) .
 <td class="center <?php echo $t_version->obsolete ? 'PVMobsolete' : '' ?>"></td>
 <td class="center"><?php if ( $t_can_manage ) {
 echo print_bracket_link( plugin_page ( 'roadmap&name=' ) . $t_version->name . '&id=' . $f_product_id, plugin_lang_get( 'roadmap' ) ) .
+print_bracket_link( plugin_page ( 'change_log&name=' ) . $t_version->name . '&id=' . $f_product_id, plugin_lang_get( 'change_log' ) ) .
 print_bracket_link( plugin_page( 'version_delete' ) .
 	'&id=' . $t_version->id . form_security_param( 'ProductMatrix_version_delete' ), plugin_lang_get( 'delete' ) );
 } ?></td>
