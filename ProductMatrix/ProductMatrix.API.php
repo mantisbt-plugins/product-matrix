@@ -745,7 +745,8 @@ class PVMVersion {
 			if ( $this->migrate_id ) {
 				$t_query = "INSERT INTO $t_status_table ( bug_id, version_id, status )
 					SELECT bug_id, " . db_param() . ", status
-					FROM $t_status_table WHERE version_id=" . db_param();
+					FROM $t_status_table WHERE version_id=" . db_param()
+					. " and status < 60";
 				db_query_bound( $t_query, array( $this->id, $this->migrate_id ) );
 			}
 
@@ -1388,55 +1389,58 @@ class ProductMatrix {
 
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
 
-				echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatusrow ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
-					'" collapse="', $t_collapse_ids, '"><td class="category pvmdepth', $t_depth, '">', $t_version->name, '</td>';
+				if (!$t_version->obsolete){
+					echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatusrow ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
+						'" collapse="', $t_collapse_ids, '"><td class="category pvmdepth', $t_depth, '">', $t_version->name, '</td>';
 
-				$t_mutable = $this->version_mutable( $t_version->id );
-				if ( $t_mutable || $t_cascade ) {
-					if ( isset( $this->status[$t_version->id] ) ) {
-						$t_status = $this->status[$t_version->id];
+					$t_mutable = $this->version_mutable( $t_version->id );
+
+					if ( $t_mutable || $t_cascade ) {
+						if ( isset( $this->status[$t_version->id] ) ) {
+							$t_status = $this->status[$t_version->id];
+						} else {
+							$t_status = $this->version_status( $t_version->id );
+							$t_status = $t_status > 0 ? $t_status : $t_status_default;
+						}
+
+						echo '<td',
+							isset( $t_status_colors[$t_status] )
+								? ' bgcolor="' . $t_status_colors[$t_status] . '"'
+								: '',
+							'><select ',
+							( $t_mutable ? 'name="Product' . $t_product->id . 'Version' . $t_version->id . '"' : '' ), '>';
+
+						$t_possible_workflow = $this->generate_possible_workflow( $t_status );
+
+						if ( isset( $t_possible_workflow[0] ) ) {
+							echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
+						}
+
+						foreach( $t_possible_workflow as $t_status_value => $t_status_name ) {
+							if ( $t_status_value < 1 ) { continue; }
+							echo '<option value="', $t_status_value, '"',
+								( $t_status == $t_status_value ? ' selected="selected"' : '' ),
+								'>', $t_status_name, '</option>';
+						}
+
+						echo '</select></td>';
+
 					} else {
 						$t_status = $this->version_status( $t_version->id );
-						$t_status = $t_status > 0 ? $t_status : $t_status_default;
-					}
 
-					echo '<td',
-						isset( $t_status_colors[$t_status] )
-							? ' bgcolor="' . $t_status_colors[$t_status] . '"'
-							: '',
-						'><select ',
-						( $t_mutable ? 'name="Product' . $t_product->id . 'Version' . $t_version->id . '"' : '' ), '>';
-
-					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
-
-					if ( isset( $t_possible_workflow[0] ) ) {
-						echo '<option value="0"', ( $t_status ? '' : ' selected="selected"' ), '>', plugin_lang_get( 'status_na' ), '</option>';
-					}
-
-					foreach( $t_possible_workflow as $t_status_value => $t_status_name ) {
-						if ( $t_status_value < 1 ) { continue; }
-						echo '<option value="', $t_status_value, '"',
-							( $t_status == $t_status_value ? ' selected="selected"' : '' ),
-							'>', $t_status_name, '</option>';
-					}
-
-					echo '</select></td>';
-
-				} else {
-					$t_status = $this->version_status( $t_version->id );
-
-					if ( is_null( $t_status ) ) {
-						if ( $t_status_default > 0 ) {
-							echo '<td bgcolor="', $t_status_colors[$t_status_default],'">', $t_status_array[$t_status_default], '</td>';
+						if ( is_null( $t_status ) ) {
+							if ( $t_status_default > 0 ) {
+								echo '<td bgcolor="', $t_status_colors[$t_status_default],'">', $t_status_array[$t_status_default], '</td>';
+							} else {
+								echo '<td>', plugin_lang_get( 'status_na' ), '</td>';
+							}
 						} else {
-							echo '<td>', plugin_lang_get( 'status_na' ), '</td>';
+							echo '<td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
 						}
-					} else {
-						echo '<td bgcolor="', $t_status_colors[$t_status], '">', $t_status_array[$t_status], '</td>';
 					}
-				}
 
-				echo '</tr>';
+					echo '</tr>';
+				}
 			}
 
 			if ( count( $t_product->platforms ) ) {
