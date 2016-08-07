@@ -194,7 +194,7 @@ EOC;
 	}
 
 	function update_bug_form( $p_event, $p_bug_id ) {
-		if ( access_has_bug_level( <plugin_config_></plugin_config_>get( 'update_threshold' ), $p_bug_id ) ) {
+		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
 			$matrix = new ProductMatrix( $p_bug_id );
 			$matrix->view_form( PVM_UPDATE );
 		}
