@@ -134,6 +134,24 @@ function PRM_roadmap_query( $p_version, $p_product_id ) {
 	return $t_result;
 }
 
+function PRM_changelog_query( $p_version, $p_product_id ) {
+	$t_bug_tbl	= db_get_table( 'mantis_bug_table' );
+	$t_status_tbl = plugin_table( 'status', 'ProductMatrix' );
+	$t_version_tbl = plugin_table( 'version', 'ProductMatrix' );
+
+	$t_select_columns = "version.*,status.status AS s_status, status.*, bug.*, bug.id AS t_bug_id";
+	$t_query = "SELECT $t_select_columns FROM $t_bug_tbl AS bug
+				JOIN $t_status_tbl AS status ON bug.id=status.bug_id
+				JOIN $t_version_tbl AS version ON status.version_id=version.id
+				WHERE bug.id=status.bug_id AND version.name=" . db_param() .
+				' AND version.product_id=' . db_param() .
+				' AND status.status <=' . config_get( 'bug_resolved_status_threshold' ) .
+				' ORDER BY bug.id DESC';
+
+	$t_result = db_query_bound( $t_query, array( $p_version, $p_product_id ) );
+	return $t_result;
+}
+
 /**
  * Retrieves Bug associated with Version
  *
