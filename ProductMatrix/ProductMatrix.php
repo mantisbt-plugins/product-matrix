@@ -17,9 +17,9 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$this->description = plugin_lang_get( 'description' );
 		$this->page = 'config_page';
 
-		$this->version = '0.3';
+		$this->version = '0.4';
 		$this->requires = array(
-			'MantisCore' => '1.2.0',
+			'MantisCore' => '1.3.0',
 		);
 		$this->uses = array(
 			'jQuery' => '1.3',
@@ -194,15 +194,15 @@ EOC;
 	}
 
 	function update_bug_form( $p_event, $p_bug_id ) {
-		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
+		if ( access_has_bug_level( <plugin_config_></plugin_config_>get( 'update_threshold' ), $p_bug_id ) ) {
 			$matrix = new ProductMatrix( $p_bug_id );
 			$matrix->view_form( PVM_UPDATE );
 		}
 	}
 
-	function update_bug( $p_event, $p_bug_data, $p_bug_id ) {
-		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
-			$matrix = new ProductMatrix( $p_bug_id, false );
+	function update_bug( $p_event, $p_exiting_bug, $p_updated_bug ) {
+		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_updated_bug->id ) ) {
+			$matrix = new ProductMatrix( $p_updated_bug->id, false );
 			$matrix->process_form();
 			$matrix->save( PVM_UPDATE );
 		}

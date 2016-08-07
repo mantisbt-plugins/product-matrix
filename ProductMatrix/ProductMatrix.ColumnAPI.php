@@ -66,7 +66,7 @@ class PVMStatusColumn extends MantisColumn {
 	 * Display status data for a given issue.
 	 * @param BugData Bug object
 	 */
-	public function display( $p_bug, $p_columns_target ) {
+	public function display( BugData $p_bug, $p_columns_target ) {
 		static $status, $color, $na;
 
 		if ( !isset( $status ) ) {
