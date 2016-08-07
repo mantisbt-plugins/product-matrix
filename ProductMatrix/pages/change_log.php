@@ -45,7 +45,7 @@ foreach( $t_version_rows as $t_version_row ) {
 
 	while( $t_row = db_fetch_array( $t_result ) ){
 
-		if( $t_bug_resolved == $t_row['status'] ){
+		if( $t_bug_resolved <= $t_row['status'] ){
 			$t_bug_ids[] = $t_row['t_bug_id'];
 			$t_versions_status[] = $t_row['s_status'];
 		} else {
