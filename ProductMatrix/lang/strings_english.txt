@@ -13,7 +13,7 @@
 
 $s_plugin_ProductMatrix_ = '';
 $s_plugin_ProductMatrix_title = 'Product Version Matrix';
-$s_plugin_ProductMatrix_description = '';
+$s_plugin_ProductMatrix_description = 'Product versions independent of projects, tracking multiple product and version statuses for each issue';
 
 $s_plugin_ProductMatrix_product = 'Product';
 $s_plugin_ProductMatrix_platform = 'Platform';
