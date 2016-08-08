@@ -656,9 +656,11 @@ class PVMPlatform {
 		$t_product = PVMProduct::load( $p_product_id, true );
 		$t_platform_ids = array_keys( $t_product->platforms );
 
-		$t_query = "DELETE FROM $t_affects_table WHERE platform_id IN (" .
-			join( ',', $t_platform_ids ) . ' )';
-		db_query_bound( $t_query );
+		if( !empty( $t_platform_ids ) ) {
+			$t_query = "DELETE FROM $t_affects_table WHERE platform_id IN (" .
+				join( ',', $t_platform_ids ) . ' )';
+			db_query_bound( $t_query );
+		}
 
 		$t_query = "DELETE FROM $t_platform_table WHERE product_id=" . db_param();
 		db_query_bound( $t_query, array( $p_product_id ) );
@@ -855,9 +857,11 @@ class PVMVersion {
 		$t_product = PVMProduct::load( $p_product_id, true );
 		$t_version_ids = array_keys( $t_product->versions );
 
-		$t_query = "DELETE FROM $t_status_table WHERE version_id IN (" .
-			join( ',', $t_version_ids ) . ' )';
-		db_query_bound( $t_query );
+		if( !empty($t_version_ids ) ) {
+			$t_query = "DELETE FROM $t_status_table WHERE version_id IN (" .
+				join( ',', $t_version_ids ) . ' )';
+			db_query_bound( $t_query );
+		}
 
 		$t_query = "DELETE FROM $t_version_table WHERE product_id=" . db_param();
 		db_query_bound( $t_query, array( $p_product_id ) );
