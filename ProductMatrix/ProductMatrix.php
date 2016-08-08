@@ -136,7 +136,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 		$t_version_table = plugin_table( 'version' );
 		$t_query = "SELECT id, product_id, name FROM $t_version_table";
-		$t_result = db_query_bound( $t_query );
+		$t_result = db_query( $t_query );
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$t_names[ $t_row['id'] ] = $t_products[ $t_row['product_id'] ]->name . ' ' . $t_row['name'];
 		}
