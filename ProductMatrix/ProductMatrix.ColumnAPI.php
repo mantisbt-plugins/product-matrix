@@ -33,7 +33,7 @@ class PVMStatusColumn extends MantisColumn {
 	 * Cache status data for the given set of issues.
 	 * @param array Bug objects
 	 */
-	public function cache( $p_bugs ) {
+	public function cache(array $p_bugs ) {
 		if ( self::$cache === null ) {
 			self::$cache = array();
 
