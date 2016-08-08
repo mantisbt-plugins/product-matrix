@@ -51,7 +51,7 @@ class PVMStatusColumn extends MantisColumn {
 				$t_status_table = plugin_table( 'status' );
 
 				$t_query = "SELECT * FROM $t_status_table WHERE bug_id IN ($t_bug_ids) AND version_id IN ($t_ver_ids)";
-				$t_result = db_query_bound( $t_query );
+				$t_result = db_query( $t_query );
 
 				while( $t_row = db_fetch_array( $t_result ) ) {
 					self::$cache[ $t_row['bug_id'] ][ $t_row['version_id'] ] = $t_row['status'];
