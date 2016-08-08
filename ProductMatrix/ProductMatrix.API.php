@@ -1,5 +1,5 @@
 <?php
-# Copyright (C) 2008-2010	John Reese
+# Copyright (C) 2008-2010, 2016  John Reese
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -109,6 +109,9 @@ class PVMUserPrefs {
  * list of versions.
  */
 class PVMProduct {
+	private $__version_tree_list = array();
+	public $__status;
+
 	var $id;
 	var $name;
 	var $platforms = array();
@@ -253,7 +256,7 @@ class PVMProduct {
 	 * @return array Array of version/depth pairs
 	 */
 	function version_tree_list() {
-		if ( !isset( $this->__version_tree_list ) ) {
+		if ( empty( $this->__version_tree_list ) && !empty( $this->version_tree ) ) {
 			$this->__version_tree_list = $this->version_tree_section( $this->version_tree[0] );
 		}
 		return $this->__version_tree_list;
@@ -656,9 +659,11 @@ class PVMPlatform {
 		$t_product = PVMProduct::load( $p_product_id, true );
 		$t_platform_ids = array_keys( $t_product->platforms );
 
-		$t_query = "DELETE FROM $t_affects_table WHERE platform_id IN (" .
-			join( ',', $t_platform_ids ) . ' )';
-		db_query_bound( $t_query );
+		if( !empty( $t_platform_ids ) ) {
+			$t_query = "DELETE FROM $t_affects_table WHERE platform_id IN (" .
+				join( ',', $t_platform_ids ) . ' )';
+			db_query_bound( $t_query );
+		}
 
 		$t_query = "DELETE FROM $t_platform_table WHERE product_id=" . db_param();
 		db_query_bound( $t_query, array( $p_product_id ) );
@@ -740,7 +745,7 @@ class PVMVersion {
 			if ( $this->migrate_id ) {
 				$t_query = "INSERT INTO $t_status_table ( bug_id, version_id, status )
 					SELECT bug_id, " . db_param() . ", status
-					FROM $t_status_table WHERE version_id=" . db_param() 
+					FROM $t_status_table WHERE version_id=" . db_param()
 					. " and status < 60";
 				db_query_bound( $t_query, array( $this->id, $this->migrate_id ) );
 			}
@@ -856,9 +861,11 @@ class PVMVersion {
 		$t_product = PVMProduct::load( $p_product_id, true );
 		$t_version_ids = array_keys( $t_product->versions );
 
-		$t_query = "DELETE FROM $t_status_table WHERE version_id IN (" .
-			join( ',', $t_version_ids ) . ' )';
-		db_query_bound( $t_query );
+		if( !empty($t_version_ids ) ) {
+			$t_query = "DELETE FROM $t_status_table WHERE version_id IN (" .
+				join( ',', $t_version_ids ) . ' )';
+			db_query_bound( $t_query );
+		}
 
 		$t_query = "DELETE FROM $t_version_table WHERE product_id=" . db_param();
 		db_query_bound( $t_query, array( $p_product_id ) );
@@ -1243,6 +1250,7 @@ class ProductMatrix {
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 		$t_status_array = plugin_config_get( 'status' );
 		$t_status_colors = plugin_config_get( 'status_color' );
+		$t_product_status = plugin_config_get( 'product_status' );
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
@@ -1258,8 +1266,8 @@ class ProductMatrix {
 				}
 			}
 
-			#Sets Product Top Level Status
-			if( plugin_config_get( 'product_status' ) ){
+			# Sets Product Top Level Status
+			if( $t_product_status ){
 				$t_product->top_status = $this->product_status( $t_product->id );
 			}
 		}
@@ -1276,9 +1284,16 @@ class ProductMatrix {
 			echo '<table class="pvmproduct" cellspacing="0">',
 
 				'<tr class="row-category">
-					<td>', $t_product->name, '</td>
-					<td bgcolor=', $t_status_colors[$t_product->top_status], '>', $t_status_array[$t_product->top_status], '</td>
-				</tr>';
+					<td>', $t_product->name, '</td>';
+
+			if( $t_product_status ) {
+				echo '<td',
+					$t_product->top_status ? ' bgcolor=' . $t_status_colors[$t_product->top_status] : '', '>',
+					 $t_status_array[$t_product->top_status];
+			} else {
+				echo '<td>';
+			}
+			echo '</td></tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
@@ -1336,6 +1351,7 @@ class ProductMatrix {
 		$this->products_to_versions();
 		$t_cascade = ( $t_cascade = plugin_config_get( 'status_cascade' ) ) == ON || $t_cascade == $p_type;
 		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_product_status = plugin_config_get( 'product_status' );
 		$t_status_array = plugin_config_get( 'status' );
 		$t_status_colors = plugin_config_get( 'status_color' );
 		$t_status_default = $p_status_default === null ? 0 : $p_status_default;
@@ -1346,28 +1362,39 @@ class ProductMatrix {
 
 		foreach( $this->products as $t_product ) {
 
-			#Sets Product Top Level Status
-			if( plugin_config_get( 'product_status' ) ){
+			# Sets Product Top Level Status
+			if( $t_product_status ) {
 				$t_product->top_status = $this->product_status( $t_product->id );
+			} else {
+				$t_product->top_status = 0;
 			}
 
 			echo '<table class="pvmproduct', ( $t_cascade ? ' pvmcascade' : '' ), '" cellspacing="0">',
-				'<tr class="row-category"><td>', $t_product->name, '</td>
-				<td bgcolor=', $t_status_colors[$t_product->top_status], '>', $t_status_array[$t_product->top_status], '</td>
-				</tr>';
+				'<tr class="row-category"><td>', $t_product->name, '</td>';
+			if( $t_product_status ) {
+				echo '<td',
+					$t_product->top_status ? ' bgcolor=' . $t_status_colors[$t_product->top_status] : '',
+					'>',
+					$t_product->top_status
+						? $t_status_array[$t_product->top_status]
+						: plugin_lang_get( 'status_na' );
+			} else {
+				echo '<td>';
+			}
+			echo '</td></tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
 				$t_status = $t_product->__status[ $t_version->id ];
 
 				$t_collapse_ids = join( ':', $this->version_child_ids( $t_version->id ) );
-				
+
 				if (!$t_version->obsolete){
 					echo '<tr id="pvmversion', $t_version->id, '" class="pvmstatusrow ', $t_depth < 1 ? 'pvmtoplevel' : 'pvmchild',
 						'" collapse="', $t_collapse_ids, '"><td class="category pvmdepth', $t_depth, '">', $t_version->name, '</td>';
 
 					$t_mutable = $this->version_mutable( $t_version->id );
-					
+
 					if ( $t_mutable || $t_cascade ) {
 						if ( isset( $this->status[$t_version->id] ) ) {
 							$t_status = $this->status[$t_version->id];
@@ -1376,7 +1403,11 @@ class ProductMatrix {
 							$t_status = $t_status > 0 ? $t_status : $t_status_default;
 						}
 
-						echo '<td bgcolor="', $t_status_colors[$t_status], '"><select ',
+						echo '<td',
+							isset( $t_status_colors[$t_status] )
+								? ' bgcolor="' . $t_status_colors[$t_status] . '"'
+								: '',
+							'><select ',
 							( $t_mutable ? 'name="Product' . $t_product->id . 'Version' . $t_version->id . '"' : '' ), '>';
 
 						$t_possible_workflow = $this->generate_possible_workflow( $t_status );
@@ -1416,6 +1447,7 @@ class ProductMatrix {
 				echo '<tr class="pvmaffected"><td class="category">Affects</td><td>';
 
 				$t_first = true;
+				$t_platform_temp_id = 0;
 				$t_platform_temp_ids = array();
 
 				foreach( $t_product->platforms as $t_platform ) {
