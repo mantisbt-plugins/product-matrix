@@ -110,6 +110,7 @@ class PVMUserPrefs {
  */
 class PVMProduct {
 	private $__version_tree_list = array();
+	public $__status;
 
 	var $id;
 	var $name;
@@ -1248,6 +1249,7 @@ class ProductMatrix {
 		$t_common_enabled = plugin_config_get( 'common_platform' );
 		$t_status_array = plugin_config_get( 'status' );
 		$t_status_colors = plugin_config_get( 'status_color' );
+		$t_product_status = plugin_config_get( 'product_status' );
 
 		$t_version_count = 0;
 		foreach( $this->products as $t_product ) {
@@ -1263,8 +1265,8 @@ class ProductMatrix {
 				}
 			}
 
-			#Sets Product Top Level Status
-			if( plugin_config_get( 'product_status' ) ){
+			# Sets Product Top Level Status
+			if( $t_product_status ){
 				$t_product->top_status = $this->product_status( $t_product->id );
 			}
 		}
@@ -1281,9 +1283,16 @@ class ProductMatrix {
 			echo '<table class="pvmproduct" cellspacing="0">',
 
 				'<tr class="row-category">
-					<td>', $t_product->name, '</td>
-					<td bgcolor=', $t_status_colors[$t_product->top_status], '>', $t_status_array[$t_product->top_status], '</td>
-				</tr>';
+					<td>', $t_product->name, '</td>';
+
+			if( $t_product_status ) {
+				echo '<td',
+					$t_product->top_status ? ' bgcolor=' . $t_status_colors[$t_product->top_status] : '', '>',
+					 $t_status_array[$t_product->top_status];
+			} else {
+				echo '<td>';
+			}
+			echo '</td></tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
@@ -1341,6 +1350,7 @@ class ProductMatrix {
 		$this->products_to_versions();
 		$t_cascade = ( $t_cascade = plugin_config_get( 'status_cascade' ) ) == ON || $t_cascade == $p_type;
 		$t_common_enabled = plugin_config_get( 'common_platform' );
+		$t_product_status = plugin_config_get( 'product_status' );
 		$t_status_array = plugin_config_get( 'status' );
 		$t_status_colors = plugin_config_get( 'status_color' );
 		$t_status_default = $p_status_default === null ? 0 : $p_status_default;
@@ -1351,15 +1361,26 @@ class ProductMatrix {
 
 		foreach( $this->products as $t_product ) {
 
-			#Sets Product Top Level Status
-			if( plugin_config_get( 'product_status' ) ){
+			# Sets Product Top Level Status
+			if( $t_product_status ) {
 				$t_product->top_status = $this->product_status( $t_product->id );
+			} else {
+				$t_product->top_status = 0;
 			}
 
 			echo '<table class="pvmproduct', ( $t_cascade ? ' pvmcascade' : '' ), '" cellspacing="0">',
-				'<tr class="row-category"><td>', $t_product->name, '</td>
-				<td bgcolor=', $t_status_colors[$t_product->top_status], '>', $t_status_array[$t_product->top_status], '</td>
-				</tr>';
+				'<tr class="row-category"><td>', $t_product->name, '</td>';
+			if( $t_product_status ) {
+				echo '<td',
+					$t_product->top_status ? ' bgcolor=' . $t_status_colors[$t_product->top_status] : '',
+					'>',
+					$t_product->top_status
+						? $t_status_array[$t_product->top_status]
+						: plugin_lang_get( 'status_na' );
+			} else {
+				echo '<td>';
+			}
+			echo '</td></tr>';
 
 			foreach( $t_product->version_tree_list() as $t_node ) {
 				list( $t_version, $t_depth ) = $t_node;
@@ -1379,7 +1400,11 @@ class ProductMatrix {
 						$t_status = $t_status > 0 ? $t_status : $t_status_default;
 					}
 
-					echo '<td bgcolor="', $t_status_colors[$t_status], '"><select ',
+					echo '<td',
+						isset( $t_status_colors[$t_status] )
+							? ' bgcolor="' . $t_status_colors[$t_status] . '"'
+							: '',
+						'><select ',
 						( $t_mutable ? 'name="Product' . $t_product->id . 'Version' . $t_version->id . '"' : '' ), '>';
 
 					$t_possible_workflow = $this->generate_possible_workflow( $t_status );
@@ -1418,6 +1443,7 @@ class ProductMatrix {
 				echo '<tr class="pvmaffected"><td class="category">Affects</td><td>';
 
 				$t_first = true;
+				$t_platform_temp_id = 0;
 				$t_platform_temp_ids = array();
 
 				foreach( $t_product->platforms as $t_platform ) {
