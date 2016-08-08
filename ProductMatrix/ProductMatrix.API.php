@@ -109,6 +109,8 @@ class PVMUserPrefs {
  * list of versions.
  */
 class PVMProduct {
+	private $__version_tree_list = array();
+
 	var $id;
 	var $name;
 	var $platforms = array();
@@ -253,7 +255,7 @@ class PVMProduct {
 	 * @return array Array of version/depth pairs
 	 */
 	function version_tree_list() {
-		if ( !isset( $this->__version_tree_list ) ) {
+		if ( empty( $this->__version_tree_list ) && !empty( $this->version_tree ) ) {
 			$this->__version_tree_list = $this->version_tree_section( $this->version_tree[0] );
 		}
 		return $this->__version_tree_list;
