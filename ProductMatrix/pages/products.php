@@ -56,22 +56,24 @@ html_page_top2();
 <br/>
 <form method="post" action="<?php echo plugin_page( 'product_add' ) ?>">
 <?php echo form_security_field( 'ProductMatrix_product_add' ) ?>
-<table class="width50" align="center" cellspacing="1">
+<div class="table-container width50">
+	<table align="center" cellspacing="1">
 
-<tr>
-<td class="form-title" colspan="2">Add Product</td>
-</tr>
+	<tr>
+	<td class="form-title" colspan="2">Add Product</td>
+	</tr>
 
-<tr <?php echo helper_alternate_class() ?>>
-<td class="category">Name</td>
-<td><input name="product_name"/></td>
-</tr>
+	<tr 	>
+	<td class="category">Name</td>
+	<td><input name="product_name"/></td>
+	</tr>
 
-<tr>
-<td class="center" colspan="2"><input type="submit"/></td>
-</tr>
+	<tr>
+	<td class="center" colspan="2"><input type="submit"/></td>
+	</tr>
 
-</table>
+	</table>
+</div>
 </form>
 <?php } ?>
 
