@@ -17,7 +17,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 		$this->description = plugin_lang_get( 'description' );
 		$this->page = 'config_page';
 
-		$this->version = '0.3';
+		$this->version = '0.4';
 		$this->requires = array(
 			'MantisCore' => '1.2.0',
 		);
