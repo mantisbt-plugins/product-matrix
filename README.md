@@ -1,6 +1,6 @@
 # Product Matrix plugin for MantisBT
 
-Copyright (c) 2008 - 2016  John Reese - http://noswap.com
+# Copyright (C) 2008-2010, 2016  John Reese
 
 Released under the [GPLv3 license](http://opensource.org/licenses/GPL-3.0)
 
