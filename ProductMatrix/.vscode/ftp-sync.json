@@ -1,0 +1,16 @@
+{
+    "remotePath": "/plugins/ProductMatrix",
+    "host": "infree.intest.info",
+    "username": "MantisPM",
+    "password": "MantisBTPWSecure",
+    "port": 21,
+    "protocol": "ftp",
+    "uploadOnSave": true,
+    "passive": false,
+    "debug": false,
+    "privateKeyPath": null,
+    "ignore": [
+        "\\.vscode",
+        "\\.git"
+    ]
+}

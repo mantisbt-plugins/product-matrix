@@ -118,7 +118,7 @@ function PRM_print_version_header( $p_version_name, $p_product_id, $p_href_page=
  * @return db query results
  */
 function PRM_roadmap_query( $p_version, $p_product_id ) {
-	$t_bug_tbl	= db_get_table( 'mantis_bug_table' );
+	$t_bug_tbl	= db_get_table( 'bug' );
 	$t_status_tbl = plugin_table( 'status', 'ProductMatrix' );
 	$t_version_tbl = plugin_table( 'version', 'ProductMatrix' );
 
