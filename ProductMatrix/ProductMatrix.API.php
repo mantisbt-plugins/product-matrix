@@ -1277,7 +1277,7 @@ class ProductMatrix {
 		}
 
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">',
+		echo '<tr ><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
 
 		foreach( $this->products as $t_product ) {
