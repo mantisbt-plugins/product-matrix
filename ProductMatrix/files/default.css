@@ -1,10 +1,12 @@
 div.productmatrix {
+	width:200px;
 }
 
 table.pvmproduct {
 	border: solid 1px #000;
 	margin-right: 2px;
 	float: left;
+	width:200px;
 }
 
 table.pvmproduct tr.pvmtoplevel td,
