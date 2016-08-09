@@ -447,11 +447,15 @@ class PVMProduct {
 			while( $t_row = db_fetch_array( $t_result ) ) {
 				$t_product_id = $t_row['product_id'];
 
-				if ( is_null( $p_products[ $t_product_id ]->projects ) ) {
-					$p_products[ $t_product_id ]->projects = array();
-				}
+				// Hide index missing warning for  missing product_id to array
+				if ( in_array($t_product_id, $p_products))
+				{
+					if ( is_null( $p_products[ $t_product_id ]->projects ) ) {
+						$p_products[ $t_product_id ]->projects = array();
+					}
 
-				$p_products[ $t_product_id ]->projects[] = $t_row['project_id'];
+					$p_products[ $t_product_id ]->projects[] = $t_row['project_id'];
+				}
 			}
 
 		} else {
