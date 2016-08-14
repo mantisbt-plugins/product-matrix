@@ -1360,7 +1360,7 @@ class ProductMatrix {
 		$t_status_colors = plugin_config_get( 'status_color' );
 		$t_status_default = $p_status_default === null ? 0 : $p_status_default;
 
-		echo '<tr ><td class="category">',
+		echo '<tr><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',
 			'<input type="hidden" name="ProductMatrix" value="1"/>';
 
