@@ -232,9 +232,9 @@ EOC;
 	function update_prefs_form( $p_event, $p_user_id ) {
 		$t_user_prefs = new PVMUserPrefs( $p_user_id );
 
-		echo '<tr ><td class="category">', plugin_lang_get( 'versions_sort_order' ),
-			'</td><td><input type="radio" name="version_order" value=', ASCENDING, ' ', check_checked( $t_user_prefs->version_order, ASCENDING ,false), '/>Ascending',
-			'<input type="radio" name="version_order" value=', DESCENDING, ' ',  check_checked( $t_user_prefs->version_order, DESCENDING , false ), '/>Descending</td></tr>';
+		echo '<div class="field-container"><label><span>', plugin_lang_get( 'versions_sort_order' ),
+			'</span></label><span class="radio"><input type="radio" name="version_order" value=', ASCENDING, ' ', check_checked( $t_user_prefs->version_order, ASCENDING ,false), '/>Ascending',
+			'<input type="radio" name="version_order" value=', DESCENDING, ' ',  check_checked( $t_user_prefs->version_order, DESCENDING , false ), '/>Descending</span><span class="label-style"></span></div>';
 	}
 
 	function update_prefs( $p_event, $p_user_id ) {
