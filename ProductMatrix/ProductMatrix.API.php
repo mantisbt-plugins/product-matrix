@@ -1293,7 +1293,7 @@ class ProductMatrix {
 			if( $t_product_status ) {
 				echo '<td',
 					$t_product->top_status ? ' bgcolor=' . $t_status_colors[$t_product->top_status] : '', '>',
-					 $t_status_array[$t_product->top_status];
+					 in_array($t_product->top_status,$t_status_array) ?$t_status_array[$t_product->top_status]:'N/A';
 			} else {
 				echo '<td>';
 			}
