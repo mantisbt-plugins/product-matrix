@@ -26,7 +26,7 @@ html_page_top2();
 <form action="<?php echo plugin_page( 'product_update' ) ?>" method="post"/>
 <?php echo form_security_field( 'ProductMatrix_product_update' ) ?>
 <input type="hidden" name="product_id" value="<?php echo $t_product->id ?>"/>
-
+<div class="table-container">
 <table class="productmatrix width90" align="center" cellspacing="1">
 
 <tr>
@@ -43,7 +43,7 @@ html_page_top2();
 </tr>
 
 <?php foreach( $t_product->platforms as $t_platform ) { ?>
-<tr <?php echo helper_alternate_class() ?>>
+<tr>
 <td colspan="2">
 	<input name="platform_<?php echo $t_platform->id ?>_name" value="<?php echo $t_platform->name ?>" size="15"/>
 </td>
@@ -73,7 +73,7 @@ html_page_top2();
 </tr>
 
 <?php foreach( $t_product->version_tree_list() as $t_node ) { list( $t_version, $t_depth ) = $t_node; ?>
-<tr <?php echo helper_alternate_class() ?>>
+<tr>
 <td><?php echo str_pad( '', $t_depth, '-' ), ' <input name="version_', $t_version->id, '_name" value="', $t_version->name, '" size="10"/>' ?></td>
 
 <td class="center <?php echo $t_version->released ? 'PVMreleased' : '' ?>">
@@ -111,6 +111,7 @@ html_page_top2();
 </tr>
 
 </table>
+</div>
 </form>
 
 <?php
