@@ -23,7 +23,7 @@ function PRM_product_get_name( $p_product_id ){
 
 	$t_query = "SELECT * FROM $t_product_tbl WHERE id=" . db_param();
 
-	$t_result = db_query_bound( $t_query, array( $p_product_id ) );
+	$t_result = db_query( $t_query, array( $p_product_id ) );
 	$t_row = db_fetch_array( $t_result );
 
 	return $t_row['name'];
@@ -38,7 +38,7 @@ function PRM_product_get_all_rows(){
 	$t_product_tbl = plugin_table( 'product', 'ProductMatrix' );
 
 	$t_query = "SELECT * FROM $t_product_tbl";
-	$t_result = db_query_bound( $t_query );
+	$t_result = db_query( $t_query );
 
 	$t_products = array();
 
@@ -69,7 +69,7 @@ function PRM_product_version_get_all_rows( $p_product_id ) {
 	$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
 	$t_query = "SELECT * FROM $t_version_table WHERE product_id=" . db_param();
-	$t_result = db_query_bound( $t_query, array( $p_product_id ) );
+	$t_result = db_query( $t_query, array( $p_product_id ) );
 	$t_count = db_num_rows( $t_result );
 
 	$t_rows = array();
@@ -118,7 +118,7 @@ function PRM_print_version_header( $p_version_name, $p_product_id, $p_href_page=
  * @return db query results
  */
 function PRM_roadmap_query( $p_version, $p_product_id ) {
-	$t_bug_tbl	= db_get_table( 'mantis_bug_table' );
+	$t_bug_tbl	= db_get_table( 'bug' );
 	$t_status_tbl = plugin_table( 'status', 'ProductMatrix' );
 	$t_version_tbl = plugin_table( 'version', 'ProductMatrix' );
 
@@ -130,7 +130,7 @@ function PRM_roadmap_query( $p_version, $p_product_id ) {
 				' AND version.product_id=' . db_param() .
 				' ORDER BY bug.id DESC';
 
-	$t_result = db_query_bound( $t_query, array( $p_version, $p_product_id ) );
+	$t_result = db_query( $t_query, array( $p_version, $p_product_id ) );
 	return $t_result;
 }
 
@@ -148,7 +148,7 @@ function PRM_changelog_query( $p_version, $p_product_id ) {
 				' AND status.status <=' . config_get( 'bug_resolved_status_threshold' ) .
 				' ORDER BY bug.id DESC';
 
-	$t_result = db_query_bound( $t_query, array( $p_version, $p_product_id ) );
+	$t_result = db_query( $t_query, array( $p_version, $p_product_id ) );
 	return $t_result;
 }
 

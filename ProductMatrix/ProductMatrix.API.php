@@ -75,7 +75,7 @@ class PVMUserPrefs {
 
 		$t_user_table = plugin_table( 'user', 'ProductMatrix' );
 		$t_query = "SELECT * FROM $t_user_table WHERE user_id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_user_id ) );
+		$t_result = db_query( $t_query, array( $p_user_id ) );
 
 		if ( db_num_rows ( $t_result ) < 1 ) {
 			$this->version_order = ASCENDING;
@@ -91,14 +91,14 @@ class PVMUserPrefs {
 	function save() {
 		$t_user_table = plugin_table( 'user', 'ProductMatrix' );
 		$t_query = "SELECT * FROM $t_user_table WHERE user_id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $this->user_id ) );
+		$t_result = db_query( $t_query, array( $this->user_id ) );
 
 		if ( db_num_rows ( $t_result ) < 1 ) {
 			$t_query = "INSERT INTO $t_user_table ( user_id, version_order ) VALUES ( " . db_param() . ', ' . db_param() . ' )';
-			db_query_bound ( $t_query, array( $this->user_id, $this->version_order ) );
+			db_query ( $t_query, array( $this->user_id, $this->version_order ) );
 		} else {
 			$t_query = "UPDATE $t_user_table SET version_order=" . db_param() . ' WHERE user_id=' . db_param();
-			db_query_bound ( $t_query, array( $this->version_order, $this->user_id ) );
+			db_query ( $t_query, array( $this->version_order, $this->user_id ) );
 		}
 	}
 }
@@ -142,14 +142,14 @@ class PVMProduct {
 		if ( 0 == $this->id ) { #create
 			$t_query = "INSERT INTO $t_product_table ( name ) VALUES (" .
 				db_param() . ')';
-			db_query_bound( $t_query, array( $this->name ) );
+			db_query( $t_query, array( $this->name ) );
 
 			$this->id = db_insert_id( $t_product_table );
 
 		} else { #update
 			$t_query = "UPDATE $t_product_table SET name=" . db_param() .
 				' WHERE id=' . db_param();
-			db_query_bound( $t_query, array( $this->name, $this->id ) );
+			db_query( $t_query, array( $this->name, $this->id ) );
 		}
 
 		foreach( $this->versions as $t_version ) {
@@ -171,7 +171,7 @@ class PVMProduct {
 		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
 
 		$t_query = "DELETE FROM $t_project_table WHERE product_id=" . db_param();
-		db_query_bound( $t_query, array( $this->id ) );
+		db_query( $t_query, array( $this->id ) );
 
 		if ( is_array( $this->projects ) ) {
 			$t_query = "INSERT INTO $t_project_table (product_id, project_id) VALUES ";
@@ -185,7 +185,7 @@ class PVMProduct {
 			}
 
 			$t_query .= implode( ', ', $t_values );
-			db_query_bound( $t_query, $t_params );
+			db_query( $t_query, $t_params );
 		}
 	}
 
@@ -294,7 +294,7 @@ class PVMProduct {
 		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
 
 		$t_query = "SELECT * FROM $t_product_table WHERE id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_id ) );
+		$t_result = db_query( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
 			plugin_error( 'ProductNotFound', ERROR, 'ProductMatrix' );
@@ -325,7 +325,7 @@ class PVMProduct {
 		$t_product_table = plugin_table( 'product', 'ProductMatrix' );
 
 		$t_query = "SELECT * FROM $t_product_table";
-		$t_result = db_query_bound( $t_query );
+		$t_result = db_query( $t_query );
 
 		$t_products = array();
 		while( $t_row = db_fetch_array( $t_result ) ) {
@@ -361,7 +361,7 @@ class PVMProduct {
 		$t_query = "SELECT $t_product_table.* FROM $t_product_table
 			LEFT JOIN $t_project_table ON $t_product_table.id=$t_project_table.product_id
 			WHERE $t_project_table.project_id IS NULL OR $t_project_table.project_id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_project_id ) );
+		$t_result = db_query( $t_query, array( $p_project_id ) );
 
 		$t_products = array();
 		while( $t_row = db_fetch_array( $t_result ) ) {
@@ -418,7 +418,7 @@ class PVMProduct {
 		$t_query = "SELECT DISTINCT( p.id ), p.name FROM $t_product_table AS p
 			JOIN $t_version_table AS v ON p.id=v.product_id
 			WHERE v.id IN ( $t_version_list )";
-		$t_result = db_query_bound( $t_query );
+		$t_result = db_query( $t_query );
 
 		$t_products = array();
 		while( $t_row = db_fetch_array( $t_result ) ) {
@@ -442,21 +442,25 @@ class PVMProduct {
 
 		if ( is_array( $p_products ) ) {
 			$t_query = "SELECT product_id, project_id FROM $t_project_table";
-			$t_result = db_query_bound( $t_query );
+			$t_result = db_query( $t_query );
 
 			while( $t_row = db_fetch_array( $t_result ) ) {
 				$t_product_id = $t_row['product_id'];
 
-				if ( is_null( $p_products[ $t_product_id ]->projects ) ) {
-					$p_products[ $t_product_id ]->projects = array();
-				}
+				// Hide index missing warning for  missing product_id to array
+				if ( in_array($t_product_id, $p_products))
+				{
+					if ( is_null( $p_products[ $t_product_id ]->projects ) ) {
+						$p_products[ $t_product_id ]->projects = array();
+					}
 
-				$p_products[ $t_product_id ]->projects[] = $t_row['project_id'];
+					$p_products[ $t_product_id ]->projects[] = $t_row['project_id'];
+				}
 			}
 
 		} else {
 			$t_query = "SELECT project_id FROM $t_project_table WHERE product_id=" . db_param();
-			$t_result = db_query_bound( $t_query, array( $p_products->id ) );
+			$t_result = db_query( $t_query, array( $p_products->id ) );
 
 			if ( db_num_rows( $t_result ) > 0 ) {
 				$p_products->projects = array();
@@ -480,10 +484,10 @@ class PVMProduct {
 		$t_project_table = plugin_table( 'product_projects', 'ProductMatrix' );
 
 		$t_query = "DELETE FROM $t_project_table WHERE product_id=" . db_param();
-		db_query_bound( $t_query, array( $p_id ) );
+		db_query( $t_query, array( $p_id ) );
 
 		$t_query = "DELETE FROM $t_product_table WHERE id=" . db_param();
-		db_query_bound( $t_query, array( $p_id ) );
+		db_query( $t_query, array( $p_id ) );
 	}
 
 	/**
@@ -559,7 +563,7 @@ class PVMPlatform {
 					db_param() . ',' .
 					db_param() .
 				')';
-			db_query_bound( $t_query, array(
+			db_query( $t_query, array(
 				$this->product_id,
 				$this->name,
 				$this->obsolete
@@ -573,7 +577,7 @@ class PVMPlatform {
 					name=' . db_param() . ',
 					obsolete=' . db_param() . '
 				WHERE id=' . db_param();
-			db_query_bound( $t_query, array(
+			db_query( $t_query, array(
 				$this->product_id,
 				$this->name,
 				$this->obsolete,
@@ -591,7 +595,7 @@ class PVMPlatform {
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
 
 		$t_query = "SELECT * FROM $t_platform_table WHERE id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_id ) );
+		$t_result = db_query( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
 			plugin_error( 'PlatformNotFound', ERROR, 'ProductMatrix' );
@@ -616,7 +620,7 @@ class PVMPlatform {
 		$t_platform_table = plugin_table( 'platform', 'ProductMatrix' );
 
 		$t_query = "SELECT * FROM $t_platform_table WHERE product_id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_product_id ) );
+		$t_result = db_query( $t_query, array( $p_product_id ) );
 
 		$t_platforms = array();
 		while( $t_row = db_fetch_array( $t_result ) ) {
@@ -641,10 +645,10 @@ class PVMPlatform {
 		$t_affects_table = plugin_table( 'affects', 'ProductMatrix' );
 
 		$t_query = "DELETE FROM $t_affects_table WHERE platform_id=" . db_param();
-		db_query_bound( $t_query, array( $p_id ) );
+		db_query( $t_query, array( $p_id ) );
 
 		$t_query = "DELETE FROM $t_platform_table WHERE id=" . db_param();
-		db_query_bound( $t_query, array( $p_id ) );
+		db_query( $t_query, array( $p_id ) );
 	}
 
 	/**
@@ -662,11 +666,11 @@ class PVMPlatform {
 		if( !empty( $t_platform_ids ) ) {
 			$t_query = "DELETE FROM $t_affects_table WHERE platform_id IN (" .
 				join( ',', $t_platform_ids ) . ' )';
-			db_query_bound( $t_query );
+			db_query( $t_query );
 		}
 
 		$t_query = "DELETE FROM $t_platform_table WHERE product_id=" . db_param();
-		db_query_bound( $t_query, array( $p_product_id ) );
+		db_query( $t_query, array( $p_product_id ) );
 	}
 }
 
@@ -729,7 +733,7 @@ class PVMVersion {
 					db_param() . ',' .
 					db_param() .
 				')';
-			db_query_bound( $t_query, array(
+			db_query( $t_query, array(
 				$this->parent_id,
 				$this->inherit_id,
 				$this->product_id,
@@ -747,7 +751,7 @@ class PVMVersion {
 					SELECT bug_id, " . db_param() . ", status
 					FROM $t_status_table WHERE version_id=" . db_param()
 					. " and status < 60";
-				db_query_bound( $t_query, array( $this->id, $this->migrate_id ) );
+				db_query( $t_query, array( $this->id, $this->migrate_id ) );
 			}
 
 		} else { #update
@@ -760,7 +764,7 @@ class PVMVersion {
 					released=' . db_param() . ',
 					obsolete=' . db_param() . '
 				WHERE id=' . db_param();
-			db_query_bound( $t_query, array(
+			db_query( $t_query, array(
 				$this->parent_id,
 				$this->inherit_id,
 				$this->product_id,
@@ -782,7 +786,7 @@ class PVMVersion {
 		$t_version_table = plugin_table( 'version', 'ProductMatrix' );
 
 		$t_query = "SELECT * FROM $t_version_table WHERE id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_id ) );
+		$t_result = db_query( $t_query, array( $p_id ) );
 
 		if ( db_num_rows( $t_result ) < 1 ) {
 			plugin_error( 'VersionNotFound', ERROR, 'ProductMatrix' );
@@ -811,7 +815,7 @@ class PVMVersion {
 		$t_user_prefs = new PVMUserPrefs();
 
 		$t_query = "SELECT * FROM $t_version_table WHERE product_id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_product_id ) );
+		$t_result = db_query( $t_query, array( $p_product_id ) );
 
 		$t_versions = array();
 		while( $t_row = db_fetch_array( $t_result ) ) {
@@ -843,10 +847,10 @@ class PVMVersion {
 		$t_status_table = plugin_table( 'status', 'ProductMatrix' );
 
 		$t_query = "DELETE FROM $t_status_table WHERE version_id=" . db_param();
-		db_query_bound( $t_query, array( $p_id ) );
+		db_query( $t_query, array( $p_id ) );
 
 		$t_query = "DELETE FROM $t_version_table WHERE id=" . db_param();
-		db_query_bound( $t_query, array( $p_id ) );
+		db_query( $t_query, array( $p_id ) );
 	}
 
 	/**
@@ -864,11 +868,11 @@ class PVMVersion {
 		if( !empty($t_version_ids ) ) {
 			$t_query = "DELETE FROM $t_status_table WHERE version_id IN (" .
 				join( ',', $t_version_ids ) . ' )';
-			db_query_bound( $t_query );
+			db_query( $t_query );
 		}
 
 		$t_query = "DELETE FROM $t_version_table WHERE product_id=" . db_param();
-		db_query_bound( $t_query, array( $p_product_id ) );
+		db_query( $t_query, array( $p_product_id ) );
 	}
 }
 
@@ -916,7 +920,7 @@ class ProductMatrix {
 		$t_affects_table = plugin_table( 'affects' );
 
 		$t_query = "SELECT * FROM $t_status_table WHERE bug_id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
+		$t_result = db_query( $t_query, array( $p_bug_id ) );
 
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$this->status[ $t_row['version_id'] ] = $t_row['status'];
@@ -924,7 +928,7 @@ class ProductMatrix {
 		}
 
 		$t_query = "SELECT * FROM $t_affects_table WHERE bug_id=" . db_param();
-		$t_result = db_query_bound( $t_query, array( $p_bug_id ) );
+		$t_result = db_query( $t_query, array( $p_bug_id ) );
 
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$this->affects[ $t_row['product_id'] ][ $t_row['platform_id'] ] = true;
@@ -952,14 +956,14 @@ class ProductMatrix {
 			if ( !isset( $this->__status[ $t_version_id ] ) ) { # new status
 				$t_query = "INSERT INTO $t_status_table ( bug_id, version_id, status )
 					VALUES ( " . join( ',', array( db_param(), db_param(), db_param() ) ) . ' )';
-				db_query_bound( $t_query, array( $this->bug_id, $t_version_id, $t_status ) );
+				db_query( $t_query, array( $this->bug_id, $t_version_id, $t_status ) );
 
 				$this->history_log_version( $t_version_id, null, $t_status );
 				$this->__status[ $t_version_id ] = $t_status;
 
 			} else if ( is_null( $t_status ) ) { # deleted status
 				$t_query = "DELETE FROM $t_status_table WHERE bug_id=" . db_param() . ' AND version_id=' . db_param();
-				db_query_bound( $t_query, array( $this->bug_id, $t_version_id ) );
+				db_query( $t_query, array( $this->bug_id, $t_version_id ) );
 
 				$this->history_log_version( $t_version_id, $this->__status[ $t_version_id ], null );
 				unset( $this->status[ $t_version_id ] );
@@ -968,7 +972,7 @@ class ProductMatrix {
 			} else if ( $t_status != $this->__status[ $t_version_id ] ) { # updated status
 				$t_query = "UPDATE $t_status_table SET status=" . db_param() .
 					' WHERE bug_id=' . db_param() . ' AND version_id=' . db_param();
-				db_query_bound( $t_query, array( $t_status, $this->bug_id, $t_version_id ) );
+				db_query( $t_query, array( $t_status, $this->bug_id, $t_version_id ) );
 
 				$this->history_log_version( $t_version_id, $this->__status[ $t_version_id ], $t_status );
 				$this->__status[ $t_version_id ] = $t_status;
@@ -980,7 +984,7 @@ class ProductMatrix {
 				if ( !isset( $this->__affects[ $t_product_id ][ $t_platform_id ] ) ) { # new platform
 					$t_query = "INSERT INTO $t_affects_table ( bug_id, product_id, platform_id )
 						VALUES ( " . join( ',', array( db_param(), db_param(), db_param() ) ) . ' )';
-					db_query_bound( $t_query, array( $this->bug_id, $t_product_id, $t_platform_id ) );
+					db_query( $t_query, array( $this->bug_id, $t_product_id, $t_platform_id ) );
 
 					$this->history_log_platform( $t_product_id, $t_platform_id, true );
 					$this->__affects[ $t_product_id ][ $t_platform_id ] = true;
@@ -988,7 +992,7 @@ class ProductMatrix {
 				} else if ( false == $t_affected ) { # removed platform
 					$t_query = "DELETE FROM $t_affects_table WHERE bug_id=" . db_param() .
 						' AND product_id=' . db_param() . ' AND platform_id=' . db_param();
-					db_query_bound( $t_query, array( $this->bug_id, $t_product_id, $t_platform_id ) );
+					db_query( $t_query, array( $this->bug_id, $t_product_id, $t_platform_id ) );
 
 					$this->history_log_platform( $t_product_id, $t_platform_id, false );
 					unset( $this->affects[ $t_product_id ][ $t_platform_id ] );
@@ -1273,7 +1277,7 @@ class ProductMatrix {
 		}
 
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">',
+		echo '<tr><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">';
 
 		foreach( $this->products as $t_product ) {
@@ -1289,7 +1293,7 @@ class ProductMatrix {
 			if( $t_product_status ) {
 				echo '<td',
 					$t_product->top_status ? ' bgcolor=' . $t_status_colors[$t_product->top_status] : '', '>',
-					 $t_status_array[$t_product->top_status];
+					 in_array($t_product->top_status,$t_status_array) ?$t_status_array[$t_product->top_status]:'N/A';
 			} else {
 				echo '<td>';
 			}
@@ -1356,7 +1360,7 @@ class ProductMatrix {
 		$t_status_colors = plugin_config_get( 'status_color' );
 		$t_status_default = $p_status_default === null ? 0 : $p_status_default;
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">',
+		echo '<tr><td class="category">',
 			plugin_lang_get( 'product_status' ), '</td><td colspan="5"><div class="productmatrix">',
 			'<input type="hidden" name="ProductMatrix" value="1"/>';
 

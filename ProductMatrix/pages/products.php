@@ -21,56 +21,59 @@ html_page_top2();
 ?>
 
 <br/>
-<table class="width50" align="center" cellspacing="1">
+<div class="table-container width50">
+	<table class="" align="center" cellspacing="1">
 
-<tr>
-<td class="form-title">Products</td>
-<td class="right" colspan="3"><?php if ( $t_can_manage ) print_bracket_link( plugin_page( 'config_page' ), plugin_lang_get( 'configuration' ) ); ?></td>
-</tr>
+	<tr>
+	<td class="form-title">Products</td>
+	<td class="right" colspan="3"><?php if ( $t_can_manage ) print_bracket_link( plugin_page( 'config_page' ), plugin_lang_get( 'configuration' ) ); ?></td>
+	</tr>
 
-<tr class="row-category">
-<td>Name</td>
-<td>Versions</td>
-<td>Platforms</td>
-<td>Actions</td>
-</tr>
+	<tr class="row-category">
+	<td>Name</td>
+	<td>Versions</td>
+	<td>Platforms</td>
+	<td>Actions</td>
+	</tr>
 
-<?php foreach( $t_products as $t_product ) { ?>
-<tr <?php echo helper_alternate_class() ?>>
-<td class="center"><a href="<?php echo plugin_page( 'product_view' ), '&id=', $t_product->id ?>"><?php echo $t_product->name ?></a></td>
-<td class="center"><?php echo count( $t_product->versions ) ?></td>
-<td class="center"><?php echo count( $t_product->platforms ) ?></td>
-<td class="center">
-<?php
-	print_bracket_link( plugin_page( 'roadmap' ) . '&id=' . $t_product->id, plugin_lang_get( 'roadmap' ) );
-	print_bracket_link( plugin_page( 'change_log' ) . '&id=' . $t_product->id, plugin_lang_get( 'change_log' ) );
-?>
-</td>
-</tr>
-<?php } ?>
+	<?php foreach( $t_products as $t_product ) { ?>
+	<tr >
+	<td class="center"><a href="<?php echo plugin_page( 'product_view' ), '&id=', $t_product->id ?>"><?php echo $t_product->name ?></a></td>
+	<td class="center"><?php echo count( $t_product->versions ) ?></td>
+	<td class="center"><?php echo count( $t_product->platforms ) ?></td>
+	<td class="center">
+	<?php
+		print_bracket_link( plugin_page( 'roadmap' ) . '&id=' . $t_product->id, plugin_lang_get( 'roadmap' ) );
+		print_bracket_link( plugin_page( 'change_log' ) . '&id=' . $t_product->id, plugin_lang_get( 'change_log' ) );
+	?>
+	</td>
+	</tr>
+	<?php } ?>
 
-</table>
-
+	</table>
+</div>
 <?php if ( $t_can_manage ) { ?>
 <br/>
 <form method="post" action="<?php echo plugin_page( 'product_add' ) ?>">
 <?php echo form_security_field( 'ProductMatrix_product_add' ) ?>
-<table class="width50" align="center" cellspacing="1">
+<div class="table-container width50">
+	<table align="center" cellspacing="1">
 
-<tr>
-<td class="form-title" colspan="2">Add Product</td>
-</tr>
+	<tr>
+	<td class="form-title" colspan="2">Add Product</td>
+	</tr>
 
-<tr <?php echo helper_alternate_class() ?>>
-<td class="category">Name</td>
-<td><input name="product_name"/></td>
-</tr>
+	<tr 	>
+	<td class="category">Name</td>
+	<td><input name="product_name"/></td>
+	</tr>
 
-<tr>
-<td class="center" colspan="2"><input type="submit"/></td>
-</tr>
+	<tr>
+	<td class="center" colspan="2"><input type="submit"/></td>
+	</tr>
 
-</table>
+	</table>
+</div>
 </form>
 <?php } ?>
 

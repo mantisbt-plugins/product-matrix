@@ -118,7 +118,7 @@ class PVMVersionFilter extends MantisFilter {
 
 			$t_versions = array();
 			$t_query = "SELECT DISTINCT version_id FROM $t_status_table";
-			$t_result = db_query_bound( $t_query );
+			$t_result = db_query( $t_query );
 			while( $t_row = db_fetch_array( $t_result ) ) {
 				$t_versions[ $t_row['version_id'] ] = true;
 			}
@@ -257,7 +257,7 @@ class PVMStatusColumnFilter extends MantisFilter {
 
 			$t_versions = array();
 			$t_query = "SELECT DISTINCT version_id FROM $t_status_table";
-			$t_result = db_query_bound( $t_query );
+			$t_result = db_query( $t_query );
 			while( $t_row = db_fetch_array( $t_result ) ) {
 				$t_versions[ $t_row['version_id'] ] = true;
 			}

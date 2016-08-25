@@ -19,7 +19,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 		$this->version = '0.4';
 		$this->requires = array(
-			'MantisCore' => '1.2.0',
+			'MantisCore' => '1.3.0',
 		);
 		$this->uses = array(
 			'jQuery' => '1.3',
@@ -136,7 +136,7 @@ class ProductMatrixPlugin extends MantisPlugin {
 
 		$t_version_table = plugin_table( 'version' );
 		$t_query = "SELECT id, product_id, name FROM $t_version_table";
-		$t_result = db_query_bound( $t_query );
+		$t_result = db_query( $t_query );
 		while( $t_row = db_fetch_array( $t_result ) ) {
 			$t_names[ $t_row['id'] ] = $t_products[ $t_row['product_id'] ]->name . ' ' . $t_row['name'];
 		}
@@ -200,9 +200,9 @@ EOC;
 		}
 	}
 
-	function update_bug( $p_event, $p_bug_data, $p_bug_id ) {
-		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_bug_id ) ) {
-			$matrix = new ProductMatrix( $p_bug_id, false );
+	function update_bug( $p_event, $p_exiting_bug, $p_updated_bug ) {
+		if ( access_has_bug_level( plugin_config_get( 'update_threshold' ), $p_updated_bug->id ) ) {
+			$matrix = new ProductMatrix( $p_updated_bug->id, false );
 			$matrix->process_form();
 			$matrix->save( PVM_UPDATE );
 		}
@@ -232,9 +232,9 @@ EOC;
 	function update_prefs_form( $p_event, $p_user_id ) {
 		$t_user_prefs = new PVMUserPrefs( $p_user_id );
 
-		echo '<tr ', helper_alternate_class(), '><td class="category">', plugin_lang_get( 'versions_sort_order' ),
-			'</td><td><input type="radio" name="version_order" value=', ASCENDING, ' ', check_checked( $t_user_prefs->version_order, ASCENDING ), '/>Ascending',
-			'<input type="radio" name="version_order" value=', DESCENDING, ' ',  check_checked( $t_user_prefs->version_order, DESCENDING ), '/>Descending</td></tr>';
+		echo '<div class="field-container"><label><span>', plugin_lang_get( 'versions_sort_order' ),
+			'</span></label><span class="radio"><input type="radio" name="version_order" value=', ASCENDING, ' ', check_checked( $t_user_prefs->version_order, ASCENDING ,false), '/>Ascending',
+			'<input type="radio" name="version_order" value=', DESCENDING, ' ',  check_checked( $t_user_prefs->version_order, DESCENDING , false ), '/>Descending</span><span class="label-style"></span></div>';
 	}
 
 	function update_prefs( $p_event, $p_user_id ) {
